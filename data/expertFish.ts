@@ -1,0 +1,92 @@
+import { Fish } from "./fishTypes";
+
+export const expertFish: Fish[] = [
+  {
+    id: "discus",
+    commonName: "Discus",
+    pondCompatible: false,
+    scientificName: "Symphysodon",
+    category: "Expert",
+    lifespan: "10-15 Years",
+    size: "8 Inches",
+    temperature: "28°C - 31°C",
+    ph: "6.0 - 7.0",
+    tankSize: "50 Gallons",
+    temperament: "Peaceful",
+    diet: "Omnivore",
+    description:
+      "Discus fish require pristine water conditions and advanced care.",
+    image: "",
+  },
+
+  {
+    id: "arowana",
+    commonName: "Arowana",
+    pondCompatible: false,
+    scientificName: "Osteoglossidae",
+    category: "Expert",
+    lifespan: "15-20 Years",
+    size: "24-36 Inches",
+    temperature: "24°C - 30°C",
+    ph: "6.0 - 7.5",
+    tankSize: "180 Gallons",
+    temperament: "Aggressive",
+    diet: "Carnivore",
+    description:
+      "Arowanas are large predatory fish requiring spacious aquariums.",
+    image: "",
+  },
+
+  {
+    id: "flowerhorn",
+    commonName: "Flowerhorn",
+    pondCompatible: false,
+    scientificName: "Hybrid Cichlid",
+    category: "Expert",
+    lifespan: "10-12 Years",
+    size: "12-16 Inches",
+    temperature: "26°C - 30°C",
+    ph: "7.0 - 8.0",
+    tankSize: "75 Gallons",
+    temperament: "Aggressive",
+    diet: "Omnivore",
+    description:
+      "Flowerhorns are hybrid cichlids known for their vibrant colors and head hump.",
+    image: "",
+  },
+
+  {
+    id: "oscar",
+    commonName: "Oscar",
+    pondCompatible: false,
+    scientificName: "Astronotus ocellatus",
+    category: "Expert",
+    lifespan: "10-15 Years",
+    size: "12-14 Inches",
+    temperature: "24°C - 28°C",
+    ph: "6.5 - 7.5",
+    tankSize: "75 Gallons",
+    temperament: "Aggressive",
+    diet: "Omnivore",
+    description: "Oscars are intelligent cichlids with strong personalities.",
+    image: "",
+  },
+
+  {
+    id: "koi",
+    commonName: "Koi",
+    pondCompatible: true,
+    scientificName: "Cyprinus rubrofuscus",
+    category: "Expert",
+    lifespan: "20-30 Years",
+    size: "24-36 Inches",
+    temperature: "15°C - 25°C",
+    ph: "7.0 - 8.0",
+    tankSize: "Pond",
+    temperament: "Peaceful",
+    diet: "Omnivore",
+    description:
+      "Koi are ornamental carp prized for their beautiful color patterns.",
+    image: "",
+  },
+];

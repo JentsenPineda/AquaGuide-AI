@@ -1,148 +1,174 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
+  FlatList,
+  Image,
   Pressable,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
+import { fishImages } from "../data/fishImages";
 
 import { allFish } from "../data/allFish";
 
-export default function AquaPlants() {
+export default function AquaPlantScreen() {
+  const [search, setSearch] = useState("");
   const [selectedFish, setSelectedFish] = useState("goldfish");
 
+  const filteredFish = useMemo(() => {
+    return allFish.filter((fish) =>
+      fish.commonName.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [search]);
+
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+
+      <View style={styles.hero}>
+        <Text style={styles.logo}>🌿</Text>
+
+        <Text style={styles.title}>Aqua Plant Guide</Text>
+
+        <Text style={styles.subtitle}>
+          Find compatible aquatic plants for your ornamental fish.
+        </Text>
+      </View>
+
+      {/* Search */}
+
+      <TextInput
+        placeholder="Search fish species..."
+        placeholderTextColor="#7D8B99"
+        style={styles.search}
+        value={search}
+        onChangeText={setSearch}
+      />
+
+      {/* Fish Cards */}
+
+      <FlatList
+        data={filteredFish}
+        numColumns={2}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 150 }}
+        renderItem={({ item }) => (
+          <Pressable
+            onPress={() => setSelectedFish(item.id)}
+            style={[
+              styles.card,
+              selectedFish === item.id && styles.selectedCard,
+            ]}
+          >
+            <Image
+              source={fishImages[item.id as keyof typeof fishImages]}
+              style={styles.image}
+            />
+            <Text style={styles.cardTitle}>{item.commonName}</Text>
+          </Pressable>
+        )}
+      />
+
+      {/* Button */}
+
+      <Pressable
+        style={styles.button}
+        onPress={() =>
+          router.push({
+            pathname: "/plant-result",
+            params: {
+              fish: selectedFish,
+            },
+          })
+        }
       >
-        <View style={styles.hero}>
-          <Text style={styles.heroTitle}>🌿 Aqua Plant Guide</Text>
-
-          <Text style={styles.heroSubtitle}>
-            Discover aquatic plants compatible with your ornamental fish.
-          </Text>
-        </View>
-
-        <Text style={styles.sectionTitle}>Select Fish Species</Text>
-
-        <View style={styles.chipContainer}>
-          {allFish.map((fish) => (
-            <Pressable
-              key={fish.id}
-              onPress={() => setSelectedFish(fish.id)}
-              style={[
-                styles.chip,
-                selectedFish === fish.id && styles.activeChip,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.chipText,
-                  selectedFish === fish.id && styles.activeChipText,
-                ]}
-              >
-                {fish.commonName}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <Pressable
-          style={styles.generateButton}
-          onPress={() =>
-            router.push({
-              pathname: "/plant-result",
-              params: {
-                fish: selectedFish,
-              },
-            })
-          }
-        >
-          <Text style={styles.generateText}>Generate Compatible Plants</Text>
-        </Pressable>
-      </ScrollView>
+        <Text style={styles.buttonText}>Show Compatible Plants</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
+  container: {
     flex: 1,
     backgroundColor: "#08141F",
-  },
-
-  container: {
-    padding: 20,
+    padding: 16,
   },
 
   hero: {
-    backgroundColor: "#102331",
-    padding: 22,
-    borderRadius: 24,
+    alignItems: "center",
     marginBottom: 20,
   },
 
-  heroTitle: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "bold",
+  logo: {
+    fontSize: 40,
   },
 
-  heroSubtitle: {
-    color: "#B0BEC5",
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#FFFFFF",
     marginTop: 8,
   },
 
-  sectionTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 15,
+  subtitle: {
+    color: "#AAB7C2",
+    textAlign: "center",
+    marginTop: 8,
   },
 
-  chipContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-
-  chip: {
+  search: {
     backgroundColor: "#102331",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginRight: 8,
-    marginBottom: 8,
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    height: 55,
+    color: "#FFFFFF",
+    marginBottom: 18,
   },
 
-  activeChip: {
-    backgroundColor: "#00D4FF",
+  card: {
+    flex: 1,
+    backgroundColor: "#102331",
+    borderRadius: 18,
+    margin: 6,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "transparent",
   },
 
-  chipText: {
-    color: "#fff",
+  selectedCard: {
+    borderColor: "#00D4FF",
   },
 
-  activeChipText: {
-    color: "#08141F",
+  image: {
+    width: "100%",
+    height: 120,
+  },
+
+  cardTitle: {
+    color: "#FFFFFF",
+    textAlign: "center",
+    padding: 10,
     fontWeight: "700",
   },
 
-  generateButton: {
+  button: {
+    position: "absolute",
+    left: 16,
+    right: 16,
+    bottom: 20,
     backgroundColor: "#00D4FF",
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: 20,
+    paddingVertical: 18,
     alignItems: "center",
-    marginTop: 20,
   },
 
-  generateText: {
-    color: "#08141F",
+  buttonText: {
+    fontSize: 17,
     fontWeight: "800",
-    fontSize: 16,
+    color: "#08141F",
   },
 });

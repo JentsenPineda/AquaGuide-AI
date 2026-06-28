@@ -10,13 +10,13 @@ export const expertFish: Fish[] = [
     lifespan: "10-15 Years",
     size: "8 Inches",
     temperature: "28°C - 31°C",
-    ph: "6.0 - 7.0",
+    pH: "6.0 - 7.0",
     tankSize: "50 Gallons",
     temperament: "Peaceful",
     diet: "Omnivore",
     description:
       "Discus fish require pristine water conditions and advanced care.",
-    image: "",
+    image: require("../assets/images/discus/pigeon.png"),
   },
 
   {
@@ -28,13 +28,13 @@ export const expertFish: Fish[] = [
     lifespan: "15-20 Years",
     size: "24-36 Inches",
     temperature: "24°C - 30°C",
-    ph: "6.0 - 7.5",
+    pH: "6.0 - 7.5",
     tankSize: "180 Gallons",
     temperament: "Aggressive",
     diet: "Carnivore",
     description:
       "Arowanas are large predatory fish requiring spacious aquariums.",
-    image: "",
+    image: require("../assets/images/arowana/redtail.png"),
   },
 
   {
@@ -46,13 +46,13 @@ export const expertFish: Fish[] = [
     lifespan: "10-12 Years",
     size: "12-16 Inches",
     temperature: "26°C - 30°C",
-    ph: "7.0 - 8.0",
+    pH: "7.0 - 8.0",
     tankSize: "75 Gallons",
     temperament: "Aggressive",
     diet: "Omnivore",
     description:
       "Flowerhorns are hybrid cichlids known for their vibrant colors and head hump.",
-    image: "",
+    image: require("../assets/images/flowerhorn/zhenzhu.png"),
   },
 
   {
@@ -64,12 +64,12 @@ export const expertFish: Fish[] = [
     lifespan: "10-15 Years",
     size: "12-14 Inches",
     temperature: "24°C - 28°C",
-    ph: "6.5 - 7.5",
+    pH: "6.5 - 7.5",
     tankSize: "75 Gallons",
     temperament: "Aggressive",
     diet: "Omnivore",
     description: "Oscars are intelligent cichlids with strong personalities.",
-    image: "",
+    image: require("../assets/images/oscar/tiger.png"),
   },
 
   {
@@ -81,12 +81,12 @@ export const expertFish: Fish[] = [
     lifespan: "20-30 Years",
     size: "24-36 Inches",
     temperature: "15°C - 25°C",
-    ph: "7.0 - 8.0",
+    pH: "7.0 - 8.0",
     tankSize: "Pond",
     temperament: "Peaceful",
     diet: "Omnivore",
     description:
       "Koi are ornamental carp prized for their beautiful color patterns.",
-    image: "",
+    image: require("../assets/images/koi/kohaku.png"),
   },
 ];

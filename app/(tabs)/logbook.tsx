@@ -1,9 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-
 import {
   Alert,
   Modal,
@@ -15,7 +14,20 @@ import {
   TextInput,
   View,
 } from "react-native";
-
+import ReminderCard from "../../components/reminder/ReminderCard";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  addLog as addLogToFirestore,
+  deleteLog as deleteLogFromFirestore,
+  getLogs,
+  subscribeToLogs,
+} from "../../services/logbookService";
+import {
+  addReminder as addReminderToFirestore,
+  deleteReminder as deleteReminderFromFirestore,
+  getReminders,
+  subscribeToReminders,
+} from "../../services/reminderService";
 type LogItem = {
   id: string;
   type:
@@ -26,7 +38,7 @@ type LogItem = {
     | "New Fish Added"
     | "Tank Maintenance";
 
-  note: string;
+  note?: string;
   date: string;
 };
 
@@ -48,12 +60,11 @@ type ReminderItem = {
   monthDay?: number;
 
   time: string;
-  note: string;
+  note?: string;
 
   notificationId?: string;
 };
-const LOGS_KEY = "@aquaguide_logs";
-const REMINDERS_KEY = "@aquaguide_reminders";
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -63,6 +74,9 @@ Notifications.setNotificationHandler({
   }),
 });
 export default function LogbookScreen() {
+  const { user, loading, logout } = useAuth();
+  // ================= STATE =================
+
   const [logs, setLogs] = useState<LogItem[]>([]);
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
 
@@ -83,17 +97,44 @@ export default function LogbookScreen() {
   const [repeatType, setRepeatType] = useState<"Daily" | "Weekly" | "Monthly">(
     "Daily",
   );
+
   const [weekDay, setWeekDay] = useState("Sunday");
 
   const [monthDay, setMonthDay] = useState(1);
+
   const [showReminderForm, setShowReminderForm] = useState(false);
 
+  // Safe UID for Firestore calls
+  const uid = user?.uid ?? "";
+  console.log("USER:", user);
+  console.log("UID:", uid);
   // ================= LOAD DATA =================
 
   useEffect(() => {
-    loadData();
+    if (!user) return;
+
     requestNotificationPermission();
-  }, []);
+
+    loadData();
+
+    const unsubscribeLogs = subscribeToLogs(uid, (updatedLogs) => {
+      setLogs(updatedLogs);
+    });
+
+    const unsubscribeReminders = subscribeToReminders(
+      uid,
+      (updatedReminders) => {
+        console.log("Realtime reminders:", updatedReminders);
+
+        setReminders(updatedReminders);
+      },
+    );
+
+    return () => {
+      unsubscribeLogs();
+      unsubscribeReminders();
+    };
+  }, [uid]);
   const requestNotificationPermission = async () => {
     const { status } = await Notifications.requestPermissionsAsync();
 
@@ -105,63 +146,43 @@ export default function LogbookScreen() {
     }
   };
   const loadData = async () => {
+    if (!user) return;
+
     try {
-      const storedLogs = await AsyncStorage.getItem(LOGS_KEY);
+      const firestoreLogs = await getLogs(user.uid);
+      setLogs(firestoreLogs);
 
-      const storedReminders = await AsyncStorage.getItem(REMINDERS_KEY);
-
-      if (storedLogs) {
-        setLogs(JSON.parse(storedLogs));
-      }
-
-      if (storedReminders) {
-        setReminders(JSON.parse(storedReminders));
-      }
+      const firestoreReminders = await getReminders(user.uid);
+      setReminders(firestoreReminders);
     } catch (error) {
       console.log("Error loading data:", error);
     }
   };
-
   // ================= SAVE DATA =================
-
-  const saveLogs = async (updatedLogs: LogItem[]) => {
-    try {
-      await AsyncStorage.setItem(LOGS_KEY, JSON.stringify(updatedLogs));
-    } catch (error) {
-      console.log("Error saving logs:", error);
-    }
-  };
-
-  const saveReminders = async (updatedReminders: ReminderItem[]) => {
-    try {
-      await AsyncStorage.setItem(
-        REMINDERS_KEY,
-        JSON.stringify(updatedReminders),
-      );
-    } catch (error) {
-      console.log("Error saving reminders:", error);
-    }
-  };
 
   // ================= ADD LOG =================
 
   const addLog = async () => {
-    if (!logNote.trim()) return;
+    if (!user) {
+      Alert.alert("Login Required", "Please log in to add a log.");
+      return;
+    }
 
-    const newLog: LogItem = {
-      id: Date.now().toString(),
-      type: logType,
-      note: logNote,
-      date: new Date().toLocaleString(),
-    };
+    try {
+      const newLog: Omit<LogItem, "id"> = {
+        type: logType,
+        note: logNote,
+        date: selectedDate.toLocaleString(),
+      };
 
-    const updatedLogs = [newLog, ...logs];
+      await addLogToFirestore(user.uid, newLog);
 
-    setLogs(updatedLogs);
-
-    await saveLogs(updatedLogs);
-
-    setLogNote("");
+      setLogType("Feeding");
+      setLogNote("");
+    } catch (error) {
+      console.log("Error adding log:", error);
+      Alert.alert("Error", "Failed to save log.");
+    }
   };
 
   // ================= ADD REMINDER =================
@@ -239,7 +260,6 @@ export default function LogbookScreen() {
       weekDay: repeatType === "Weekly" ? weekDay : undefined,
 
       monthDay: repeatType === "Monthly" ? monthDay : undefined,
-
       notificationId,
 
       note: reminderNote,
@@ -250,11 +270,8 @@ export default function LogbookScreen() {
       }),
     };
 
-    const updatedReminders = [newReminder, ...reminders];
+    await addReminderToFirestore(uid, newReminder);
 
-    setReminders(updatedReminders);
-
-    await saveReminders(updatedReminders);
     setShowReminderForm(false);
 
     setReminderNote("");
@@ -269,12 +286,13 @@ export default function LogbookScreen() {
       );
     }
 
+    await deleteReminderFromFirestore(uid, id);
+
     const updatedReminders = reminders.filter((item) => item.id !== id);
 
     setReminders(updatedReminders);
-
-    await AsyncStorage.setItem(REMINDERS_KEY, JSON.stringify(updatedReminders));
   };
+
   const getLogIcon = (type: string) => {
     switch (type) {
       case "Feeding":
@@ -300,14 +318,13 @@ export default function LogbookScreen() {
     }
   };
   const deleteLog = async (id: string) => {
-    const updatedLogs = logs.filter((item) => item.id !== id);
+    if (!user) return;
 
-    setLogs(updatedLogs);
+    console.log("Deleting:", id);
 
-    await saveLogs(updatedLogs);
+    await deleteLogFromFirestore(user.uid, id);
   };
   const hour = new Date().getHours();
-
   const greeting =
     hour < 12
       ? "Good Morning ☀️"
@@ -342,9 +359,54 @@ export default function LogbookScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>🐟 AquaGuide AI</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <View>
+            <Text style={styles.title}>🐟 AquaGuide AI</Text>
+            <Text style={styles.subtitle}>
+              Your Personal Aquarium Assistant
+            </Text>
+          </View>
 
-        <Text style={styles.subtitle}>Your Personal Aquarium Assistant</Text>
+          <Pressable
+            onPress={() =>
+              Alert.alert("Logout", "Are you sure you want to logout?", [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Logout",
+                  style: "destructive",
+                  onPress: async () => {
+                    await logout();
+                    router.replace("/auth/login");
+                  },
+                },
+              ])
+            }
+            style={{
+              backgroundColor: "#FF6B6B",
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 10,
+            }}
+          >
+            <Text
+              style={{
+                color: "#FFF",
+                fontWeight: "700",
+              }}
+            >
+              Logout
+            </Text>
+          </Pressable>
+        </View>
         <View
           style={{
             backgroundColor: "rgba(0,212,255,0.08)",
@@ -650,36 +712,17 @@ export default function LogbookScreen() {
             <Text style={styles.emptyText}>No reminders yet.</Text>
           ) : (
             reminders.map((item) => (
-              <View key={item.id} style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardType}>
-                    {`${getReminderIcon(item.type)} ${item.type}`}
-                  </Text>
-                  <Pressable onPress={() => deleteReminder(item.id)}>
-                    <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
-                  </Pressable>
-                </View>
-
-                <Text style={styles.cardDate}>
-                  {item.repeat === "Daily"
-                    ? "🔁 Every Day"
-                    : item.repeat === "Weekly"
-                      ? `🔁 Every ${item.weekDay}`
-                      : `🔁 Every Month on Day ${item.monthDay}`}
-                </Text>
-
-                <Text style={styles.cardDate}>🕒 {item.time}</Text>
-                {item.note ? (
-                  <Text
-                    style={{
-                      color: "#B0BEC5",
-                      marginTop: 4,
-                    }}
-                  >
-                    {item.note}
-                  </Text>
-                ) : null}
-              </View>
+              <ReminderCard
+                key={item.id}
+                id={item.id}
+                type={item.type}
+                repeat={item.repeat}
+                weekDay={item.weekDay}
+                monthDay={item.monthDay}
+                time={item.time}
+                note={item.note}
+                onDelete={deleteReminder}
+              />
             ))
           )}
         </View>

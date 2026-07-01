@@ -1,12 +1,12 @@
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDocs,
-    onSnapshot,
-    orderBy,
-    query,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
@@ -46,14 +46,22 @@ export const subscribeToLogs = (
     orderBy("date", "desc"),
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const logs = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<LogItem, "id">),
-    }));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const logs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<LogItem, "id">),
+      }));
 
-    callback(logs);
-  });
+      callback(logs);
+    },
+    (error) => {
+      if (error.code !== "permission-denied") {
+        console.error(error);
+      }
+    },
+  );
 };
 
 export const addLog = async (

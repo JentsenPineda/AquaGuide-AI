@@ -2,15 +2,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { loginUser } from "../../services/authService";
 
@@ -40,7 +40,7 @@ export default function LoginScreen() {
 
       Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`);
 
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/logbook");
     } catch (error: any) {
       let message = "Unable to login.";
 

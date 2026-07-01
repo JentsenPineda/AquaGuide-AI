@@ -14,18 +14,17 @@ import {
   TextInput,
   View,
 } from "react-native";
+import LoginRequired from "../../components/LoginRequired";
 import ReminderCard from "../../components/reminder/ReminderCard";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   addLog as addLogToFirestore,
   deleteLog as deleteLogFromFirestore,
-  getLogs,
   subscribeToLogs,
 } from "../../services/logbookService";
 import {
   addReminder as addReminderToFirestore,
   deleteReminder as deleteReminderFromFirestore,
-  getReminders,
   subscribeToReminders,
 } from "../../services/reminderService";
 type LogItem = {
@@ -75,6 +74,7 @@ Notifications.setNotificationHandler({
 });
 export default function LogbookScreen() {
   const { user, loading, logout } = useAuth();
+
   // ================= STATE =================
 
   const [logs, setLogs] = useState<LogItem[]>([]);
@@ -104,28 +104,20 @@ export default function LogbookScreen() {
 
   const [showReminderForm, setShowReminderForm] = useState(false);
 
-  // Safe UID for Firestore calls
-  const uid = user?.uid ?? "";
-  console.log("USER:", user);
-  console.log("UID:", uid);
   // ================= LOAD DATA =================
 
   useEffect(() => {
-    if (!user) return;
+    if (!user?.uid) return;
 
     requestNotificationPermission();
 
-    loadData();
-
-    const unsubscribeLogs = subscribeToLogs(uid, (updatedLogs) => {
+    const unsubscribeLogs = subscribeToLogs(user.uid, (updatedLogs) => {
       setLogs(updatedLogs);
     });
 
     const unsubscribeReminders = subscribeToReminders(
-      uid,
+      user.uid,
       (updatedReminders) => {
-        console.log("Realtime reminders:", updatedReminders);
-
         setReminders(updatedReminders);
       },
     );
@@ -134,7 +126,7 @@ export default function LogbookScreen() {
       unsubscribeLogs();
       unsubscribeReminders();
     };
-  }, [uid]);
+  }, [user?.uid]);
   const requestNotificationPermission = async () => {
     const { status } = await Notifications.requestPermissionsAsync();
 
@@ -145,19 +137,7 @@ export default function LogbookScreen() {
       );
     }
   };
-  const loadData = async () => {
-    if (!user) return;
 
-    try {
-      const firestoreLogs = await getLogs(user.uid);
-      setLogs(firestoreLogs);
-
-      const firestoreReminders = await getReminders(user.uid);
-      setReminders(firestoreReminders);
-    } catch (error) {
-      console.log("Error loading data:", error);
-    }
-  };
   // ================= SAVE DATA =================
 
   // ================= ADD LOG =================
@@ -250,47 +230,44 @@ export default function LogbookScreen() {
       selectedDate,
     );
 
-    const newReminder: ReminderItem = {
-      id: Date.now().toString(),
+    if (!user) return;
 
+    await addReminderToFirestore(user.uid, {
       type: reminderType,
-
       repeat: repeatType,
-
       weekDay: repeatType === "Weekly" ? weekDay : undefined,
-
       monthDay: repeatType === "Monthly" ? monthDay : undefined,
       notificationId,
-
       note: reminderNote,
-
       time: selectedDate.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
-    };
-
-    await addReminderToFirestore(uid, newReminder);
+    });
 
     setShowReminderForm(false);
-
     setReminderNote("");
   };
 
   const deleteReminder = async (id: string) => {
-    const reminder = reminders.find((r) => r.id === id);
+    try {
+      console.log("Deleting reminder id:", id);
 
-    if (reminder?.notificationId) {
-      await Notifications.cancelScheduledNotificationAsync(
-        reminder.notificationId,
-      );
+      const reminder = reminders.find((r) => r.id === id);
+
+      if (reminder?.notificationId) {
+        await Notifications.cancelScheduledNotificationAsync(
+          reminder.notificationId,
+        );
+      }
+
+      if (!user) return;
+
+      await deleteReminderFromFirestore(user.uid, id);
+      console.log("Reminder deleted successfully.");
+    } catch (error) {
+      console.log("DELETE ERROR:", error);
     }
-
-    await deleteReminderFromFirestore(uid, id);
-
-    const updatedReminders = reminders.filter((item) => item.id !== id);
-
-    setReminders(updatedReminders);
   };
 
   const getLogIcon = (type: string) => {
@@ -356,484 +333,502 @@ export default function LogbookScreen() {
         return "📌";
     }
   };
+  if (!user) {
+    return <LoginRequired />;
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View>
-            <Text style={styles.title}>🐟 AquaGuide AI</Text>
-            <Text style={styles.subtitle}>
-              Your Personal Aquarium Assistant
-            </Text>
-          </View>
-
-          <Pressable
-            onPress={() =>
-              Alert.alert("Logout", "Are you sure you want to logout?", [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Logout",
-                  style: "destructive",
-                  onPress: async () => {
-                    await logout();
-                    router.replace("/auth/login");
-                  },
-                },
-              ])
-            }
+        <>
+          <View
             style={{
-              backgroundColor: "#FF6B6B",
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              borderRadius: 10,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <View>
+              <Text style={styles.title}>
+                👋 Welcome, {user?.displayName || "Aquarist"}
+              </Text>
+
+              <Text style={styles.subtitle}>{user?.email}</Text>
+            </View>
+
+            <Pressable
+              onPress={() =>
+                Alert.alert("Logout", "Are you sure you want to logout?", [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Logout",
+                    style: "destructive",
+                    onPress: async () => {
+                      await logout();
+                      router.replace("/(tabs)/logbook");
+                    },
+                  },
+                ])
+              }
+              style={{
+                backgroundColor: "#FF6B6B",
+                paddingHorizontal: 14,
+                paddingVertical: 8,
+                borderRadius: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: "#FFF",
+                  fontWeight: "700",
+                }}
+              >
+                Logout
+              </Text>
+            </Pressable>
+          </View>
+          <View
+            style={{
+              backgroundColor: "rgba(0,212,255,0.08)",
+              borderRadius: 18,
+              padding: 16,
+              marginTop: 20,
+              borderWidth: 1,
+              borderColor: "rgba(0,212,255,0.2)",
             }}
           >
             <Text
               style={{
-                color: "#FFF",
+                color: "#FFFFFF",
+                fontSize: 18,
                 fontWeight: "700",
+                marginBottom: 8,
               }}
             >
-              Logout
+              {greeting}
             </Text>
-          </Pressable>
-        </View>
-        <View
-          style={{
-            backgroundColor: "rgba(0,212,255,0.08)",
-            borderRadius: 18,
-            padding: 16,
-            marginTop: 20,
-            borderWidth: 1,
-            borderColor: "rgba(0,212,255,0.2)",
-          }}
-        >
-          <Text
-            style={{
-              color: "#FFFFFF",
-              fontSize: 18,
-              fontWeight: "700",
-              marginBottom: 8,
-            }}
-          >
-            {greeting}
-          </Text>
 
-          <Text
-            style={{
-              color: "rgba(255,255,255,0.8)",
-              lineHeight: 22,
-            }}
-          >
-            Welcome back to AquaGuide AI.
-            {"\n"}
-            Monitor your fish, track care activities, and never miss an
-            important reminder.
-          </Text>
-        </View>
-
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{logs.length}</Text>
-            <Text style={styles.statLabel}>📖 Care Logs</Text>
+            <Text
+              style={{
+                color: "rgba(255,255,255,0.8)",
+                lineHeight: 22,
+              }}
+            >
+              Welcome back to AquaGuide AI.
+              {"\n"}
+              Monitor your fish, track care activities, and never miss an
+              important reminder.
+            </Text>
           </View>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{reminders.length}</Text>
-            <Text style={styles.statLabel}>⏰ Active Reminders</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{logs.length}</Text>
+              <Text style={styles.statLabel}>📖 Care Logs</Text>
+            </View>
+
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{reminders.length}</Text>
+              <Text style={styles.statLabel}>⏰ Active Reminders</Text>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📋 Today's Tasks</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>📋 Today's Tasks</Text>
 
-          {reminders.length === 0 ? (
-            <Text style={styles.emptyText}>No tasks for today.</Text>
-          ) : (
-            reminders.slice(0, 3).map((item) => (
+            {reminders.length === 0 ? (
+              <Text style={styles.emptyText}>No tasks for today.</Text>
+            ) : (
+              reminders.slice(0, 3).map((item) => (
+                <View
+                  key={item.id}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={{
+                        color: "#FFF",
+                        fontWeight: "700",
+                      }}
+                    >
+                      {item.type}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: "#B0BEC5",
+                      }}
+                    >
+                      {item.time}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      backgroundColor: "rgba(0,212,255,0.15)",
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 999,
+                    }}
+                  >
+                    <Pressable
+                      style={{
+                        backgroundColor: "#00D4FF",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 999,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "#000",
+                          fontWeight: "800",
+                          fontSize: 12,
+                        }}
+                      >
+                        Complete
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
+
+          {/* REMINDERS */}
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="alarm-outline" size={18} color="#fff" />
+
               <View
-                key={item.id}
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  flex: 1,
                 }}
               >
-                <View>
-                  <Text
-                    style={{
-                      color: "#FFF",
-                      fontWeight: "700",
-                    }}
-                  >
-                    {item.type}
-                  </Text>
+                <Text style={styles.sectionTitle}>Reminders</Text>
 
-                  <Text
-                    style={{
-                      color: "#B0BEC5",
-                    }}
-                  >
-                    {item.time}
-                  </Text>
-                </View>
-
-                <View
-                  style={{
-                    backgroundColor: "rgba(0,212,255,0.15)",
-                    paddingHorizontal: 10,
-                    paddingVertical: 4,
-                    borderRadius: 999,
-                  }}
-                >
-                  <Pressable
-                    style={{
-                      backgroundColor: "#00D4FF",
-                      paddingHorizontal: 12,
-                      paddingVertical: 8,
-                      borderRadius: 999,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#000",
-                        fontWeight: "800",
-                        fontSize: 12,
-                      }}
-                    >
-                      Complete
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-            ))
-          )}
-        </View>
-
-        {/* REMINDERS */}
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="alarm-outline" size={18} color="#fff" />
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flex: 1,
-              }}
-            >
-              <Text style={styles.sectionTitle}>Reminders</Text>
-
-              <Pressable
-                style={styles.createReminderBtn}
-                onPress={() => setShowReminderForm(!showReminderForm)}
-              >
-                <Ionicons name="add" size={18} color="#000" />
-                <Text style={styles.createReminderText}>Create Reminder</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          {showReminderForm && (
-            <>
-              <View style={styles.typeRow}>
-                {[
-                  "Feeding",
-                  "Water Change",
-                  "Water Testing",
-                  "Medication",
-                  "Tank Cleaning",
-                  "Plant Maintenance",
-                ].map((type) => (
-                  <Pressable
-                    key={type}
-                    onPress={() => {
-                      setReminderType(type as ReminderType);
-
-                      if (type === "Feeding") {
-                        setRepeatType("Daily");
-                      }
-
-                      if (type === "Water Change" || type === "Water Testing") {
-                        setRepeatType("Weekly");
-                      }
-
-                      if (type === "Tank Cleaning") {
-                        setRepeatType("Monthly");
-                      }
-                    }}
-                    style={[
-                      styles.typeBtn,
-                      reminderType === type && styles.typeActive,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.typeText,
-                        reminderType === type && styles.typeTextActive,
-                      ]}
-                    >
-                      {type}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              <TextInput
-                value={reminderNote}
-                onChangeText={setReminderNote}
-                placeholder="Optional note..."
-                placeholderTextColor="rgba(255,255,255,0.5)"
-                style={styles.input}
-              />
-
-              <View style={styles.typeRow}>
-                {["Daily", "Weekly", "Monthly"].map((item) => (
-                  <Pressable
-                    key={item}
-                    onPress={() =>
-                      setRepeatType(item as "Daily" | "Weekly" | "Monthly")
-                    }
-                    style={[
-                      styles.typeBtn,
-                      repeatType === item && styles.typeActive,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.typeText,
-                        repeatType === item && styles.typeTextActive,
-                      ]}
-                    >
-                      {item}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              {/* WEEKLY SELECTOR */}
-              {repeatType === "Weekly" && (
-                <View>
-                  <Text style={styles.sectionTitle}>Day of Week</Text>
-
-                  <View style={styles.typeRow}>
-                    {[
-                      "Sunday",
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                      "Saturday",
-                    ].map((day) => (
-                      <Pressable
-                        key={day}
-                        onPress={() => setWeekDay(day)}
-                        style={[
-                          styles.typeBtn,
-                          weekDay === day && styles.typeActive,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.typeText,
-                            weekDay === day && styles.typeTextActive,
-                          ]}
-                        >
-                          {day}
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </View>
-                </View>
-              )}
-
-              {/* MONTHLY SELECTOR */}
-              {repeatType === "Monthly" && (
-                <View>
-                  <Text style={styles.sectionTitle}>Day of Month</Text>
-
-                  <View style={styles.typeRow}>
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                      <Pressable
-                        key={day}
-                        onPress={() => setMonthDay(day)}
-                        style={[
-                          styles.typeBtn,
-                          monthDay === day && styles.typeActive,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.typeText,
-                            monthDay === day && styles.typeTextActive,
-                          ]}
-                        >
-                          {day}
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </View>
-                </View>
-              )}
-              <View style={styles.inputRow}>
                 <Pressable
-                  style={styles.dateButton}
-                  onPress={() => setShowTimeModal(true)}
+                  style={styles.createReminderBtn}
+                  onPress={() => setShowReminderForm(!showReminderForm)}
                 >
-                  <Text style={styles.dateButtonText}>🕒 Select Time</Text>
-                </Pressable>
-
-                <Pressable style={styles.addBtn} onPress={addReminder}>
                   <Ionicons name="add" size={18} color="#000" />
+                  <Text style={styles.createReminderText}>Create Reminder</Text>
                 </Pressable>
               </View>
+            </View>
 
-              <Text style={styles.selectedInfo}>
-                {`🕒 ${selectedDate.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}`}
-              </Text>
-            </>
-          )}
-          {reminders.length === 0 ? (
-            <Text style={styles.emptyText}>No reminders yet.</Text>
-          ) : (
-            reminders.map((item) => (
-              <ReminderCard
-                key={item.id}
-                id={item.id}
-                type={item.type}
-                repeat={item.repeat}
-                weekDay={item.weekDay}
-                monthDay={item.monthDay}
-                time={item.time}
-                note={item.note}
-                onDelete={deleteReminder}
-              />
-            ))
-          )}
-        </View>
+            {showReminderForm && (
+              <>
+                <View style={styles.typeRow}>
+                  {[
+                    "Feeding",
+                    "Water Change",
+                    "Water Testing",
+                    "Medication",
+                    "Tank Cleaning",
+                    "Plant Maintenance",
+                  ].map((type) => (
+                    <Pressable
+                      key={type}
+                      onPress={() => {
+                        setReminderType(type as ReminderType);
 
-        {/* LOGBOOK */}
+                        if (type === "Feeding") {
+                          setRepeatType("Daily");
+                        }
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="book-outline" size={18} color="#fff" />
+                        if (
+                          type === "Water Change" ||
+                          type === "Water Testing"
+                        ) {
+                          setRepeatType("Weekly");
+                        }
 
-            <Text style={styles.sectionTitle}>Care Logbook</Text>
-          </View>
+                        if (type === "Tank Cleaning") {
+                          setRepeatType("Monthly");
+                        }
+                      }}
+                      style={[
+                        styles.typeBtn,
+                        reminderType === type && styles.typeActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.typeText,
+                          reminderType === type && styles.typeTextActive,
+                        ]}
+                      >
+                        {type}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
 
-          <Text
-            style={{
-              color: "#FFFFFF",
-              fontSize: 14,
-              marginBottom: 10,
-              opacity: 0.8,
-            }}
-          >
-            Select activity type
-          </Text>
-          <View style={styles.typeRow}>
-            {[
-              "Feeding",
-              "Water Change",
-              "Health Observation",
-              "Disease Treatment",
-              "New Fish Added",
-              "Tank Maintenance",
-            ].map((type) => (
-              <Pressable
-                key={type}
-                onPress={() => setLogType(type as LogItem["type"])}
-                style={[styles.typeBtn, logType === type && styles.typeActive]}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    logType === type && styles.typeTextActive,
-                  ]}
-                >
-                  {type}
+                <TextInput
+                  value={reminderNote}
+                  onChangeText={setReminderNote}
+                  placeholder="Optional note..."
+                  placeholderTextColor="rgba(255,255,255,0.5)"
+                  style={styles.input}
+                />
+
+                <View style={styles.typeRow}>
+                  {["Daily", "Weekly", "Monthly"].map((item) => (
+                    <Pressable
+                      key={item}
+                      onPress={() =>
+                        setRepeatType(item as "Daily" | "Weekly" | "Monthly")
+                      }
+                      style={[
+                        styles.typeBtn,
+                        repeatType === item && styles.typeActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.typeText,
+                          repeatType === item && styles.typeTextActive,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                {/* WEEKLY SELECTOR */}
+                {repeatType === "Weekly" && (
+                  <View>
+                    <Text style={styles.sectionTitle}>Day of Week</Text>
+
+                    <View style={styles.typeRow}>
+                      {[
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                      ].map((day) => (
+                        <Pressable
+                          key={day}
+                          onPress={() => setWeekDay(day)}
+                          style={[
+                            styles.typeBtn,
+                            weekDay === day && styles.typeActive,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.typeText,
+                              weekDay === day && styles.typeTextActive,
+                            ]}
+                          >
+                            {day}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                {/* MONTHLY SELECTOR */}
+                {repeatType === "Monthly" && (
+                  <View>
+                    <Text style={styles.sectionTitle}>Day of Month</Text>
+
+                    <View style={styles.typeRow}>
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map(
+                        (day) => (
+                          <Pressable
+                            key={day}
+                            onPress={() => setMonthDay(day)}
+                            style={[
+                              styles.typeBtn,
+                              monthDay === day && styles.typeActive,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.typeText,
+                                monthDay === day && styles.typeTextActive,
+                              ]}
+                            >
+                              {day}
+                            </Text>
+                          </Pressable>
+                        ),
+                      )}
+                    </View>
+                  </View>
+                )}
+                <View style={styles.inputRow}>
+                  <Pressable
+                    style={styles.dateButton}
+                    onPress={() => setShowTimeModal(true)}
+                  >
+                    <Text style={styles.dateButtonText}>🕒 Select Time</Text>
+                  </Pressable>
+
+                  <Pressable style={styles.addBtn} onPress={addReminder}>
+                    <Ionicons name="add" size={18} color="#000" />
+                  </Pressable>
+                </View>
+
+                <Text style={styles.selectedInfo}>
+                  {`🕒 ${selectedDate.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}`}
                 </Text>
-              </Pressable>
-            ))}
+              </>
+            )}
+            {reminders.length === 0 ? (
+              <Text style={styles.emptyText}>No reminders yet.</Text>
+            ) : (
+              reminders.map((item) => (
+                <ReminderCard
+                  key={item.id}
+                  id={item.id}
+                  type={item.type}
+                  repeat={item.repeat}
+                  weekDay={item.weekDay}
+                  monthDay={item.monthDay}
+                  time={item.time}
+                  note={item.note}
+                  onDelete={deleteReminder}
+                />
+              ))
+            )}
           </View>
-          <TextInput
-            value={logNote}
-            onChangeText={setLogNote}
-            placeholder="Write log note..."
-            placeholderTextColor="rgba(255,255,255,0.5)"
-            style={styles.input}
-          />
 
-          <Pressable
-            onPress={addLog}
-            style={{
-              backgroundColor: "#00D4FF",
-              borderRadius: 14,
-              paddingVertical: 14,
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: 12,
-            }}
-          >
+          {/* LOGBOOK */}
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="book-outline" size={18} color="#fff" />
+
+              <Text style={styles.sectionTitle}>Care Logbook</Text>
+            </View>
+
             <Text
               style={{
-                color: "#000",
-                fontWeight: "700",
-                fontSize: 16,
+                color: "#FFFFFF",
+                fontSize: 14,
+                marginBottom: 10,
+                opacity: 0.8,
               }}
             >
-              Save Log Entry
+              Select activity type
             </Text>
-          </Pressable>
-          {filteredLogs.length === 0 ? (
-            <Text style={styles.emptyText}>
-              📖 Start Your Fish Journal
-              {"\n\n"}
-              Track:
-              {"\n"}• Feeding Records
-              {"\n"}• Water Changes
-              {"\n"}• Health Observations
-              {"\n"}• Treatments
-              {"\n\n"}
-              Your care history will appear here.
-            </Text>
-          ) : (
-            filteredLogs.map((log) => (
-              <View key={log.id} style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardType}>
-                    {`${getLogIcon(log.type)} ${log.type}`}
+            <View style={styles.typeRow}>
+              {[
+                "Feeding",
+                "Water Change",
+                "Health Observation",
+                "Disease Treatment",
+                "New Fish Added",
+                "Tank Maintenance",
+              ].map((type) => (
+                <Pressable
+                  key={type}
+                  onPress={() => setLogType(type as LogItem["type"])}
+                  style={[
+                    styles.typeBtn,
+                    logType === type && styles.typeActive,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.typeText,
+                      logType === type && styles.typeTextActive,
+                    ]}
+                  >
+                    {type}
                   </Text>
+                </Pressable>
+              ))}
+            </View>
+            <TextInput
+              value={logNote}
+              onChangeText={setLogNote}
+              placeholder="Write log note..."
+              placeholderTextColor="rgba(255,255,255,0.5)"
+              style={styles.input}
+            />
 
-                  <Pressable onPress={() => deleteLog(log.id)}>
-                    <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
-                  </Pressable>
+            <Pressable
+              onPress={addLog}
+              style={{
+                backgroundColor: "#00D4FF",
+                borderRadius: 14,
+                paddingVertical: 14,
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 12,
+              }}
+            >
+              <Text
+                style={{
+                  color: "#000",
+                  fontWeight: "700",
+                  fontSize: 16,
+                }}
+              >
+                Save Log Entry
+              </Text>
+            </Pressable>
+            {filteredLogs.length === 0 ? (
+              <Text style={styles.emptyText}>
+                📖 Start Your Fish Journal
+                {"\n\n"}
+                Track:
+                {"\n"}• Feeding Records
+                {"\n"}• Water Changes
+                {"\n"}• Health Observations
+                {"\n"}• Treatments
+                {"\n\n"}
+                Your care history will appear here.
+              </Text>
+            ) : (
+              filteredLogs.map((log) => (
+                <View key={log.id} style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardType}>
+                      {`${getLogIcon(log.type)} ${log.type}`}
+                    </Text>
+
+                    <Pressable onPress={() => deleteLog(log.id)}>
+                      <Ionicons
+                        name="trash-outline"
+                        size={20}
+                        color="#FF6B6B"
+                      />
+                    </Pressable>
+                  </View>
+
+                  <Text style={styles.cardTitle}>{log.note}</Text>
+
+                  <Text style={styles.cardDate}>{log.date}</Text>
                 </View>
-
-                <Text style={styles.cardTitle}>{log.note}</Text>
-
-                <Text style={styles.cardDate}>{log.date}</Text>
-              </View>
-            ))
-          )}
-        </View>
-
-        <View style={{ height: 40 }} />
+              ))
+            )}
+          </View>
+          <View style={{ height: 40 }} />
+        </>
       </ScrollView>
 
       <Modal visible={showTimeModal} transparent animationType="fade">

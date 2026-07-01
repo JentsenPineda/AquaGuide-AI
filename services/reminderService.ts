@@ -46,8 +46,8 @@ export const getReminders = async (uid: string) => {
   const snapshot = await getDocs(q);
 
   return snapshot.docs.map((doc) => ({
+    ...(doc.data() as Omit<Reminder, "id">),
     id: doc.id,
-    ...doc.data(),
   })) as Reminder[];
 };
 export const subscribeToReminders = (
@@ -59,14 +59,22 @@ export const subscribeToReminders = (
     orderBy("createdAt", "desc"),
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const reminders = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Reminder[];
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const reminders = snapshot.docs.map((doc) => ({
+        ...(doc.data() as Omit<Reminder, "id">),
+        id: doc.id,
+      })) as Reminder[];
 
-    callback(reminders);
-  });
+      callback(reminders);
+    },
+    (error) => {
+      if (error.code !== "permission-denied") {
+        console.error(error);
+      }
+    },
+  );
 };
 export const addReminder = async (
   uid: string,

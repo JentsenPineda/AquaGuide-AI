@@ -232,7 +232,7 @@ export default function TankCareScreen() {
             </Text>
             <Text style={styles.resultLabel}>pH</Text>
             <Text style={styles.resultValue}>
-              {careData.idealPH ?? selectedFish.ph}
+              {careData.idealPH ?? selectedFish.pH}
             </Text>
             <Text style={styles.resultLabel}>Diet</Text>
             <Text style={styles.resultValue}>{selectedFish.diet}</Text>

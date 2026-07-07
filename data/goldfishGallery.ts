@@ -172,4 +172,189 @@ export const goldfishGallery = {
       image: require("../assets/images/common-goldfish/Yellow-Shubunkin-Goldfish.png"),
     },
   ],
+  fancy: [
+    {
+      id: "blackmoor",
+      name: "Black Moor",
+      image: require("../assets/images/common-goldfish/black-moor.png"),
+    },
+    {
+      id: "bubble-eye",
+      name: "Bubble Eye",
+      image: require("../assets/images/common-goldfish/bubble-eye.png"),
+    },
+    {
+      id: "butterfly-tail",
+      name: "Butterfly Tail",
+      image: require("../assets/images/common-goldfish/butterfly-tail.png"),
+    },
+    {
+      id: "calico-variant",
+      name: "Calico Goldfish",
+      image: require("../assets/images/common-goldfish/calico-variant.png"),
+    },
+    {
+      id: "celestial-eye",
+      name: "Celestial Eye",
+      image: require("../assets/images/common-goldfish/celestial-eye.png"),
+    },
+    {
+      id: "comet-classic",
+      name: "Classic Comet Goldfish",
+      image: require("../assets/images/common-goldfish/comet.png"),
+    },
+    {
+      id: "crown-pearlscale",
+      name: "Crown Pearlscale",
+      image: require("../assets/images/common-goldfish/crown-pearlscale.png"),
+    },
+    {
+      id: "demekin",
+      name: "Demekin",
+      image: require("../assets/images/common-goldfish/demekin.png"),
+    },
+    {
+      id: "eggfish",
+      name: "Eggfish",
+      image: require("../assets/images/common-goldfish/eggfish.png"),
+    },
+    {
+      id: "fantail",
+      name: "Fantail",
+      image: require("../assets/images/common-goldfish/fantail.png"),
+    },
+    {
+      id: "izumo-nankin",
+      name: "Izumo Nankin",
+      image: require("../assets/images/common-goldfish/izumo-nankin.png"),
+    },
+    {
+      id: "japanese-shubunkin",
+      name: "Japanese Shubunkin",
+      image: require("../assets/images/common-goldfish/japanese-shubunkin.png"),
+    },
+    {
+      id: "jikin",
+      name: "Jikin",
+      image: require("../assets/images/common-goldfish/jikin.png"),
+    },
+    {
+      id: "kirin",
+      name: "Kirin Goldfish",
+      image: require("../assets/images/common-goldfish/kirin.png"),
+    },
+    {
+      id: "lionhead",
+      name: "Lionhead",
+      image: require("../assets/images/common-goldfish/lionhead.png"),
+    },
+    {
+      id: "london-shubunkin",
+      name: "London Shubunkin",
+      image: require("../assets/images/common-goldfish/london-shubunkin.png"),
+    },
+    {
+      id: "matt",
+      name: "Matt Goldfish",
+      image: require("../assets/images/common-goldfish/matt.png"),
+    },
+  ],
+
+  premium: [
+    {
+      id: "blue-egg-phoenix",
+      name: "Blue Egg Phoenix",
+      image: require("../assets/images/common-goldfish/blue-egg-phoenix.png"),
+    },
+    {
+      id: "blue-oranda",
+      name: "Blue Oranda",
+      image: require("../assets/images/common-goldfish/blue-oranda.png"),
+    },
+    {
+      id: "bristol-shubunkin",
+      name: "Bristol Shubunkin",
+      image: require("../assets/images/common-goldfish/bristol-shubunkin.png"),
+    },
+    {
+      id: "common-classic",
+      name: "Classic Common Goldfish",
+      image: require("../assets/images/common-goldfish/common.png"),
+    },
+    {
+      id: "oranda",
+      name: "Oranda",
+      image: require("../assets/images/common-goldfish/oranda.png"),
+    },
+    {
+      id: "panda-moor",
+      name: "Panda Moor",
+      image: require("../assets/images/common-goldfish/panda-moor.png"),
+    },
+    {
+      id: "panda-telescope",
+      name: "Panda Telescope",
+      image: require("../assets/images/common-goldfish/panda-telescope.png"),
+    },
+    {
+      id: "pearlscale",
+      name: "Pearlscale",
+      image: require("../assets/images/common-goldfish/pearlscale.png"),
+    },
+    {
+      id: "phoenix-tail",
+      name: "Phoenix Tail",
+      image: require("../assets/images/common-goldfish/phoenix-tail.png"),
+    },
+    {
+      id: "pompon",
+      name: "Pompon",
+      image: require("../assets/images/common-goldfish/pompon.png"),
+    },
+    {
+      id: "ranchu",
+      name: "Ranchu",
+      image: require("../assets/images/common-goldfish/ranchu.png"),
+    },
+    {
+      id: "red-cap-oranda",
+      name: "Red Cap Oranda",
+      image: require("../assets/images/common-goldfish/red-cap-oranda.png"),
+    },
+    {
+      id: "ryukin",
+      name: "Ryukin",
+      image: require("../assets/images/common-goldfish/ryukin.png"),
+    },
+    {
+      id: "sakura-oranda",
+      name: "Sakura Oranda",
+      image: require("../assets/images/common-goldfish/sakura-oranda.png"),
+    },
+    {
+      id: "telescope-eye",
+      name: "Telescope Eye",
+      image: require("../assets/images/common-goldfish/telescope-eye.png"),
+    },
+    {
+      id: "thai-oranda",
+      name: "Thai Oranda",
+      image: require("../assets/images/common-goldfish/thai-oranda.png"),
+    },
+    {
+      id: "tosakin",
+      name: "Tosakin",
+      image: require("../assets/images/common-goldfish/tosakin.png"),
+    },
+    {
+      id: "veiltail",
+      name: "Veiltail",
+      image: require("../assets/images/common-goldfish/veiltail.png"),
+    },
+    {
+      id: "wakin",
+      name: "Wakin",
+      image: require("../assets/images/common-goldfish/wakin.png"),
+    },
+  ],
 };

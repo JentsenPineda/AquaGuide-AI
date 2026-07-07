@@ -22,6 +22,8 @@ export const allGalleries: Record<string, any> = {
     ...goldfishGallery.common,
     ...goldfishGallery.comet,
     ...goldfishGallery.shubunkin,
+    ...goldfishGallery.fancy,
+    ...goldfishGallery.premium,
   ],
 
   betta: bettaGallery,

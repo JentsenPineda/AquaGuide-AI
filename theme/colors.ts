@@ -1,0 +1,30 @@
+export const Colors = {
+  // Brand
+  primary: "#00BCD4",
+  primaryLight: "#00D4FF",
+
+  // Backgrounds
+  background: "#08141F",
+  card: "#102331",
+  surface: "#173344",
+
+  // Borders
+  border: "#1E3A4C",
+  divider: "#263C4D",
+
+  // Text
+  white: "#FFFFFF",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#B0BEC5",
+  textMuted: "#90A4AE",
+
+  // Status
+  success: "#4CAF50",
+  warning: "#FFC107",
+  danger: "#F44336",
+
+  // Overlay
+  overlay: "rgba(0,0,0,0.45)",
+} as const;
+
+export type ColorKey = keyof typeof Colors;

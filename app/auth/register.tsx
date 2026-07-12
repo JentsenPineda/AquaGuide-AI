@@ -2,15 +2,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { registerUser } from "../../services/authService";
@@ -63,98 +65,104 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <Ionicons
-          name="fish"
-          size={80}
-          color="#00BCD4"
-          style={{ alignSelf: "center" }}
-        />
-
-        <Text style={styles.title}>Create Account</Text>
-
-        <Text style={styles.subtitle}>
-          Join AquaGuide AI and manage your aquarium smarter.
-        </Text>
-
-        <TextInput
-          placeholder="Full Name"
-          style={styles.input}
-          value={fullName}
-          onChangeText={setFullName}
-        />
-
-        <TextInput
-          placeholder="Username"
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-        />
-
-        <TextInput
-          placeholder="Email Address"
-          style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder="Password"
-            secureTextEntry={secure1}
-            style={styles.passwordInput}
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <TouchableOpacity onPress={() => setSecure1(!secure1)}>
-            <Ionicons
-              name={secure1 ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="#607D8B"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder="Confirm Password"
-            secureTextEntry={secure2}
-            style={styles.passwordInput}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
-
-          <TouchableOpacity onPress={() => setSecure2(!secure2)}>
-            <Ionicons
-              name={secure2 ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="#607D8B"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity
-          style={styles.button}
-          disabled={loading}
-          onPress={handleRegister}
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
-          )}
-        </TouchableOpacity>
+          <Ionicons
+            name="fish"
+            size={80}
+            color="#00BCD4"
+            style={{ alignSelf: "center" }}
+          />
 
-        <TouchableOpacity onPress={() => router.push("/auth/login")}>
-          <Text style={styles.login}>Already have an account? Sign In</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <Text style={styles.title}>Create Account</Text>
+
+          <Text style={styles.subtitle}>
+            Join AquaGuide AI and manage your aquarium smarter.
+          </Text>
+
+          <TextInput
+            placeholder="Full Name"
+            style={styles.input}
+            value={fullName}
+            onChangeText={setFullName}
+          />
+
+          <TextInput
+            placeholder="Username"
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+
+          <TextInput
+            placeholder="Email Address"
+            style={styles.input}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Password"
+              secureTextEntry={secure1}
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <TouchableOpacity onPress={() => setSecure1(!secure1)}>
+              <Ionicons
+                name={secure1 ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color="#607D8B"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Confirm Password"
+              secureTextEntry={secure2}
+              style={styles.passwordInput}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+
+            <TouchableOpacity onPress={() => setSecure2(!secure2)}>
+              <Ionicons
+                name={secure2 ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color="#607D8B"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            disabled={loading}
+            onPress={handleRegister}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.buttonText}>Create Account</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.push("/auth/login")}>
+            <Text style={styles.login}>Already have an account? Sign In</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

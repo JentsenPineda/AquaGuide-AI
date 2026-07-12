@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { loginUser } from "../../services/authService";
 
 export default function LoginScreen() {
@@ -73,70 +76,78 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <Ionicons
-          name="fish"
-          size={80}
-          color="#00BCD4"
-          style={{ alignSelf: "center" }}
-        />
-
-        <Text style={styles.title}>Welcome Back</Text>
-
-        <Text style={styles.subtitle}>
-          Sign in to continue using AquaGuide AI.
-        </Text>
-
-        <TextInput
-          placeholder="Email Address"
-          style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder="Password"
-            secureTextEntry={secure}
-            style={styles.passwordInput}
-            value={password}
-            onChangeText={setPassword}
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Ionicons
+            name="fish"
+            size={80}
+            color="#00BCD4"
+            style={{ alignSelf: "center" }}
           />
 
-          <TouchableOpacity onPress={() => setSecure(!secure)}>
-            <Ionicons
-              name={secure ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="#607D8B"
+          <Text style={styles.title}>Welcome Back</Text>
+
+          <Text style={styles.subtitle}>
+            Sign in to continue using AquaGuide AI.
+          </Text>
+
+          <TextInput
+            placeholder="Email Address"
+            style={styles.input}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Password"
+              secureTextEntry={secure}
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
             />
+
+            <TouchableOpacity onPress={() => setSecure(!secure)}>
+              <Ionicons
+                name={secure ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color="#607D8B"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.buttonText}>Login</Text>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/auth/forgot-password")}
+          >
+            <Text style={styles.link}>Forgot Password?</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/auth/forgot-password")}>
-          <Text style={styles.link}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.push("/auth/register")}>
-          <Text style={styles.link}>Don't have an account? Register</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <TouchableOpacity onPress={() => router.push("/auth/register")}>
+            <Text style={styles.link}>Don't have an account? Register</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

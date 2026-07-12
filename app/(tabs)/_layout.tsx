@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
+import CustomTabBar from "../../components/navigation/CustomTabBar";
 
 export default function TabLayout() {
   return (
     <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
       }}
@@ -20,16 +22,6 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="scan"
-        options={{
-          title: "Scan",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="camera" size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
         name="library"
         options={{
           title: "Library",
@@ -40,9 +32,26 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="scan"
+        options={{
+          title: "Scan Fish",
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "scan-circle" : "scan-circle-outline"}
+              size={38}
+              color={focused ? "#00BCD4" : "#00BCD4"}
+            />
+          ),
+          tabBarLabelStyle: {
+            fontWeight: "700",
+          },
+        }}
+      />
+
+      <Tabs.Screen
         name="logbook"
         options={{
-          title: "Logbook",
+          title: "Records",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="document-text" size={size} color={color} />
           ),

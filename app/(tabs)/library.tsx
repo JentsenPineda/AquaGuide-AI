@@ -1,4 +1,6 @@
 // app/(tabs)/library.tsx
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -118,13 +120,12 @@ export default function LibraryScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Species Library</Text>
-
-        <Text style={styles.subtitle}>
-          Explore ornamental fish species with AI-powered care information.
-        </Text>
-      </View>
+      <AppHeader
+        title="Species Library"
+        subtitle="Explore ornamental fish species with AI-powered care information."
+        showBack={false}
+        variant="light"
+      />
 
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#888" />
@@ -327,7 +328,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 20,
     paddingTop: 4,
-    paddingBottom: 120,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   card: {

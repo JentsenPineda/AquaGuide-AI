@@ -1,18 +1,21 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function NewFishCareScreen() {
   return (
     <SafeAreaView style={styles.container}>
+      <AppHeader title="New Fish Care" variant="light" />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -107,7 +110,7 @@ const styles = StyleSheet.create({
 
   content: {
     padding: 20,
-    paddingBottom: 50,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   hero: {

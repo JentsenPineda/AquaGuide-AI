@@ -1,3 +1,4 @@
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -407,11 +408,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#374151",
   },
+
   content: {
     padding: 20,
-    paddingBottom: 60,
+    paddingBottom: TAB_BAR_HEIGHT,
     flexGrow: 1,
   },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: "700",

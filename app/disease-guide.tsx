@@ -1,3 +1,4 @@
+import AppHeader from "@/components/layout/AppHeader";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Colors } from "@/theme/colors";
 import { RF, RS } from "@/utils/responsive";
 import { Ionicons } from "@expo/vector-icons";
@@ -148,6 +150,8 @@ export default function DiseaseGuide() {
   };
   return (
     <SafeAreaView style={styles.safe}>
+      <AppHeader title="Disease Guide" />
+
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -425,6 +429,7 @@ const styles = StyleSheet.create({
 
   container: {
     padding: RS(20),
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   hero: {

@@ -1,11 +1,13 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import React, { useState } from "react";
 import {
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import { allFish } from "../data/allFish";
@@ -66,15 +68,16 @@ export default function CompatibilityChecker() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <AppHeader title="Compatibility Checker" />
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.title}>Fish Compatibility Checker</Text>
-
         <Text style={styles.subtitle}>
           Check whether two fish species can live together.
         </Text>
-
         <Text style={styles.label}>Fish Species #1</Text>
-
         <View style={styles.chips}>
           {allFish.map((fish) => (
             <Pressable
@@ -86,9 +89,7 @@ export default function CompatibilityChecker() {
             </Pressable>
           ))}
         </View>
-
         <Text style={styles.label}>Fish Species #2</Text>
-
         <View style={styles.chips}>
           {allFish.map((fish) => (
             <Pressable
@@ -100,7 +101,6 @@ export default function CompatibilityChecker() {
             </Pressable>
           ))}
         </View>
-
         <View
           style={[
             styles.resultCard,
@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
 
   container: {
     padding: 20,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   title: {

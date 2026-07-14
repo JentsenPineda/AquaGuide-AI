@@ -3,8 +3,11 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CustomTabBar({ state }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+
   const routes = [
     {
       label: "Home",
@@ -29,7 +32,14 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
   ];
 
   return (
-    <View style={styles.wrapper}>
+    <View
+      style={[
+        styles.wrapper,
+        {
+          paddingBottom: Math.max(insets.bottom, 12),
+        },
+      ]}
+    >
       <View style={styles.tabBar}>
         {routes.slice(0, 2).map((item) => (
           <Pressable
@@ -42,7 +52,7 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
           </Pressable>
         ))}
 
-        <View style={{ width: 80 }} />
+        <View style={{ width: 82 }} />
 
         {routes.slice(2).map((item) => (
           <Pressable
@@ -57,7 +67,12 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
       </View>
 
       <Pressable
-        style={styles.scanButton}
+        style={[
+          styles.scanButton,
+          {
+            bottom: Math.max(insets.bottom, 12) + 30,
+          },
+        ]}
         onPress={() => router.push("/(tabs)/scan")}
       >
         <Ionicons name="scan" size={34} color="#FFFFFF" />
@@ -76,38 +91,50 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+
     backgroundColor: "#FFFFFF",
+
     marginHorizontal: 12,
-    marginBottom: 12,
+
     borderRadius: 28,
-    paddingVertical: 14,
+
+    height: 82,
+
+    paddingTop: 10,
+
     elevation: 12,
   },
 
   tab: {
-    alignItems: "center",
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   label: {
-    fontSize: 11,
     marginTop: 4,
-    color: "#003B57",
+    fontSize: 11,
     fontWeight: "600",
+    color: "#003B57",
   },
 
   scanButton: {
     position: "absolute",
     alignSelf: "center",
-    top: -26,
+
     width: 72,
     height: 72,
+
     borderRadius: 36,
+
     backgroundColor: "#00BCD4",
+
     justifyContent: "center",
     alignItems: "center",
-    elevation: 15,
+
     borderWidth: 5,
     borderColor: "#FFFFFF",
+
+    elevation: 15,
   },
 });

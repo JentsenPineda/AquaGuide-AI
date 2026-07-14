@@ -1,3 +1,5 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import React, { useMemo, useState } from "react";
 import {
   Pressable,
@@ -73,6 +75,8 @@ export default function TankCareScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <AppHeader title="Tank & Care" />
+
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -287,6 +291,7 @@ const styles = StyleSheet.create({
 
   container: {
     padding: 20,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   hero: {

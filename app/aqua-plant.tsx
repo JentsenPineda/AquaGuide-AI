@@ -1,3 +1,5 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
@@ -26,27 +28,30 @@ export default function AquaPlantScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      <AppHeader title="Aqua Plants" />
+      <View style={styles.content}>
+        {/* Header */}
 
-      <View style={styles.hero}>
-        <Text style={styles.logo}>🌿</Text>
+        <View style={styles.hero}>
+          <Text style={styles.logo}>🌿</Text>
 
-        <Text style={styles.title}>Aqua Plant Guide</Text>
+          <Text style={styles.title}>Aqua Plant Guide</Text>
 
-        <Text style={styles.subtitle}>
-          Find compatible aquatic plants for your ornamental fish.
-        </Text>
+          <Text style={styles.subtitle}>
+            Find compatible aquatic plants for your ornamental fish.
+          </Text>
+        </View>
+
+        {/* Search */}
+
+        <TextInput
+          placeholder="Search fish species..."
+          placeholderTextColor="#7D8B99"
+          style={styles.search}
+          value={search}
+          onChangeText={setSearch}
+        />
       </View>
-
-      {/* Search */}
-
-      <TextInput
-        placeholder="Search fish species..."
-        placeholderTextColor="#7D8B99"
-        style={styles.search}
-        value={search}
-        onChangeText={setSearch}
-      />
 
       {/* Fish Cards */}
 
@@ -54,7 +59,9 @@ export default function AquaPlantScreen() {
         data={filteredFish}
         numColumns={2}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 150 }}
+        contentContainerStyle={{
+          paddingBottom: TAB_BAR_HEIGHT + 70,
+        }}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => setSelectedFish(item.id)}
@@ -95,7 +102,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#08141F",
-    padding: 16,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
 
   hero: {
@@ -159,7 +169,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 16,
     right: 16,
-    bottom: 20,
+    bottom: TAB_BAR_HEIGHT - 20,
     backgroundColor: "#00D4FF",
     borderRadius: 20,
     paddingVertical: 18,

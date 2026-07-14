@@ -1,3 +1,5 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -37,16 +39,19 @@ export default function FishDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <AppHeader title="Fish Details" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: TAB_BAR_HEIGHT,
+        }}
+      >
         {/* Hero Image */}
-
         <Image
           source={fishImages[fish.id as keyof typeof fishImages]}
           style={styles.heroImage}
         />
-
         {/* Header */}
-
         <View style={styles.header}>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{fish.category}</Text>
@@ -58,9 +63,7 @@ export default function FishDetailsScreen() {
 
           <Text style={styles.description}>{fish.description}</Text>
         </View>
-
         {/* Care Stats */}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Care Requirements</Text>
 
@@ -73,7 +76,7 @@ export default function FishDetailsScreen() {
               value={fish.temperature}
             />
 
-            <StatCard icon="analytics-outline" title="pH" value={fish.ph} />
+            <StatCard icon="analytics-outline" title="pH" value={fish.pH} />
 
             <StatCard icon="time-outline" title="Life" value={fish.lifespan} />
 
@@ -86,9 +89,7 @@ export default function FishDetailsScreen() {
             />
           </View>
         </View>
-
         {/* Variants */}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Variants</Text>
 
@@ -108,9 +109,7 @@ export default function FishDetailsScreen() {
             <Text style={styles.variantButtonText}>View Variants</Text>
           </Pressable>
         </View>
-
         {/* Diseases */}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Common Diseases</Text>
 
@@ -122,9 +121,7 @@ export default function FishDetailsScreen() {
             ))}
           </View>
         </View>
-
         {/* Equipment */}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recommended Equipment</Text>
 
@@ -136,9 +133,7 @@ export default function FishDetailsScreen() {
             </View>
           ))}
         </View>
-
         {/* Breeding */}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Breeding Guide</Text>
 
@@ -146,9 +141,7 @@ export default function FishDetailsScreen() {
             <Text style={styles.infoText}>{profile?.breedingGuide}</Text>
           </View>
         </View>
-
         {/* AI Recommendation */}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>AquaGuide AI Recommendation</Text>
 
@@ -158,7 +151,6 @@ export default function FishDetailsScreen() {
             <Text style={styles.aiText}>{profile?.aiRecommendation}</Text>
           </View>
         </View>
-
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>

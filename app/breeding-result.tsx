@@ -1,8 +1,8 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-
-import { useLocalSearchParams } from "expo-router";
-
 import { breedingDatabase } from "../data/breedingDatabase";
 
 export default function BreedingResult() {
@@ -22,6 +22,7 @@ export default function BreedingResult() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <AppHeader title="Breeding Guide" />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
 
   container: {
     padding: 20,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   center: {

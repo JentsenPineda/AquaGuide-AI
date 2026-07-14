@@ -1,3 +1,4 @@
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
@@ -869,6 +870,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     gap: 20,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   emptyText: {

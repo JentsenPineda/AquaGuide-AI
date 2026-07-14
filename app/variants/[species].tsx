@@ -1,3 +1,5 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -35,12 +37,16 @@ export default function VariantsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <AppHeader title="Fish Variants" />
       <FlatList
         data={filteredVariants}
         keyExtractor={(item) => item.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.row}
+        contentContainerStyle={{
+          paddingBottom: TAB_BAR_HEIGHT,
+        }}
         ListHeaderComponent={
           <>
             <View style={styles.hero}>

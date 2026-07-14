@@ -1,12 +1,14 @@
+import AppHeader from "@/components/layout/AppHeader";
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { router } from "expo-router";
 import React from "react";
 import {
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import { equipmentCategories } from "../../data/equipmentDatabase";
@@ -14,6 +16,7 @@ import { equipmentCategories } from "../../data/equipmentDatabase";
 export default function EquipmentGuide() {
   return (
     <SafeAreaView style={styles.safe}>
+      <AppHeader title="Equipment Guide" />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -59,6 +62,7 @@ const styles = StyleSheet.create({
 
   container: {
     padding: 20,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   hero: {

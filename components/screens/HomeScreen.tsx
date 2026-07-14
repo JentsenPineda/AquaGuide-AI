@@ -1,3 +1,4 @@
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -167,6 +168,7 @@ const styles = StyleSheet.create({
 
   container: {
     padding: 20,
+    paddingBottom: TAB_BAR_HEIGHT,
   },
 
   header: {

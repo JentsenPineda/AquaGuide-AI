@@ -49,22 +49,25 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="logbook"
+        name="fish-care"
         options={{
-          title: "Records",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="document-text" size={size} color={color} />
+          title: "Fish Care",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "fish" : "fish-outline"}
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
-
       <Tabs.Screen
-        name="profile"
+        name="menu"
         options={{
-          title: "Profile",
+          title: "Menu",
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
-              name={focused ? "person-circle" : "person-circle-outline"}
+              name={focused ? "menu" : "menu-outline"}
               size={size}
               color={color}
             />

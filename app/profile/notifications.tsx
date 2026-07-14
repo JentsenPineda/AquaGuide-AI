@@ -1,14 +1,13 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 function SettingRow({
@@ -49,78 +48,88 @@ export default function NotificationsScreen() {
   const [tips, setTips] = useState(false);
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Notifications",
-        }}
+    <View style={styles.screen}>
+      <AppHeader
+        title="Notifications"
+        subtitle="Manage your notification preferences"
+        showBack
+        variant="light"
       />
 
-      <SafeAreaView style={styles.container}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 20 }}
-        >
-          <Text style={styles.header}>Notification Settings</Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.header}>Notification Settings</Text>
 
-          <Text style={styles.description}>
-            Manage how AquaGuide AI keeps you informed about your aquarium.
-          </Text>
+        <Text style={styles.description}>
+          Manage how AquaGuide AI keeps you informed about your aquarium.
+        </Text>
 
-          <View style={styles.card}>
-            <SettingRow
-              icon="notifications-outline"
-              title="Reminder Notifications"
-              subtitle="Feeding, water changes, medication and maintenance alerts."
-              value={reminders}
-              onValueChange={setReminders}
-            />
+        <View style={styles.card}>
+          <SettingRow
+            icon="notifications-outline"
+            title="Reminder Notifications"
+            subtitle="Feeding, water changes, medication and maintenance alerts."
+            value={reminders}
+            onValueChange={setReminders}
+          />
 
-            <SettingRow
-              icon="volume-high-outline"
-              title="Notification Sound"
-              subtitle="Play a sound when reminders are triggered."
-              value={sound}
-              onValueChange={setSound}
-            />
+          <SettingRow
+            icon="volume-high-outline"
+            title="Notification Sound"
+            subtitle="Play a sound when reminders are triggered."
+            value={sound}
+            onValueChange={setSound}
+          />
 
-            <SettingRow
-              icon="phone-portrait-outline"
-              title="Vibration"
-              subtitle="Vibrate your phone for reminder alerts."
-              value={vibration}
-              onValueChange={setVibration}
-            />
+          <SettingRow
+            icon="phone-portrait-outline"
+            title="Vibration"
+            subtitle="Vibrate your phone for reminder alerts."
+            value={vibration}
+            onValueChange={setVibration}
+          />
 
-            <SettingRow
-              icon="bulb-outline"
-              title="Daily Fishkeeping Tips"
-              subtitle="Receive helpful aquarium care tips."
-              value={tips}
-              onValueChange={setTips}
-            />
-          </View>
+          <SettingRow
+            icon="bulb-outline"
+            title="Daily Fishkeeping Tips"
+            subtitle="Receive helpful aquarium care tips."
+            value={tips}
+            onValueChange={setTips}
+          />
+        </View>
 
-          <TouchableOpacity style={styles.testButton}>
-            <Ionicons name="paper-plane-outline" size={20} color="#FFFFFF" />
+        <TouchableOpacity style={styles.testButton}>
+          <Ionicons name="paper-plane-outline" size={20} color="#FFFFFF" />
 
-            <Text style={styles.testText}>Send Test Notification</Text>
-          </TouchableOpacity>
+          <Text style={styles.testText}>Send Test Notification</Text>
+        </TouchableOpacity>
 
-          <Text style={styles.footer}>
-            These preferences will be synchronized with your account in a future
-            update.
-          </Text>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+        <Text style={styles.footer}>
+          These preferences will be synchronized with your account in a future
+          update.
+        </Text>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F4F7FA",
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#F4F7FA",
+  },
+
+  content: {
+    padding: 20,
+    paddingBottom: 40,
   },
 
   header: {

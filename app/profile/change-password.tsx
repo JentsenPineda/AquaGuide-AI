@@ -1,5 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Stack } from "expo-router";
+import AppHeader from "@/components/layout/AppHeader";
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -8,7 +7,6 @@ import {
 import React, { useState } from "react";
 import {
   Alert,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,7 +15,8 @@ import {
   View,
 } from "react-native";
 
-import { auth } from "../../../config/firebase";
+import { Ionicons } from "@expo/vector-icons";
+import { auth } from "../../config/firebase";
 
 export default function ChangePasswordScreen() {
   const user = auth.currentUser;
@@ -70,70 +69,75 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Change Password",
-        }}
+    <View style={styles.screen}>
+      <AppHeader
+        title="Change Password"
+        subtitle="Keep your AquaGuide AI account secure"
+        showBack
+        variant="light"
       />
 
-      <SafeAreaView style={styles.container}>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <Ionicons name="lock-closed" size={65} color="#00BCD4" />
+
+          <Text style={styles.title}>Change Password</Text>
+
+          <Text style={styles.subtitle}>
+            Keep your AquaGuide AI account secure.
+          </Text>
+        </View>
+
+        <View style={styles.card}>
+          <TextInput
+            style={styles.input}
+            placeholder="Current Password"
+            secureTextEntry
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="New Password"
+            secureTextEntry
+            value={newPassword}
+            onChangeText={setNewPassword}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm New Password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleChangePassword}
+          disabled={loading}
         >
-          <View style={styles.header}>
-            <Ionicons name="lock-closed" size={65} color="#00BCD4" />
-
-            <Text style={styles.title}>Change Password</Text>
-
-            <Text style={styles.subtitle}>
-              Keep your AquaGuide AI account secure.
-            </Text>
-          </View>
-
-          <View style={styles.card}>
-            <TextInput
-              style={styles.input}
-              placeholder="Current Password"
-              secureTextEntry
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="New Password"
-              secureTextEntry
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm New Password"
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-          </View>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleChangePassword}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? "Updating..." : "Update Password"}
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+          <Text style={styles.buttonText}>
+            {loading ? "Updating..." : "Update Password"}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F4F7FA",
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#F4F7FA",
@@ -141,6 +145,7 @@ const styles = StyleSheet.create({
 
   content: {
     padding: 20,
+    paddingBottom: 40,
   },
 
   header: {

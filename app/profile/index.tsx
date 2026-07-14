@@ -1,3 +1,4 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -13,10 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import LoginRequired from "../../../components/LoginRequired";
-import { useAuth } from "../../../contexts/AuthContext";
-import { subscribeToLogs } from "../../../services/logbookService";
-import { subscribeToReminders } from "../../../services/reminderService";
+import LoginRequired from "../../components/LoginRequired";
+import { useAuth } from "../../contexts/AuthContext";
+import { subscribeToLogs } from "../../services/logbookService";
+import { subscribeToReminders } from "../../services/reminderService";
 
 function SettingItem({
   icon,
@@ -164,108 +165,126 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <Image
-            source={{
-              uri:
-                selectedImage ||
-                "https://ui-avatars.com/api/?name=User&background=E5E7EB&color=374151",
-            }}
-            style={styles.avatar}
+    <View style={styles.screen}>
+      <AppHeader
+        title="Profile"
+        subtitle="Manage your AquaGuide AI account"
+        showBack
+        variant="light"
+      />
+
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri:
+                  selectedImage ||
+                  "https://ui-avatars.com/api/?name=User&background=E5E7EB&color=374151",
+              }}
+              style={styles.avatar}
+            />
+
+            <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
+              <Ionicons name="camera" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.name}>{displayName || "AquaGuide User"}</Text>
+
+          <TouchableOpacity
+            onPress={() =>
+              Alert.alert(
+                "Coming Soon",
+                "Editing profile name will be available in the next update.",
+              )
+            }
+          ></TouchableOpacity>
+
+          <Text style={styles.email}>{user.email}</Text>
+
+          <View style={styles.badge}>
+            <Ionicons name="cloud-done" size={16} color="#16A34A" />
+            <Text style={styles.badgeText}>Cloud Sync</Text>
+          </View>
+        </View>
+
+        {/* Statistics */}
+        <View style={styles.statsContainer}>
+          <Text style={styles.sectionTitle}>Your Statistics</Text>
+
+          <View style={styles.stats}>
+            <View style={styles.card}>
+              <Ionicons
+                name="notifications-outline"
+                size={28}
+                color="#00BCD4"
+              />
+              <Text style={styles.number}>{reminderCount}</Text>
+              <Text style={styles.label}>Reminders</Text>
+            </View>
+
+            <View style={styles.card}>
+              <Ionicons name="book-outline" size={28} color="#00BCD4" />
+              <Text style={styles.number}>{logCount}</Text>
+              <Text style={styles.label}>Logbooks</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Settings */}
+        <View style={styles.settingsCard}>
+          <Text style={styles.settingsTitle}>Settings</Text>
+
+          <SettingItem
+            icon="notifications-outline"
+            title="Notifications"
+            onPress={() => router.push("/profile/notifications")}
           />
 
-          <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
-            <Ionicons name="camera" size={20} color="#FFFFFF" />
-          </TouchableOpacity>
+          <SettingItem
+            icon="moon-outline"
+            title="Dark Mode"
+            onPress={() => router.push("/profile/dark-mode")}
+          />
+
+          <SettingItem
+            icon="lock-closed-outline"
+            title="Change Password"
+            onPress={() => router.push("/profile/change-password")}
+          />
+
+          <SettingItem
+            icon="document-text-outline"
+            title="Privacy Policy"
+            onPress={() => router.push("/profile/privacy-policy")}
+          />
+
+          <SettingItem
+            icon="information-circle-outline"
+            title="About AquaGuide AI"
+            onPress={() => router.push("/profile/about")}
+          />
         </View>
-        <Text style={styles.name}>{displayName || "AquaGuide User"}</Text>
 
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert(
-              "Coming Soon",
-              "Editing profile name will be available in the next update.",
-            )
-          }
-        ></TouchableOpacity>
-
-        <Text style={styles.email}>{user.email}</Text>
-
-        <View style={styles.badge}>
-          <Ionicons name="cloud-done" size={16} color="#16A34A" />
-          <Text style={styles.badgeText}>Cloud Sync</Text>
-        </View>
-      </View>
-
-      {/* Statistics */}
-      <View style={styles.statsContainer}>
-        <Text style={styles.sectionTitle}>Your Statistics</Text>
-
-        <View style={styles.stats}>
-          <View style={styles.card}>
-            <Ionicons name="notifications-outline" size={28} color="#00BCD4" />
-            <Text style={styles.number}>{reminderCount}</Text>
-            <Text style={styles.label}>Reminders</Text>
-          </View>
-
-          <View style={styles.card}>
-            <Ionicons name="book-outline" size={28} color="#00BCD4" />
-            <Text style={styles.number}>{logCount}</Text>
-            <Text style={styles.label}>Logbooks</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Settings */}
-      <View style={styles.settingsCard}>
-        <Text style={styles.settingsTitle}>Settings</Text>
-
-        <SettingItem
-          icon="notifications-outline"
-          title="Notifications"
-          onPress={() => router.push("/profile/notifications")}
-        />
-
-        <SettingItem
-          icon="moon-outline"
-          title="Dark Mode"
-          onPress={() => router.push("/profile/dark-mode")}
-        />
-
-        <SettingItem
-          icon="lock-closed-outline"
-          title="Change Password"
-          onPress={() => router.push("/profile/change-password")}
-        />
-
-        <SettingItem
-          icon="document-text-outline"
-          title="Privacy Policy"
-          onPress={() => router.push("/profile/privacy-policy")}
-        />
-
-        <SettingItem
-          icon="information-circle-outline"
-          title="About AquaGuide AI"
-          onPress={() => router.push("/profile/about")}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="log-out-outline" size={22} color="#fff" />
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={22} color="#fff" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F5F7FA",
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",

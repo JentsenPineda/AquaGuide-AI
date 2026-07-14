@@ -20,14 +20,14 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
       route: "/(tabs)/library",
     },
     {
-      label: "Records",
-      icon: "document-text",
-      route: "/(tabs)/logbook",
+      label: "Fish Care",
+      icon: "fish",
+      route: "/(tabs)/fish-care",
     },
     {
-      label: "Profile",
-      icon: "person-circle",
-      route: "/(tabs)/profile",
+      label: "Menu",
+      icon: "menu",
+      route: "/(tabs)/menu",
     },
   ];
 

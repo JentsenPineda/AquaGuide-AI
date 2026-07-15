@@ -72,7 +72,7 @@ export default function FishCareScreen() {
           icon="build"
           title="Equipment Guide"
           subtitle="Filters, heaters, lighting and aquarium accessories"
-          route="/equipment/equipment"
+          route="/equipment/equipment-guide"
           iconColor="#FB8C00"
           iconBackground="#FFF3E0"
         />

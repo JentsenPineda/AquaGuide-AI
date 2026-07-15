@@ -141,11 +141,9 @@ export default function HomeScreen() {
             route="/new-fish-care"
           />
 
-          <ModuleCard
-            title="Reminder & Logbook"
-            icon="alarm-outline"
-            route="/(tabs)/logbook"
-          />
+          <ModuleCard title="Reminder" icon="alarm-outline" route="/reminder" />
+
+          <ModuleCard title="Logbook" icon="book-outline" route="/logbook" />
 
           <ModuleCard
             title="Compatibility"

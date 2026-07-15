@@ -1,3 +1,4 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -43,7 +44,7 @@ export default function LoginScreen() {
 
       Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`);
 
-      router.replace("/(tabs)/logbook");
+      router.replace("/logbook");
     } catch (error: any) {
       let message = "Unable to login.";
 
@@ -76,6 +77,13 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <AppHeader
+        title="Welcome Back"
+        subtitle="Sign in to continue using AquaGuide AI"
+        showBack
+        variant="light"
+      />
+
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}

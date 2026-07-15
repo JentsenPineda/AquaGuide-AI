@@ -7,6 +7,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
@@ -71,6 +72,14 @@ export const addLog = async (
   const docRef = await addDoc(collection(db, "users", userId, "logs"), log);
 
   return docRef.id;
+};
+
+export const updateLog = async (
+  userId: string,
+  logId: string,
+  log: Omit<LogItem, "id">,
+) => {
+  await updateDoc(doc(db, "users", userId, "logs", logId), log);
 };
 
 export const deleteLog = async (userId: string, logId: string) => {

@@ -147,12 +147,23 @@ export default function ReminderCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderRadius: 12,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-    marginBottom: 10,
+    backgroundColor: "#FFFFFF",
+
+    borderRadius: 22,
+
+    padding: 18,
+
+    marginBottom: 16,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+
+    elevation: 4,
   },
 
   header: {
@@ -162,19 +173,8 @@ const styles = StyleSheet.create({
   },
 
   type: {
-    color: "#00D4FF",
-    fontWeight: "800",
-    fontSize: 12,
-  },
-
-  date: {
-    color: "rgba(255,255,255,0.6)",
-    marginTop: 4,
-  },
-
-  note: {
-    color: "#B0BEC5",
-    marginTop: 6,
+    fontSize: 20,
+    fontWeight: "700",
   },
 
   titleSection: {

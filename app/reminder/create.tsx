@@ -1,7 +1,7 @@
 import AppHeader from "@/components/layout/AppHeader";
 import {
-    ReminderRepeat,
-    ReminderType,
+  ReminderRepeat,
+  ReminderType,
 } from "@/components/reminder/ReminderCard";
 import ReminderNotesCard from "@/components/reminder/ReminderNotesCard";
 import ReminderScheduleSelector from "@/components/reminder/ReminderScheduleSelector";
@@ -15,8 +15,9 @@ import { addReminder } from "@/services/reminderService";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 const reminderTypes: {
   title: ReminderType;
   icon: keyof typeof Ionicons.glyphMap;
@@ -102,10 +103,14 @@ export default function CreateReminderScreen() {
         variant="light"
       />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid
+        extraScrollHeight={30}
+        extraHeight={120}
       >
         {/* HERO */}
 
@@ -187,8 +192,7 @@ export default function CreateReminderScreen() {
             onPress={handleSave}
           />
         </View>
-      </ScrollView>
-
+      </KeyboardAwareScrollView>
       <ReminderTimePickerModal
         visible={showTimePicker}
         hours={time.getHours()}
@@ -221,7 +225,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 22,
     paddingTop: 24,
-    paddingBottom: 40,
+    paddingBottom: 140,
   },
 
   hero: {

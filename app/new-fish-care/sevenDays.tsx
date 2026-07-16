@@ -6,7 +6,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -68,7 +67,7 @@ export default function SevenDaysScreen() {
   const progress = (finished / weekPlan.length) * 100;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader title="New Fish Care" variant="light" />
       <ScrollView
         contentContainerStyle={styles.content}
@@ -149,7 +148,7 @@ export default function SevenDaysScreen() {
           <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

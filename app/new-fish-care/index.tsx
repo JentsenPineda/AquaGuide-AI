@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,7 +13,7 @@ import {
 
 export default function NewFishCareScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader title="New Fish Care" variant="light" />
       <ScrollView
         contentContainerStyle={styles.content}
@@ -98,7 +97,7 @@ export default function NewFishCareScreen() {
           <Text style={styles.learnText}>Why Is Acclimation Important?</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

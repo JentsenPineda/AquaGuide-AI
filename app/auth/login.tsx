@@ -1,13 +1,12 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,15 +15,25 @@ import {
   View,
 } from "react-native";
 
+import { useEffect } from "react";
 import { loginUser } from "../../services/authService";
 
 export default function LoginScreen() {
+  useEffect(() => {
+    console.log("LOGIN SCREEN MOUNTED");
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [secure, setSecure] = useState(true);
 
   const [loading, setLoading] = useState(false);
+
+  type LoginRedirect = "reminder" | "logbook";
+
+  const { redirect } = useLocalSearchParams<{
+    redirect?: LoginRedirect;
+  }>();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -44,7 +53,19 @@ export default function LoginScreen() {
 
       Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`);
 
-      router.replace("/logbook");
+      switch (redirect) {
+        case "reminder":
+          router.replace("/reminder");
+          break;
+
+        case "logbook":
+          router.replace("/logbook");
+          break;
+
+        default:
+          router.replace("/(tabs)/menu");
+          break;
+      }
     } catch (error: any) {
       let message = "Unable to login.";
 
@@ -76,7 +97,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader
         title="Welcome Back"
         subtitle="Sign in to continue using AquaGuide AI"
@@ -156,7 +177,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -3,7 +3,6 @@ import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import React, { useMemo, useState } from "react";
 import {
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -74,9 +73,8 @@ export default function TankCareScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Tank & Care" />
-
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -279,7 +277,7 @@ export default function TankCareScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

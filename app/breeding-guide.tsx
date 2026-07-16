@@ -2,14 +2,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { allFish } from "../data/allFish";
 
@@ -17,7 +10,7 @@ export default function BreedingGuide() {
   const [selectedFish, setSelectedFish] = useState("");
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Breeding Guide" />
 
       <ScrollView
@@ -68,7 +61,7 @@ export default function BreedingGuide() {
         </Pressable>
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

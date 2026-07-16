@@ -6,7 +6,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,7 +15,7 @@ import {
 
 export default function SuccessScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader title="New Fish Care" variant="light" />
       <ScrollView
         contentContainerStyle={styles.content}
@@ -97,7 +96,7 @@ export default function SuccessScreen() {
 
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => router.replace("/(tabs)")}
+          onPress={() => router.replace("/")}
         >
           <Ionicons name="home" size={22} color="#FFFFFF" />
 
@@ -115,14 +114,14 @@ export default function SuccessScreen() {
 
         <TouchableOpacity
           style={styles.secondaryButton}
-          onPress={() => router.push("/reminders")}
+          onPress={() => router.push("/reminder")}
         >
           <Ionicons name="notifications" size={22} color="#00BCD4" />
 
           <Text style={styles.secondaryText}>Set Feeding Reminder</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

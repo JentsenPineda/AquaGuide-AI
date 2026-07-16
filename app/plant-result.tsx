@@ -2,14 +2,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { fishPlantCompatibility } from "../data/fishPlantCompatibility";
 import { plantDatabase } from "../data/plantDatabase";
@@ -21,7 +14,7 @@ export default function PlantResult() {
     fishPlantCompatibility[fish as keyof typeof fishPlantCompatibility] || [];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Compatible Plants" />
 
       <ScrollView
@@ -70,7 +63,7 @@ export default function PlantResult() {
           );
         })}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

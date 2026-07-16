@@ -7,7 +7,6 @@ import React, { useMemo, useState } from "react";
 import {
   FlatList,
   Image,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -119,7 +118,7 @@ export default function LibraryScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader
         title="Species Library"
         subtitle="Explore ornamental fish species with AI-powered care information."
@@ -205,7 +204,7 @@ export default function LibraryScreen() {
           </View>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

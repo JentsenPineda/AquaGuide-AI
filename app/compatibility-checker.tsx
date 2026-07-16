@@ -1,14 +1,7 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import React, { useState } from "react";
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { allFish } from "../data/allFish";
 import { fishCompatibility } from "../data/fishCompatibility";
@@ -67,7 +60,7 @@ export default function CompatibilityChecker() {
   const compatibilityResult = result();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Compatibility Checker" />
       <ScrollView
         contentContainerStyle={styles.container}
@@ -138,7 +131,7 @@ export default function CompatibilityChecker() {
           <Text style={styles.reason}>{compatibilityResult.reason}</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 const activityConfig = {
   Feeding: {
@@ -124,7 +124,7 @@ export default function LogbookScreen() {
     ]);
   };
   if (!user) {
-    return <LoginRequired />;
+    return <LoginRequired redirect="logbook" />;
   }
   return (
     <View style={styles.screen}>

@@ -6,14 +6,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-
 const steps = [
   {
     icon: "water",
@@ -70,7 +68,7 @@ export default function AcclimationScreen() {
   }, [currentStep]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader title="New Fish Care" variant="light" />
       <ScrollView
         contentContainerStyle={styles.content}
@@ -134,7 +132,7 @@ export default function AcclimationScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

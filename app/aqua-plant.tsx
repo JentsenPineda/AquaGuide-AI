@@ -6,7 +6,6 @@ import {
   FlatList,
   Image,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -27,7 +26,7 @@ export default function AquaPlantScreen() {
   }, [search]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader title="Aqua Plants" />
       <View style={styles.content}>
         {/* Header */}
@@ -94,7 +93,7 @@ export default function AquaPlantScreen() {
       >
         <Text style={styles.buttonText}>Show Compatible Plants</Text>
       </Pressable>
-    </SafeAreaView>
+    </View>
   );
 }
 

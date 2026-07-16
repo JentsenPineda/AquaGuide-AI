@@ -2,7 +2,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { breedingDatabase } from "../data/breedingDatabase";
 
 export default function BreedingResult() {
@@ -12,16 +12,16 @@ export default function BreedingResult() {
 
   if (!guide) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <View style={styles.safe}>
         <View style={styles.center}>
           <Text style={styles.errorText}>Breeding guide not found.</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Breeding Guide" />
       <ScrollView
         contentContainerStyle={styles.container}
@@ -69,7 +69,7 @@ export default function BreedingResult() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -4,7 +4,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-export default function LoginRequired() {
+type LoginRedirect = "reminder" | "logbook";
+
+type LoginRequiredProps = {
+  redirect: LoginRedirect;
+};
+
+export default function LoginRequired({ redirect }: LoginRequiredProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
@@ -30,7 +36,14 @@ export default function LoginRequired() {
 
       <TouchableOpacity
         style={styles.loginButton}
-        onPress={() => router.push("/auth/login")}
+        onPress={() =>
+          router.push({
+            pathname: "/auth/login",
+            params: {
+              redirect,
+            },
+          })
+        }
       >
         <Text style={styles.loginText}>Login</Text>
       </TouchableOpacity>
@@ -42,7 +55,15 @@ export default function LoginRequired() {
         <Text style={styles.registerText}>Create Account</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.back()}>
+      <TouchableOpacity
+        onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace("/(tabs)");
+          }
+        }}
+      >
         <Text style={styles.guest}>Continue as Guest</Text>
       </TouchableOpacity>
     </View>

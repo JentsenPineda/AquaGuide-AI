@@ -6,7 +6,6 @@ import React from "react";
 import {
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,18 +26,20 @@ export default function FishDetailsScreen() {
 
   if (!fish) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <View style={styles.safe}>
+        <AppHeader title="Fish Details" variant="dark" />
+
         <View style={styles.center}>
           <Text style={styles.notFound}>Fish not found</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   const profile = fishProfiles[fish.id as keyof typeof fishProfiles];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Fish Details" />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -153,7 +154,7 @@ export default function FishDetailsScreen() {
         </View>
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

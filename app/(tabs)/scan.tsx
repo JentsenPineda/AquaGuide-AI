@@ -1,3 +1,4 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -7,7 +8,6 @@ import {
   Easing,
   Image,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
@@ -213,25 +213,13 @@ export default function ScanScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <Ionicons name="scan-outline" size={22} color="#fff" />
-            <Text style={styles.title}>Goldfish Scan</Text>
-          </View>
-
-          <Pressable
-            onPress={onFlip}
-            style={({ pressed }) => [
-              styles.iconBtn,
-              pressed && { opacity: 0.7 },
-            ]}
-          >
-            <Ionicons name="camera-reverse-outline" size={20} color="#fff" />
-          </Pressable>
-        </View>
+        <AppHeader
+          title="AI Fish Scan"
+          subtitle="Scan and identify ornamental fish"
+          variant="dark"
+        />
 
         {/* Camera / Preview */}
         <View style={styles.previewWrap}>
@@ -423,7 +411,7 @@ export default function ScanScreen() {
           </View>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

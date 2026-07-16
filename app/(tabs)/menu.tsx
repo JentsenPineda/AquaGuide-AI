@@ -1,9 +1,38 @@
-import { ScrollView, StyleSheet, View } from "react-native";
-
 import ModuleCard from "@/components/cards/ModuleCard";
 import AppHeader from "@/components/layout/AppHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import { router } from "expo-router";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 export default function MenuScreen() {
+  const { user, logout } = useAuth();
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to sign out of AquaGuide AI?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await logout();
+
+              router.dismissAll();
+
+              router.navigate("/(tabs)/menu");
+            } catch {
+              Alert.alert("Error", "Unable to logout.");
+            }
+          },
+        },
+      ],
+    );
+  };
   return (
     <View style={styles.container}>
       <AppHeader title="Menu" subtitle="Manage your account and application" />
@@ -52,19 +81,41 @@ export default function MenuScreen() {
           title="About"
           subtitle="Learn more about AquaGuide AI"
           icon="information-circle-outline"
-          route="/about"
+          route="/profile/about"
           iconColor="#9C27B0"
           iconBackground="#F3E5F5"
         />
 
-        <ModuleCard
-          title="Logout"
-          subtitle="Sign out from your account"
-          icon="log-out-outline"
-          route="/logout"
-          iconColor="#F44336"
-          iconBackground="#FFEBEE"
-        />
+        {user ? (
+          <ModuleCard
+            title="Logout"
+            subtitle="Sign out from your account"
+            icon="log-out-outline"
+            onPress={handleLogout}
+            iconColor="#F44336"
+            iconBackground="#FFEBEE"
+          />
+        ) : (
+          <>
+            <ModuleCard
+              title="Login"
+              subtitle="Sign in to access reminders and logbook"
+              icon="log-in-outline"
+              route="/auth/login"
+              iconColor="#00BCD4"
+              iconBackground="#E8FAFD"
+            />
+
+            <ModuleCard
+              title="Create Account"
+              subtitle="Register a new AquaGuide AI account"
+              icon="person-add-outline"
+              route="/auth/register"
+              iconColor="#4CAF50"
+              iconBackground="#E8F5E9"
+            />
+          </>
+        )}
       </ScrollView>
     </View>
   );

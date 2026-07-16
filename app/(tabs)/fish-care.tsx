@@ -1,11 +1,10 @@
 import ModuleCard from "@/components/cards/ModuleCard";
 import AppHeader from "@/components/layout/AppHeader";
 import React from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text } from "react-native";
-
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 export default function FishCareScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader
         title="Fish Care"
         subtitle="Everything you need to keep your ornamental fish healthy."
@@ -86,7 +85,7 @@ export default function FishCareScreen() {
           iconBackground="#FCE4EC"
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

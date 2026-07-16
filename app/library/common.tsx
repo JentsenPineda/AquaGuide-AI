@@ -1,8 +1,8 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import {
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -28,7 +28,12 @@ export default function SpeciesLibrary() {
   }, [search]);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
+      <AppHeader
+        title="Species Library"
+        subtitle="Browse ornamental fish species and care information"
+        variant="dark"
+      />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -67,13 +72,13 @@ export default function SpeciesLibrary() {
 
             <Text style={styles.info}>Temperature: {fish.temperature}</Text>
 
-            <Text style={styles.info}>pH Level: {fish.ph}</Text>
+            <Text style={styles.info}>pH Level: {fish.pH}</Text>
           </Pressable>
         ))}
 
         <View style={{ height: 30 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

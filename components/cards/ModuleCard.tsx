@@ -7,7 +7,8 @@ type ModuleCardProps = {
   title: string;
   subtitle: string;
   icon: keyof typeof Ionicons.glyphMap;
-  route: string;
+  route?: string;
+  onPress?: () => void;
   iconColor?: string;
   iconBackground?: string;
 };
@@ -17,13 +18,20 @@ export default function ModuleCard({
   subtitle,
   icon,
   route,
+  onPress,
   iconColor = "#00BCD4",
   iconBackground = "#E8FAFD",
 }: ModuleCardProps) {
   return (
     <Pressable
       style={styles.moduleCard}
-      onPress={() => router.push(route as any)}
+      onPress={() => {
+        if (onPress) {
+          onPress();
+        } else if (route) {
+          router.push(route as any);
+        }
+      }}
     >
       <View style={styles.moduleLeft}>
         <View

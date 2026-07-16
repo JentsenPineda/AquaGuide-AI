@@ -6,7 +6,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -70,7 +69,7 @@ const timeline = [
 
 export default function First24HoursScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <AppHeader title="New Fish Care" variant="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -142,7 +141,7 @@ export default function First24HoursScreen() {
           <Ionicons name="arrow-forward" size={22} color="#FFFFFF" />
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

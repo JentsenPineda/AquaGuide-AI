@@ -6,7 +6,6 @@ import React, { useMemo, useState } from "react";
 import {
   FlatList,
   Image,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -36,7 +35,7 @@ export default function VariantsScreen() {
     .replace(/^./, (str) => str.toUpperCase());
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Fish Variants" />
       <FlatList
         data={filteredVariants}
@@ -105,7 +104,7 @@ export default function VariantsScreen() {
           </View>
         )}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -1,21 +1,25 @@
-import { Stack } from "expo-router";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import AppHeader from "@/components/layout/AppHeader";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function VerifyEmailScreen() {
   return (
-    <>
-      <Stack.Screen options={{ title: "Email Verification" }} />
+    <View style={styles.container}>
+      <AppHeader
+        title="Email Verification"
+        subtitle="Verify your AquaGuide AI account"
+        showBack
+        variant="light"
+      />
 
-      <SafeAreaView style={styles.container}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Coming Soon</Text>
+      <View style={styles.content}>
+        <Text style={styles.title}>Coming Soon</Text>
 
-          <Text style={styles.subtitle}>
-            Email Verification will be available in a future update.
-          </Text>
-        </View>
-      </SafeAreaView>
-    </>
+        <Text style={styles.subtitle}>
+          Email verification will be available in a future update.
+        </Text>
+      </View>
+    </View>
   );
 }
 

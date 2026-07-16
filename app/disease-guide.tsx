@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -149,9 +148,8 @@ export default function DiseaseGuide() {
     }, 2000);
   };
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Disease Guide" />
-
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -417,7 +415,7 @@ export default function DiseaseGuide() {
           </View>
         </Modal>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

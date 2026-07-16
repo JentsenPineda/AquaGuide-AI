@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type AppHeaderProps = {
@@ -24,7 +24,10 @@ export default function AppHeader({
       style={[
         styles.container,
         {
-          paddingTop: insets.top,
+          paddingTop:
+            Platform.OS === "ios"
+              ? Math.max(insets.top - 8, 0)
+              : Math.max(insets.top, 6),
           backgroundColor: variant === "dark" ? "#08141F" : "#F2FBFD",
         },
       ]}
@@ -40,9 +43,15 @@ export default function AppHeader({
         <View style={styles.left}>
           {showBack ? (
             <Pressable
-              onPress={() => router.back()}
               hitSlop={12}
               style={styles.backButton}
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace("/(tabs)");
+                }
+              }}
             >
               <Ionicons
                 name="chevron-back"
@@ -54,6 +63,7 @@ export default function AppHeader({
             <View style={styles.placeholder} />
           )}
         </View>
+
         <View style={styles.titleContainer}>
           <Text
             numberOfLines={1}
@@ -69,6 +79,7 @@ export default function AppHeader({
 
           {subtitle ? (
             <Text
+              numberOfLines={1}
               style={[
                 styles.subtitle,
                 {
@@ -80,6 +91,7 @@ export default function AppHeader({
             </Text>
           ) : null}
         </View>
+
         <View style={styles.right} />
       </View>
     </View>
@@ -90,7 +102,8 @@ const styles = StyleSheet.create({
   container: {},
 
   header: {
-    height: 56,
+    minHeight: 56,
+    paddingVertical: 6,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
@@ -113,10 +126,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  title: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+
   subtitle: {
-    fontSize: 10,
     marginTop: 2,
     textAlign: "center",
+    fontSize: 10,
   },
 
   placeholder: {
@@ -125,13 +144,5 @@ const styles = StyleSheet.create({
 
   backButton: {
     padding: 4,
-  },
-
-  title: {
-    flex: 1,
-    textAlign: "center",
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "700",
   },
 });

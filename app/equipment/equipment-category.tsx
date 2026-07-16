@@ -5,7 +5,6 @@ import React from "react";
 import {
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,7 +18,7 @@ export default function EquipmentCategory() {
   const equipment = equipmentData[category as keyof typeof equipmentData] || [];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <AppHeader title="Equipment Categories" />
       <ScrollView
         contentContainerStyle={styles.container}
@@ -53,7 +52,7 @@ export default function EquipmentCategory() {
           </Pressable>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

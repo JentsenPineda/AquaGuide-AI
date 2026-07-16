@@ -63,7 +63,7 @@ export default function ReminderScreen() {
     }
   };
   if (!user) {
-    return <LoginRequired />;
+    return <LoginRequired redirect="reminder" />;
   }
 
   return (

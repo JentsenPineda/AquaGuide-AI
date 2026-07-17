@@ -56,4 +56,12 @@ export const DarkColors = {
   overlay: "rgba(0,0,0,0.45)",
 } as const;
 
+/**
+ * Temporary compatibility export.
+ * Existing screens that still import `Colors`
+ * will continue using the original dark palette.
+ * We'll migrate them one by one to `useAppColors()`.
+ */
+export const Colors = DarkColors;
+
 export type AppColors = typeof LightColors;

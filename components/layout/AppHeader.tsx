@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -15,9 +16,10 @@ export default function AppHeader({
   title,
   subtitle,
   showBack = true,
-  variant = "dark",
+  variant,
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
+  const colors = useAppColors(variant);
 
   return (
     <View
@@ -28,7 +30,7 @@ export default function AppHeader({
             Platform.OS === "ios"
               ? Math.max(insets.top - 8, 0)
               : Math.max(insets.top, 6),
-          backgroundColor: variant === "dark" ? "#08141F" : "#F2FBFD",
+          backgroundColor: colors.background,
         },
       ]}
     >
@@ -36,7 +38,7 @@ export default function AppHeader({
         style={[
           styles.header,
           {
-            borderBottomColor: variant === "dark" ? "#183B4E" : "#D7E3EA",
+            borderBottomColor: colors.border,
           },
         ]}
       >
@@ -53,11 +55,7 @@ export default function AppHeader({
                 }
               }}
             >
-              <Ionicons
-                name="chevron-back"
-                size={26}
-                color={variant === "dark" ? "#00BCD4" : "#003B57"}
-              />
+              <Ionicons name="chevron-back" size={26} color={colors.primary} />
             </Pressable>
           ) : (
             <View style={styles.placeholder} />
@@ -70,7 +68,7 @@ export default function AppHeader({
             style={[
               styles.title,
               {
-                color: variant === "dark" ? "#FFFFFF" : "#003B57",
+                color: colors.textPrimary,
               },
             ]}
           >
@@ -83,7 +81,7 @@ export default function AppHeader({
               style={[
                 styles.subtitle,
                 {
-                  color: variant === "dark" ? "#AAB7C2" : "#607D8B",
+                  color: colors.textSecondary,
                 },
               ]}
             >

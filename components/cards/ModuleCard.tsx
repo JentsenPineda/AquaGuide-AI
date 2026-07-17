@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -22,9 +23,17 @@ export default function ModuleCard({
   iconColor = "#00BCD4",
   iconBackground = "#E8FAFD",
 }: ModuleCardProps) {
+  const colors = useAppColors();
+
   return (
     <Pressable
-      style={styles.moduleCard}
+      style={[
+        styles.moduleCard,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+        },
+      ]}
       onPress={() => {
         if (onPress) {
           onPress();
@@ -46,20 +55,37 @@ export default function ModuleCard({
         </View>
 
         <View style={styles.textContainer}>
-          <Text style={styles.moduleTitle}>{title}</Text>
+          <Text
+            style={[
+              styles.moduleTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {title}
+          </Text>
 
-          <Text style={styles.moduleSubtitle}>{subtitle}</Text>
+          <Text
+            style={[
+              styles.moduleSubtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {subtitle}
+          </Text>
         </View>
       </View>
 
-      <Ionicons name="chevron-forward" size={22} color="#90A4AE" />
+      <Ionicons name="chevron-forward" size={22} color={colors.textMuted} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   moduleCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
     flexDirection: "row",
@@ -67,7 +93,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#E6EEF2",
   },
 
   moduleLeft: {
@@ -80,7 +105,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 16,
-    backgroundColor: "#E8FAFD",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
@@ -93,13 +117,11 @@ const styles = StyleSheet.create({
   moduleTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#003B57",
   },
 
   moduleSubtitle: {
     marginTop: 4,
     fontSize: 14,
-    color: "#607D8B",
     lineHeight: 20,
   },
 });

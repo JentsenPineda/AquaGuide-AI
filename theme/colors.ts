@@ -1,4 +1,33 @@
-export const Colors = {
+export const LightColors = {
+  // Brand
+  primary: "#00BCD4",
+  primaryLight: "#00D4FF",
+
+  // Backgrounds
+  background: "#F4F7FA",
+  card: "#FFFFFF",
+  surface: "#F8FAFC",
+
+  // Borders
+  border: "#E6EEF2",
+  divider: "#EEF2F7",
+
+  // Text
+  white: "#FFFFFF",
+  textPrimary: "#003B57",
+  textSecondary: "#607D8B",
+  textMuted: "#90A4AE",
+
+  // Status
+  success: "#4CAF50",
+  warning: "#FFC107",
+  danger: "#F44336",
+
+  // Overlay
+  overlay: "rgba(0,0,0,0.45)",
+} as const;
+
+export const DarkColors = {
   // Brand
   primary: "#00BCD4",
   primaryLight: "#00D4FF",
@@ -27,4 +56,4 @@ export const Colors = {
   overlay: "rgba(0,0,0,0.45)",
 } as const;
 
-export type ColorKey = keyof typeof Colors;
+export type AppColors = typeof LightColors;

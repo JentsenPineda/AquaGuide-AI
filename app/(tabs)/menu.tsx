@@ -72,7 +72,7 @@ export default function MenuScreen() {
           title="Settings"
           subtitle="Customize AquaGuide AI"
           icon="settings-outline"
-          route="/settings"
+          route="/profile/dark-mode"
           iconColor="#607D8B"
           iconBackground="#ECEFF1"
         />

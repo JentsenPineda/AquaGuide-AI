@@ -1,6 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -10,10 +10,12 @@ import {
   View,
 } from "react-native";
 
-export default function DarkModeScreen() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [followSystem, setFollowSystem] = useState(true);
+import { useTheme } from "@/contexts/ThemeContext";
 
+export default function DarkModeScreen() {
+  const { mode, colorScheme, setMode } = useTheme();
+  console.log("Theme Mode:", mode);
+  console.log("Color Scheme:", colorScheme);
   return (
     <View style={styles.screen}>
       <AppHeader
@@ -52,7 +54,10 @@ export default function DarkModeScreen() {
               </View>
             </View>
 
-            <Switch value={darkMode} onValueChange={setDarkMode} />
+            <Switch
+              value={mode === "dark"}
+              onValueChange={(value) => setMode(value ? "dark" : "light")}
+            />
           </View>
 
           <View style={styles.divider} />
@@ -74,7 +79,10 @@ export default function DarkModeScreen() {
               </View>
             </View>
 
-            <Switch value={followSystem} onValueChange={setFollowSystem} />
+            <Switch
+              value={mode === "system"}
+              onValueChange={(value) => setMode(value ? "system" : "light")}
+            />
           </View>
         </View>
 

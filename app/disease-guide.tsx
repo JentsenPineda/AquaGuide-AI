@@ -1,4 +1,8 @@
+import ThemeCard from "@/components/cards/ThemeCard";
+import ThemeChip from "@/components/chips/ThemeChip";
+import ThemeInput from "@/components/inputs/ThemeInput";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
@@ -154,60 +157,50 @@ export default function DiseaseGuide() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.hero}>
-          <Text style={styles.heroTitle}>🩺 AquaGuide AI</Text>
+        <ThemeCard style={styles.hero}>
+          <ThemeText variant="title">🩺 AquaGuide AI</ThemeText>
 
-          <Text style={styles.heroSubtitle}>
+          <ThemeText variant="subtitle" style={styles.heroSubtitle}>
             Select the symptoms you observe and AquaGuide AI will identify the
             most likely disease.
-          </Text>
-        </View>
+          </ThemeText>
+        </ThemeCard>
 
         <Text style={styles.sectionTitle}>Select Symptoms</Text>
 
-        <View style={styles.searchCard}>
+        <ThemeCard style={styles.searchCard}>
           <Text style={styles.searchTitle}>Fish Observation</Text>
 
-          <View style={styles.searchInputContainer}>
-            <Ionicons
-              name="search"
-              size={20}
-              color="#8FA3B0"
-              style={{ marginLeft: 12 }}
-            />
+          <ThemeInput
+            icon="search"
+            placeholder="Describe what you observe..."
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
 
-            <TextInput
-              placeholder="Describe what you observe..."
-              placeholderTextColor="#8FA3B0"
-              value={searchQuery}
-              onChangeText={(text) => {
-                setSearchQuery(text);
+              if (text.trim() !== "") {
+                setIsSearchFocused(false);
 
-                if (text.trim() !== "") {
-                  setIsSearchFocused(false);
+                const matches = findMatchingSymptoms(text);
 
-                  const matches = findMatchingSymptoms(text);
+                const matchedCategory = symptomDatabase.find((category) =>
+                  category.symptoms.some(
+                    (symptom) =>
+                      symptom.toLowerCase().includes(text.toLowerCase()) ||
+                      matches.includes(symptom),
+                  ),
+                );
 
-                  const matchedCategory = symptomDatabase.find((category) =>
-                    category.symptoms.some(
-                      (symptom) =>
-                        symptom.toLowerCase().includes(text.toLowerCase()) ||
-                        matches.includes(symptom),
-                    ),
-                  );
-
-                  if (matchedCategory) {
-                    setExpandedCategory(matchedCategory.title);
-                  }
-                } else {
-                  setIsSearchFocused(true);
-                  setExpandedCategory(null);
+                if (matchedCategory) {
+                  setExpandedCategory(matchedCategory.title);
                 }
-              }}
-              onFocus={() => setIsSearchFocused(true)}
-              style={styles.searchInput}
-            />
-          </View>
+              } else {
+                setIsSearchFocused(true);
+                setExpandedCategory(null);
+              }
+            }}
+            onFocus={() => setIsSearchFocused(true)}
+          />
 
           {isSearchFocused && searchQuery.trim() === "" && (
             <>
@@ -215,9 +208,9 @@ export default function DiseaseGuide() {
 
               <View style={styles.exampleChips}>
                 {exampleSearches.map((item) => (
-                  <Pressable
+                  <ThemeChip
                     key={item}
-                    style={styles.exampleChip}
+                    title={item}
                     onPress={() => {
                       const query = item.toLowerCase();
 
@@ -240,14 +233,12 @@ export default function DiseaseGuide() {
                         setExpandedCategory(matchedCategory.title);
                       }
                     }}
-                  >
-                    <Text style={styles.exampleChipText}>{item}</Text>
-                  </Pressable>
+                  />
                 ))}
               </View>
             </>
           )}
-        </View>
+        </ThemeCard>
 
         {selectedSymptoms.length > 0 && (
           <View style={styles.selectedCard}>
@@ -431,20 +422,17 @@ const styles = StyleSheet.create({
   },
 
   hero: {
-    backgroundColor: Colors.card,
     padding: RS(22),
     borderRadius: RS(24),
     marginBottom: RS(20),
   },
 
   heroTitle: {
-    color: Colors.white,
     fontSize: RF(28),
     fontWeight: "bold",
   },
 
   heroSubtitle: {
-    color: Colors.textSecondary,
     marginTop: RS(8),
     lineHeight: RF(22),
     fontSize: RF(15),
@@ -773,14 +761,13 @@ const styles = StyleSheet.create({
   },
 
   searchCard: {
-    backgroundColor: "#102331",
     borderRadius: 18,
     padding: 18,
     marginBottom: 20,
   },
 
   searchTitle: {
-    color: "#FFFFFF",
+    color: "#000000ff",
     fontSize: 20,
     fontWeight: "700",
   },

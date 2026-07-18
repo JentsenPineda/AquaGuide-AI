@@ -1,91 +1,129 @@
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function NewFishCareScreen() {
+  const colors = useAppColors();
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
+
+    heroIcon: {
+      backgroundColor: colors.card,
+    },
+
+    sectionTitle: {
+      color: colors.textPrimary,
+    },
+
+    card: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    timeCard: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="New Fish Care" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="New Fish Care" />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         {/* Hero */}
-        <View style={styles.hero}>
-          <View style={styles.heroIcon}>
-            <Ionicons name="fish" size={70} color="#00BCD4" />
+        <ThemeCard style={styles.hero}>
+          <View style={[styles.heroIcon, dynamicStyles.heroIcon]}>
+            <Ionicons name="fish" size={70} color={colors.primary} />
           </View>
 
-          <Text style={styles.title}>Welcome Your New Fish</Text>
+          <ThemeText variant="title" style={styles.title}>
+            Welcome Your New Fish
+          </ThemeText>
 
-          <Text style={styles.subtitle}>
+          <ThemeText variant="body" style={styles.subtitle}>
             Follow this interactive guide to safely acclimate your newly
             purchased fish. Proper acclimation reduces stress, prevents water
             shock, and lowers the risk of diseases.
-          </Text>
-        </View>
+          </ThemeText>
+        </ThemeCard>
 
         {/* Benefits */}
-        <Text style={styles.sectionTitle}>Why Proper Acclimation Matters</Text>
+        <ThemeText
+          variant="title"
+          style={[styles.sectionTitle, dynamicStyles.sectionTitle]}
+        >
+          Why Proper Acclimation Matters
+        </ThemeText>
 
-        <View style={styles.card}>
-          <Ionicons name="heart" size={30} color="#00BCD4" />
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
+          <Ionicons name="heart" size={30} color={colors.primary} />
+
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Reduce Stress</Text>
-            <Text style={styles.cardText}>
+            <ThemeText variant="subtitle">Reduce Stress</ThemeText>
+
+            <ThemeText variant="body" style={styles.cardText}>
               Fish experience stress during transportation. Proper acclimation
               helps them recover safely.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
+        </ThemeCard>
 
-        <View style={styles.card}>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
           <Ionicons name="water" size={30} color="#2196F3" />
+
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Prevent Water Shock</Text>
-            <Text style={styles.cardText}>
+            <ThemeText variant="subtitle">Prevent Water Shock</ThemeText>
+
+            <ThemeText variant="body" style={styles.cardText}>
               Sudden changes in temperature or water chemistry can seriously
               harm your fish.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
+        </ThemeCard>
 
-        <View style={styles.card}>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
           <Ionicons name="shield-checkmark" size={30} color="#4CAF50" />
+
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Prevent Diseases</Text>
-            <Text style={styles.cardText}>
+            <ThemeText variant="subtitle">Prevent Diseases</ThemeText>
+
+            <ThemeText variant="body" style={styles.cardText}>
               A stress-free acclimation process strengthens the immune system
               and reduces disease risk.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
+        </ThemeCard>
 
         {/* Time */}
-        <View style={styles.timeCard}>
+        <ThemeCard style={[styles.timeCard, dynamicStyles.timeCard]}>
           <Ionicons name="time" size={32} color="#FF9800" />
-          <Text style={styles.timeTitle}>Estimated Guide Duration</Text>
-          <Text style={styles.timeValue}>30 – 45 Minutes</Text>
-        </View>
+
+          <ThemeText variant="subtitle" style={styles.timeTitle}>
+            Estimated Guide Duration
+          </ThemeText>
+
+          <ThemeText variant="title" style={styles.timeValue}>
+            30 – 45 Minutes
+          </ThemeText>
+        </ThemeCard>
 
         {/* Buttons */}
-        <TouchableOpacity
-          style={styles.startButton}
+        <ThemeButton
+          title="Start Guide"
           onPress={() => router.push("/new-fish-care/preparation")}
-        >
-          <Text style={styles.startText}>Start Guide</Text>
-
-          <Ionicons name="arrow-forward-circle" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
+          style={styles.startButton}
+        />
 
         <TouchableOpacity style={styles.learnButton}>
           <Ionicons
@@ -94,7 +132,9 @@ export default function NewFishCareScreen() {
             color="#00BCD4"
           />
 
-          <Text style={styles.learnText}>Why Is Acclimation Important?</Text>
+          <ThemeText variant="subtitle" style={styles.learnText}>
+            Why Is Acclimation Important?
+          </ThemeText>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -114,6 +154,8 @@ const styles = StyleSheet.create({
 
   hero: {
     alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     marginTop: 15,
     marginBottom: 30,
   },
@@ -122,7 +164,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#E6FAFD",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -131,7 +172,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: "800",
-    color: "#003B57",
     textAlign: "center",
   },
 
@@ -139,7 +179,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 16,
     lineHeight: 25,
-    color: "#607D8B",
     textAlign: "center",
   },
 
@@ -164,15 +203,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
 
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#003B57",
-    marginBottom: 6,
-  },
-
   cardText: {
-    color: "#607D8B",
     lineHeight: 22,
     fontSize: 15,
   },
@@ -191,7 +222,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 17,
     fontWeight: "700",
-    color: "#003B57",
   },
 
   timeValue: {
@@ -211,13 +241,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
-  startText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 18,
-    marginRight: 10,
-  },
-
   learnButton: {
     borderWidth: 2,
     borderColor: "#00BCD4",
@@ -229,7 +252,6 @@ const styles = StyleSheet.create({
   },
 
   learnText: {
-    color: "#00BCD4",
     fontSize: 17,
     fontWeight: "700",
     marginLeft: 8,

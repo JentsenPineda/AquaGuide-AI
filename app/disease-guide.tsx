@@ -1,8 +1,3 @@
-import ThemeCard from "@/components/cards/ThemeCard";
-import ThemeChip from "@/components/chips/ThemeChip";
-import ThemeInput from "@/components/inputs/ThemeInput";
-import AppHeader from "@/components/layout/AppHeader";
-import ThemeText from "@/components/text/ThemeText";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,15 +9,27 @@ import {
   View,
 } from "react-native";
 
-import { TAB_BAR_HEIGHT } from "@/constants/layout";
-import { Colors } from "@/theme/colors";
-import { RF, RS } from "@/utils/responsive";
 import { Ionicons } from "@expo/vector-icons";
+
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
+import ThemeChip from "@/components/chips/ThemeChip";
+import ThemeInput from "@/components/inputs/ThemeInput";
+import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
+
+import { useAppColors } from "@/theme/useAppColors";
+
+import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { RF, RS } from "@/utils/responsive";
+
 import { diseaseDatabase } from "../data/diseaseDatabase";
 import { symptomDatabase } from "../data/symptomDatabase";
 import { symptomIntentDatabase } from "../data/symptomIntentDatabase";
 
 export default function DiseaseGuide() {
+  const colors = useAppColors();
+
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -30,6 +37,62 @@ export default function DiseaseGuide() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+
+  const dynamicStyles = {
+    safe: {
+      backgroundColor: colors.background,
+    },
+
+    sectionTitle: {
+      color: colors.textPrimary,
+    },
+
+    selectedCard: {
+      backgroundColor: colors.card,
+    },
+
+    selectedTitle: {
+      color: colors.textPrimary,
+    },
+
+    selectedItemText: {
+      color: colors.textPrimary,
+    },
+
+    clearText: {
+      color: colors.primary,
+    },
+
+    symptomCard: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    activeSymptomCard: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+
+    symptomText: {
+      color: colors.textPrimary,
+    },
+
+    activeSymptomText: {
+      color: colors.background,
+    },
+
+    infoCard: {
+      backgroundColor: colors.surface,
+    },
+
+    divider: {
+      backgroundColor: colors.border,
+    },
+
+    confidenceBadge: {
+      backgroundColor: colors.primary,
+    },
+  };
   useEffect(() => {
     const observations = [
       ...new Set(
@@ -151,7 +214,7 @@ export default function DiseaseGuide() {
     }, 2000);
   };
   return (
-    <View style={styles.safe}>
+    <View style={[styles.safe, dynamicStyles.safe]}>
       <AppHeader title="Disease Guide" />
       <ScrollView
         contentContainerStyle={styles.container}
@@ -166,8 +229,12 @@ export default function DiseaseGuide() {
           </ThemeText>
         </ThemeCard>
 
-        <Text style={styles.sectionTitle}>Select Symptoms</Text>
-
+        <ThemeText
+          variant="title"
+          style={[styles.sectionTitle, dynamicStyles.sectionTitle]}
+        >
+          Select Symptoms
+        </ThemeText>
         <ThemeCard style={styles.searchCard}>
           <Text style={styles.searchTitle}>Fish Observation</Text>
 
@@ -241,11 +308,14 @@ export default function DiseaseGuide() {
         </ThemeCard>
 
         {selectedSymptoms.length > 0 && (
-          <View style={styles.selectedCard}>
+          <View style={[styles.selectedCard, dynamicStyles.selectedCard]}>
             <View style={styles.selectedHeader}>
-              <Text style={styles.selectedTitle}>
+              <ThemeText
+                variant="body"
+                style={[styles.selectedTitle, dynamicStyles.selectedTitle]}
+              >
                 Selected Symptoms ({selectedSymptoms.length})
-              </Text>
+              </ThemeText>
 
               <Pressable
                 onPress={() => {
@@ -253,15 +323,32 @@ export default function DiseaseGuide() {
                   setResult(null);
                 }}
               >
-                <Text style={styles.clearText}>Clear All</Text>
+                <ThemeText
+                  variant="body"
+                  style={[styles.clearText, dynamicStyles.clearText]}
+                >
+                  Clear All
+                </ThemeText>
               </Pressable>
             </View>
 
             {selectedSymptoms.map((symptom) => (
               <View key={symptom} style={styles.selectedItem}>
-                <Ionicons name="checkmark-circle" size={18} color="#00BCD4" />
+                <Ionicons
+                  name="checkmark-circle"
+                  size={18}
+                  color={colors.primary}
+                />
 
-                <Text style={styles.selectedItemText}>{symptom}</Text>
+                <ThemeText
+                  variant="body"
+                  style={[
+                    styles.selectedItemText,
+                    dynamicStyles.selectedItemText,
+                  ]}
+                >
+                  {symptom}
+                </ThemeText>
               </View>
             ))}
           </View>
@@ -271,7 +358,15 @@ export default function DiseaseGuide() {
             const expanded = expandedCategory === category.title;
 
             return (
-              <View key={category.title} style={styles.categoryCard}>
+              <View
+                key={category.title}
+                style={[
+                  styles.categoryCard,
+                  {
+                    backgroundColor: colors.card,
+                  },
+                ]}
+              >
                 <Pressable
                   style={styles.categoryHeader}
                   onPress={() =>
@@ -282,10 +377,20 @@ export default function DiseaseGuide() {
                     <Ionicons
                       name={category.icon as any}
                       size={22}
-                      color="#00BCD4"
+                      color={colors.primary}
                     />
 
-                    <Text style={styles.categoryTitle}>{category.title}</Text>
+                    <ThemeText
+                      variant="body"
+                      style={[
+                        styles.categoryTitle,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      {category.title}
+                    </ThemeText>
                   </View>
 
                   <Ionicons
@@ -293,7 +398,7 @@ export default function DiseaseGuide() {
                       expanded ? "chevron-up-outline" : "chevron-down-outline"
                     }
                     size={22}
-                    color="#FFFFFF"
+                    color={colors.textPrimary}
                   />
                 </Pressable>
 
@@ -304,19 +409,26 @@ export default function DiseaseGuide() {
                       onPress={() => toggleSymptom(symptom)}
                       style={[
                         styles.symptomCard,
-                        selectedSymptoms.includes(symptom) &&
+                        dynamicStyles.symptomCard,
+                        selectedSymptoms.includes(symptom) && [
                           styles.activeSymptomCard,
+                          dynamicStyles.activeSymptomCard,
+                        ],
                       ]}
                     >
-                      <Text
+                      <ThemeText
+                        variant="body"
                         style={[
                           styles.symptomText,
-                          selectedSymptoms.includes(symptom) &&
+                          dynamicStyles.symptomText,
+                          selectedSymptoms.includes(symptom) && [
                             styles.activeSymptomText,
+                            dynamicStyles.activeSymptomText,
+                          ],
                         ]}
                       >
                         {symptom}
-                      </Text>
+                      </ThemeText>
                     </Pressable>
                   ))}
               </View>
@@ -324,21 +436,49 @@ export default function DiseaseGuide() {
           })}
         </View>
 
-        <Pressable style={styles.analyzeButton} onPress={analyzeSymptoms}>
-          <Text style={styles.analyzeText}>Analyze Symptoms</Text>
-        </Pressable>
+        <ThemeButton
+          title="Analyze Symptoms"
+          loading={loading}
+          onPress={analyzeSymptoms}
+          style={styles.analyzeButton}
+        />
 
         <Modal visible={loading} transparent animationType="fade">
           <View style={styles.modalOverlay}>
-            <View style={styles.loadingModal}>
-              <ActivityIndicator size="large" color="#00BCD4" />
+            <View
+              style={[
+                styles.loadingModal,
+                {
+                  backgroundColor: colors.card,
+                },
+              ]}
+            >
+              <ActivityIndicator size="large" color={colors.primary} />
 
-              <Text style={styles.loadingTitle}>Analyzing Symptoms</Text>
+              <ThemeText
+                variant="title"
+                style={[
+                  styles.loadingTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Analyzing Symptoms
+              </ThemeText>
 
-              <Text style={styles.loadingMessage}>
+              <ThemeText
+                variant="body"
+                style={[
+                  styles.loadingMessage,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
                 AquaGuide AI is comparing the selected symptoms with the disease
                 database...
-              </Text>
+              </ThemeText>
             </View>
           </View>
         </Modal>
@@ -349,7 +489,14 @@ export default function DiseaseGuide() {
           animationType="slide"
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.resultModal}>
+            <View
+              style={[
+                styles.resultModal,
+                {
+                  backgroundColor: colors.card,
+                },
+              ]}
+            >
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.resultScrollContent}
@@ -357,38 +504,129 @@ export default function DiseaseGuide() {
                 <Ionicons
                   name="shield-checkmark"
                   size={60}
-                  color="#00BCD4"
+                  color={colors.primary}
                   style={{ alignSelf: "center", marginBottom: 15 }}
                 />
-                <Text style={styles.resultModalTitle}>Disease Analysis</Text>
-                <Text style={styles.resultSubtitle}>Diagnosis Complete</Text>
-                <View style={styles.divider} />
-                <Text style={styles.resultLabel}>Most Likely Disease</Text>
-                <Text style={styles.resultDisease}>{result?.name}</Text>
-                <View style={styles.confidenceBadge}>
+                <ThemeText
+                  variant="title"
+                  style={[
+                    styles.resultModalTitle,
+                    {
+                      color: colors.primary,
+                    },
+                  ]}
+                >
+                  Disease Analysis
+                </ThemeText>
+                <ThemeText
+                  variant="body"
+                  style={[
+                    styles.resultSubtitle,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Diagnosis Complete
+                </ThemeText>
+                <View style={[styles.divider, dynamicStyles.divider]} />
+                <ThemeText
+                  variant="body"
+                  style={[
+                    styles.resultLabel,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Most Likely Disease
+                </ThemeText>
+                <ThemeText
+                  variant="title"
+                  style={[
+                    styles.resultDisease,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {result?.name}
+                </ThemeText>
+                <View
+                  style={[
+                    styles.confidenceBadge,
+                    dynamicStyles.confidenceBadge,
+                  ]}
+                >
                   <Text style={styles.confidenceText}>HIGH MATCH</Text>
                 </View>
                 <View style={styles.divider} />
-                <Text style={styles.resultSection}>Treatment</Text>
+                <ThemeText
+                  variant="title"
+                  style={[
+                    styles.resultSection,
+                    {
+                      color: colors.primary,
+                    },
+                  ]}
+                >
+                  Treatment
+                </ThemeText>
                 {result?.treatment.map((item: string) => (
-                  <View key={item} style={styles.infoCard}>
+                  <View
+                    key={item}
+                    style={[styles.infoCard, dynamicStyles.infoCard]}
+                  >
                     <Ionicons
                       name="checkmark-circle"
                       size={18}
-                      color="#00BCD4"
+                      color={colors.primary}
                     />
-                    <Text style={styles.infoText}>{item}</Text>
+                    <ThemeText
+                      variant="body"
+                      style={[
+                        styles.infoText,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      {item}
+                    </ThemeText>
                   </View>
                 ))}
-                <Text style={styles.resultSection}>Prevention</Text>
+                <ThemeText
+                  variant="title"
+                  style={[
+                    styles.resultSection,
+                    {
+                      color: colors.primary,
+                    },
+                  ]}
+                >
+                  Prevention
+                </ThemeText>
                 {result?.prevention.map((item: string) => (
-                  <View key={item} style={styles.infoCard}>
+                  <View
+                    key={item}
+                    style={[styles.infoCard, dynamicStyles.infoCard]}
+                  >
                     <Ionicons
                       name="shield-checkmark"
                       size={18}
-                      color="#00BCD4"
+                      color={colors.primary}
                     />
-                    <Text style={styles.infoText}>{item}</Text>
+                    <ThemeText
+                      variant="body"
+                      style={[
+                        styles.infoText,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      {item}
+                    </ThemeText>
                   </View>
                 ))}
                 <Pressable
@@ -399,7 +637,17 @@ export default function DiseaseGuide() {
                     setSearchQuery("");
                   }}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <ThemeText
+                    variant="body"
+                    style={[
+                      styles.closeButtonText,
+                      {
+                        color: colors.background,
+                      },
+                    ]}
+                  >
+                    Close
+                  </ThemeText>
                 </Pressable>
               </ScrollView>
             </View>
@@ -413,7 +661,6 @@ export default function DiseaseGuide() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
 
   container: {
@@ -439,7 +686,6 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: Colors.white,
     fontSize: RF(18),
     fontWeight: "700",
     marginBottom: RS(12),
@@ -451,28 +697,21 @@ const styles = StyleSheet.create({
   },
 
   symptomCard: {
-    backgroundColor: Colors.card,
     borderRadius: RS(14),
     paddingVertical: RS(14),
     paddingHorizontal: RS(16),
     marginBottom: RS(10),
     borderWidth: 1,
-    borderColor: Colors.border,
   },
 
-  activeSymptomCard: {
-    backgroundColor: Colors.primaryLight,
-    borderColor: Colors.primaryLight,
-  },
+  activeSymptomCard: {},
 
   symptomText: {
-    color: Colors.white,
     fontSize: RF(15),
     fontWeight: "600",
   },
 
   activeSymptomText: {
-    color: Colors.background,
     fontWeight: "700",
   },
 
@@ -500,10 +739,6 @@ const styles = StyleSheet.create({
   },
 
   analyzeButton: {
-    backgroundColor: "#00D4FF",
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: "center",
     marginTop: 15,
   },
 
@@ -511,59 +746,6 @@ const styles = StyleSheet.create({
     color: "#08141F",
     fontWeight: "800",
     fontSize: 16,
-  },
-
-  loadingCard: {
-    backgroundColor: "#102331",
-    borderRadius: 24,
-    padding: 25,
-    alignItems: "center",
-    marginTop: 20,
-  },
-
-  loadingText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 15,
-  },
-
-  loadingSub: {
-    color: "#B0BEC5",
-    marginTop: 10,
-    textAlign: "center",
-  },
-
-  resultCard: {
-    backgroundColor: "#102331",
-    borderRadius: 24,
-    padding: 20,
-    marginTop: 20,
-  },
-
-  resultTitle: {
-    color: "#00D4FF",
-    fontSize: 18,
-    fontWeight: "700",
-  },
-
-  diseaseName: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-
-  sectionLabel: {
-    color: "#00D4FF",
-    marginTop: 20,
-    marginBottom: 8,
-    fontWeight: "700",
-  },
-
-  resultItem: {
-    color: "#CFD8DC",
-    marginBottom: 5,
   },
 
   modalOverlay: {
@@ -575,21 +757,18 @@ const styles = StyleSheet.create({
 
   loadingModal: {
     width: "85%",
-    backgroundColor: "#102331",
     borderRadius: 24,
     padding: 28,
     alignItems: "center",
   },
 
   loadingTitle: {
-    color: "#FFFFFF",
     fontSize: 22,
     fontWeight: "700",
     marginTop: 20,
   },
 
   loadingMessage: {
-    color: "#B0BEC5",
     textAlign: "center",
     marginTop: 12,
     lineHeight: 22,
@@ -598,7 +777,6 @@ const styles = StyleSheet.create({
   resultModal: {
     width: "90%",
     maxHeight: "85%",
-    backgroundColor: "#102331",
     borderRadius: 24,
     overflow: "hidden",
   },
@@ -609,21 +787,18 @@ const styles = StyleSheet.create({
   },
 
   resultModalTitle: {
-    color: "#00D4FF",
     fontSize: 24,
     fontWeight: "800",
     marginBottom: 10,
   },
 
   resultDisease: {
-    color: "#FFFFFF",
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
   },
 
   resultSection: {
-    color: "#00D4FF",
     fontSize: 18,
     fontWeight: "700",
     marginTop: 15,
@@ -639,7 +814,6 @@ const styles = StyleSheet.create({
   },
 
   closeButtonText: {
-    color: "#FFFFFF",
     fontWeight: "700",
     fontSize: 17,
   },
@@ -653,7 +827,6 @@ const styles = StyleSheet.create({
 
   divider: {
     height: 1,
-    backgroundColor: "#263C4D",
     marginVertical: 18,
   },
 
@@ -664,7 +837,6 @@ const styles = StyleSheet.create({
 
   confidenceBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "#00BCD4",
     borderRadius: 30,
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -680,14 +852,12 @@ const styles = StyleSheet.create({
   infoCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#173344",
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
   },
 
   infoText: {
-    color: "#FFFFFF",
     marginLeft: 10,
     flex: 1,
     lineHeight: 20,
@@ -698,7 +868,6 @@ const styles = StyleSheet.create({
   },
 
   categoryCard: {
-    backgroundColor: "#102331",
     borderRadius: 18,
     marginBottom: 14,
     overflow: "hidden",
@@ -717,14 +886,12 @@ const styles = StyleSheet.create({
   },
 
   categoryTitle: {
-    color: "#FFFFFF",
     fontSize: 17,
     fontWeight: "700",
     marginLeft: 12,
   },
 
   selectedCard: {
-    backgroundColor: "#102331",
     borderRadius: 18,
     padding: 18,
     marginBottom: 20,
@@ -738,13 +905,11 @@ const styles = StyleSheet.create({
   },
 
   selectedTitle: {
-    color: "#FFFFFF",
     fontSize: 17,
     fontWeight: "700",
   },
 
   clearText: {
-    color: "#00BCD4",
     fontWeight: "700",
   },
 

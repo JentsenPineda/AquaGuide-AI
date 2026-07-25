@@ -1,17 +1,15 @@
 // app/(tabs)/new-fish-care/inspection.tsx
 
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const symptoms = [
   {
@@ -76,36 +74,55 @@ const symptoms = [
 ];
 
 export default function InspectionScreen() {
+  const colors = useAppColors();
   const [selected, setSelected] = useState<any>(null);
 
   const recommendation = useMemo(() => {
     return selected;
   }, [selected]);
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
 
+    header: {
+      backgroundColor: colors.card,
+    },
+
+    card: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    resultCard: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="New Fish Care" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="New Fish Care" />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Ionicons name="search-circle" size={75} color="#00BCD4" />
-
-          <Text style={styles.title}>Health Inspection</Text>
-
-          <Text style={styles.subtitle}>
+        <ThemeCard style={[styles.header, dynamicStyles.header]}>
+          <Ionicons name="search-circle" size={75} color={colors.primary} />
+          <ThemeText variant="title" style={styles.title}>
+            Health Inspection
+          </ThemeText>
+          <ThemeText variant="body" style={styles.subtitle}>
             Observe your fish after acclimation. Choose the condition that best
             matches its behavior.
-          </Text>
-        </View>
-
+          </ThemeText>
+        </ThemeCard>
         {symptoms.map((item) => (
           <TouchableOpacity
             key={item.id}
             activeOpacity={0.8}
             style={[
               styles.card,
+              dynamicStyles.card,
               selected?.id === item.id && {
                 borderColor: item.color,
                 borderWidth: 2,
@@ -125,11 +142,15 @@ export default function InspectionScreen() {
             </View>
 
             <View style={{ flex: 1 }}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-
-              <Text style={[styles.status, { color: item.color }]}>
+              <ThemeText variant="subtitle" style={styles.cardTitle}>
+                {item.title}
+              </ThemeText>
+              <ThemeText
+                variant="body"
+                style={[styles.status, { color: item.color }]}
+              >
                 {item.status}
-              </Text>
+              </ThemeText>
             </View>
 
             <Ionicons name="chevron-forward" size={24} color="#90A4AE" />
@@ -137,35 +158,35 @@ export default function InspectionScreen() {
         ))}
 
         {recommendation && (
-          <View style={styles.resultCard}>
-            <Text style={styles.resultTitle}>AquaGuide AI Recommendation</Text>
-
-            <Text style={styles.resultText}>{recommendation.advice}</Text>
-          </View>
+          <ThemeCard style={[styles.resultCard, dynamicStyles.resultCard]}>
+            <ThemeText variant="subtitle" style={styles.resultTitle}>
+              AquaGuide AI Recommendation
+            </ThemeText>
+            <ThemeText variant="body" style={styles.resultText}>
+              {recommendation.advice}
+            </ThemeText>
+          </ThemeCard>
         )}
 
-        <View style={styles.warning}>
+        <ThemeCard style={styles.warning}>
           <Ionicons name="medical" size={28} color="#F44336" />
 
           <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.warningTitle}>Important Reminder</Text>
-
-            <Text style={styles.warningText}>
+            <ThemeText variant="subtitle" style={styles.warningTitle}>
+              Important Reminder
+            </ThemeText>
+            <ThemeText variant="body" style={styles.warningText}>
               If your fish shows severe breathing difficulty, continuous
               rolling, heavy bleeding, or cannot swim properly, isolate the fish
               immediately and check the Disease Guide for treatment options.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.button}
+        </ThemeCard>
+        <ThemeButton
+          title="Continue"
           onPress={() => router.push("/new-fish-care/first24hours")}
-        >
-          <Text style={styles.buttonText}>Continue</Text>
-
-          <Ionicons name="arrow-forward" size={22} color="#FFFFFF" />
-        </TouchableOpacity>
+          style={styles.button}
+        />
       </ScrollView>
     </View>
   );
@@ -184,6 +205,8 @@ const styles = StyleSheet.create({
 
   header: {
     alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     marginBottom: 25,
   },
 
@@ -281,12 +304,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-  },
-
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
-    marginRight: 10,
   },
 });

@@ -1,17 +1,15 @@
 // app/(tabs)/new-fish-care/first24hours.tsx
 
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 const timeline = [
   {
@@ -68,24 +66,38 @@ const timeline = [
 ];
 
 export default function First24HoursScreen() {
+  const colors = useAppColors();
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
+
+    header: {
+      backgroundColor: colors.card,
+    },
+
+    card: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="New Fish Care" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="New Fish Care" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <View style={styles.header}>
-          <Ionicons name="time" size={70} color="#00BCD4" />
-
-          <Text style={styles.title}>First 24 Hours</Text>
-
-          <Text style={styles.subtitle}>
+        <ThemeCard style={[styles.header, dynamicStyles.header]}>
+          <Ionicons name="time" size={70} color={colors.primary} />
+          <ThemeText variant="title" style={styles.title}>
+            First 24 Hours
+          </ThemeText>
+          <ThemeText variant="body" style={styles.subtitle}>
             The first day is the most important. Follow these simple steps to
             help your fish settle into its new home.
-          </Text>
-        </View>
-
+          </ThemeText>
+        </ThemeCard>
         {timeline.map((item, index) => (
           <View key={index} style={styles.timelineContainer}>
             <View style={styles.leftSide}>
@@ -103,43 +115,44 @@ export default function First24HoursScreen() {
               {index !== timeline.length - 1 && <View style={styles.line} />}
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.time}>{item.time}</Text>
-
-              <Text style={styles.cardTitle}>{item.title}</Text>
-
+            <ThemeCard style={[styles.card, dynamicStyles.card]}>
+              <ThemeText variant="subtitle" style={styles.time}>
+                {item.time}
+              </ThemeText>
+              <ThemeText variant="subtitle" style={styles.cardTitle}>
+                {item.title}
+              </ThemeText>
               {item.tasks.map((task, i) => (
                 <View key={i} style={styles.taskRow}>
                   <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
 
-                  <Text style={styles.taskText}>{task}</Text>
+                  <ThemeText variant="body" style={styles.taskText}>
+                    {task}
+                  </ThemeText>
                 </View>
               ))}
-            </View>
+            </ThemeCard>
           </View>
         ))}
 
-        <View style={styles.tipCard}>
+        <ThemeCard style={styles.tipCard}>
           <Ionicons name="bulb" size={28} color="#FFC107" />
 
           <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.tipTitle}>AquaGuide AI Tip</Text>
-
-            <Text style={styles.tipText}>
+            <ThemeText variant="subtitle" style={styles.tipTitle}>
+              AquaGuide AI Tip
+            </ThemeText>
+            <ThemeText variant="body" style={styles.tipText}>
               It is completely normal if your new fish hides during the first
               day. Give it time to adjust before becoming concerned.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.button}
+        </ThemeCard>
+        <ThemeButton
+          title="Continue"
           onPress={() => router.push("/new-fish-care/sevenDays")}
-        >
-          <Text style={styles.buttonText}>Continue</Text>
-
-          <Ionicons name="arrow-forward" size={22} color="#FFFFFF" />
-        </TouchableOpacity>
+          style={styles.button}
+        />
       </ScrollView>
     </View>
   );
@@ -158,6 +171,8 @@ const styles = StyleSheet.create({
 
   header: {
     alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     marginBottom: 30,
   },
 
@@ -266,12 +281,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-  },
-
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 18,
-    marginRight: 10,
   },
 });

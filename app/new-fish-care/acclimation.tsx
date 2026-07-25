@@ -1,17 +1,15 @@
 // app/(tabs)/new-fish-care/acclimation.tsx
 
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 const steps = [
   {
     icon: "water",
@@ -59,6 +57,7 @@ const steps = [
 ];
 
 export default function AcclimationScreen() {
+  const colors = useAppColors();
   const [currentStep, setCurrentStep] = useState(0);
 
   const step = steps[currentStep];
@@ -66,70 +65,97 @@ export default function AcclimationScreen() {
   const progress = useMemo(() => {
     return ((currentStep + 1) / steps.length) * 100;
   }, [currentStep]);
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
 
+    durationCard: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    card: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    hero: {
+      backgroundColor: colors.card,
+    },
+
+    textPrimary: {
+      color: colors.textPrimary,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="New Fish Care" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="New Fish Care" />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.step}>
+        <ThemeText variant="subtitle" style={styles.step}>
           STEP {currentStep + 1} OF {steps.length}
-        </Text>
+        </ThemeText>
 
         <View style={styles.progressBackground}>
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
 
-        <View style={styles.hero}>
-          <Ionicons name={step.icon as any} size={80} color="#00BCD4" />
-        </View>
+        <ThemeCard style={[styles.hero, dynamicStyles.hero]}>
+          <Ionicons name={step.icon as any} size={80} color={colors.primary} />
+        </ThemeCard>
 
-        <Text style={styles.title}>{step.title}</Text>
-
-        <View style={styles.durationCard}>
+        <ThemeText variant="title" style={styles.title}>
+          {step.title}
+        </ThemeText>
+        <ThemeCard style={[styles.durationCard, dynamicStyles.durationCard]}>
           <Ionicons name="time" size={24} color="#FF9800" />
 
-          <Text style={styles.duration}>Recommended Time</Text>
+          <ThemeText variant="subtitle" style={styles.duration}>
+            Recommended Time
+          </ThemeText>
 
-          <Text style={styles.durationValue}>{step.duration}</Text>
-        </View>
+          <ThemeText variant="title" style={styles.durationValue}>
+            {step.duration}
+          </ThemeText>
+        </ThemeCard>
 
-        <View style={styles.card}>
-          <Text style={styles.heading}>What To Do</Text>
-
-          <Text style={styles.description}>{step.description}</Text>
-        </View>
-
-        <View style={styles.tipCard}>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
+          <ThemeText variant="subtitle" style={styles.heading}>
+            What To Do
+          </ThemeText>
+          <ThemeText variant="body" style={styles.description}>
+            {step.description}
+          </ThemeText>
+        </ThemeCard>
+        <ThemeCard style={styles.tipCard}>
           <Ionicons name="bulb" size={28} color="#FFC107" />
 
           <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.tipTitle}>Why This Step Matters</Text>
+            <ThemeText variant="subtitle" style={styles.tipTitle}>
+              Why This Step Matters
+            </ThemeText>
 
-            <Text style={styles.tipText}>{step.why}</Text>
+            <ThemeText variant="body" style={styles.tipText}>
+              {step.why}
+            </ThemeText>
           </View>
-        </View>
+        </ThemeCard>
 
         {currentStep < steps.length - 1 ? (
-          <TouchableOpacity
-            style={styles.button}
+          <ThemeButton
+            title="Next Step"
             onPress={() => setCurrentStep(currentStep + 1)}
-          >
-            <Text style={styles.buttonText}>Next Step</Text>
-
-            <Ionicons name="arrow-forward" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
             style={styles.button}
+          />
+        ) : (
+          <ThemeButton
+            title="Continue"
             onPress={() => router.push("/new-fish-care/inspection")}
-          >
-            <Text style={styles.buttonText}>Continue</Text>
-
-            <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
+            style={styles.button}
+          />
         )}
       </ScrollView>
     </View>
@@ -170,6 +196,9 @@ const styles = StyleSheet.create({
 
   hero: {
     alignItems: "center",
+    justifyContent: "center",
+    padding: 28,
+    borderRadius: 24,
     marginBottom: 25,
   },
 
@@ -252,12 +281,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-  },
-
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 18,
-    marginRight: 10,
   },
 });

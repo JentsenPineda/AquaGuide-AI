@@ -1,125 +1,129 @@
 // app/(tabs)/new-fish-care/success.tsx
 
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function SuccessScreen() {
+  const colors = useAppColors();
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
+
+    hero: {
+      backgroundColor: colors.card,
+    },
+
+    card: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="New Fish Care" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="New Fish Care" />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.hero}>
+        <ThemeCard style={[styles.hero, dynamicStyles.hero]}>
           <View style={styles.circle}>
             <Ionicons name="checkmark-circle" size={100} color="#4CAF50" />
           </View>
 
-          <Text style={styles.title}>Congratulations!</Text>
-
-          <Text style={styles.subtitle}>
+          <ThemeText variant="title" style={styles.title}>
+            Congratulations!
+          </ThemeText>
+          <ThemeText variant="body" style={styles.subtitle}>
             You have successfully completed the New Fish Care Guide. Your fish
             now has a much better chance of adapting safely to its new aquarium.
-          </Text>
-        </View>
+          </ThemeText>
+        </ThemeCard>
 
-        <View style={styles.achievementCard}>
+        <ThemeCard style={styles.achievementCard}>
           <Ionicons name="ribbon" size={34} color="#FFC107" />
 
           <View style={styles.achievementContent}>
-            <Text style={styles.achievementTitle}>Achievement Unlocked</Text>
-
-            <Text style={styles.achievementText}>
+            <ThemeText variant="subtitle" style={styles.achievementTitle}>
+              Achievement Unlocked
+            </ThemeText>
+            <ThemeText variant="body" style={styles.achievementText}>
               🏅 First Successful Fish Acclimation
-            </Text>
+            </ThemeText>
           </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>What You've Learned</Text>
-
-        <View style={styles.card}>
+        </ThemeCard>
+        <ThemeText variant="subtitle" style={styles.sectionTitle}>
+          What You've Learned
+        </ThemeText>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
           <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
 
-          <Text style={styles.cardText}>
+          <ThemeText variant="body" style={styles.cardText}>
             Proper acclimation reduces fish stress.
-          </Text>
-        </View>
-
-        <View style={styles.card}>
+          </ThemeText>
+        </ThemeCard>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
           <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
 
-          <Text style={styles.cardText}>
+          <ThemeText variant="body" style={styles.cardText}>
             Slow adjustment prevents water shock.
-          </Text>
-        </View>
-
-        <View style={styles.card}>
+          </ThemeText>
+        </ThemeCard>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
           <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
 
-          <Text style={styles.cardText}>
+          <ThemeText variant="body" style={styles.cardText}>
             Observe your fish during its first week.
-          </Text>
-        </View>
-
-        <View style={styles.card}>
+          </ThemeText>
+        </ThemeCard>
+        <ThemeCard style={[styles.card, dynamicStyles.card]}>
           <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
 
-          <Text style={styles.cardText}>
+          <ThemeText variant="body" style={styles.cardText}>
             Feed lightly and maintain clean water.
-          </Text>
-        </View>
-
-        <View style={styles.tipCard}>
+          </ThemeText>
+        </ThemeCard>
+        <ThemeCard style={styles.tipCard}>
           <Ionicons name="bulb" size={30} color="#FFC107" />
 
           <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.tipTitle}>AquaGuide AI Recommendation</Text>
-
-            <Text style={styles.tipText}>
+            <ThemeText variant="subtitle" style={styles.tipTitle}>
+              AquaGuide AI Recommendation
+            </ThemeText>
+            <ThemeText variant="body" style={styles.tipText}>
               Continue observing your fish for the next seven days. If you
               notice unusual behavior, visit the Disease Guide or use AI Fish
               Recognition for additional guidance.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.primaryButton}
+        </ThemeCard>
+        <ThemeButton
+          title="Return to Home"
           onPress={() => router.replace("/")}
-        >
-          <Ionicons name="home" size={22} color="#FFFFFF" />
+          style={styles.primaryButton}
+        />
 
-          <Text style={styles.primaryText}>Return to Home</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.secondaryButton}
+        <ThemeButton
+          title="Open Species Library"
+          variant="outline"
           onPress={() => router.push("/library")}
-        >
-          <Ionicons name="book" size={22} color="#00BCD4" />
-
-          <Text style={styles.secondaryText}>Open Species Library</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={styles.secondaryButton}
-          onPress={() => router.push("/reminder")}
-        >
-          <Ionicons name="notifications" size={22} color="#00BCD4" />
+        />
 
-          <Text style={styles.secondaryText}>Set Feeding Reminder</Text>
-        </TouchableOpacity>
+        <ThemeButton
+          title="Set Feeding Reminder"
+          variant="outline"
+          onPress={() => router.push("/reminder")}
+          style={styles.secondaryButton}
+        />
       </ScrollView>
     </View>
   );
@@ -138,6 +142,8 @@ const styles = StyleSheet.create({
 
   hero: {
     alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     marginBottom: 30,
   },
 
@@ -246,13 +252,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
-  primaryText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 17,
-    marginLeft: 10,
-  },
-
   secondaryButton: {
     height: 56,
     borderRadius: 18,
@@ -262,12 +261,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     marginBottom: 15,
-  },
-
-  secondaryText: {
-    color: "#00BCD4",
-    fontWeight: "700",
-    fontSize: 16,
-    marginLeft: 10,
   },
 });

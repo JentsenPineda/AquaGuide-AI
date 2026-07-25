@@ -1,26 +1,34 @@
 import ModuleCard from "@/components/cards/ModuleCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
+import { useAppColors } from "@/theme/useAppColors";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 export default function FishCareScreen() {
+  const colors = useAppColors();
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
+  };
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <AppHeader
         title="Fish Care"
         subtitle="Everything you need to keep your ornamental fish healthy."
         showBack={false}
-        variant="light"
       />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <Text style={styles.sectionTitle}>Care Modules</Text>
-
-        <Text style={styles.sectionSubtitle}>
+        <ThemeText variant="title" style={styles.sectionTitle}>
+          Care Modules
+        </ThemeText>
+        <ThemeText variant="body" style={styles.sectionSubtitle}>
           Choose a fish care topic to learn more.
-        </Text>
+        </ThemeText>
 
         <ModuleCard
           icon="fish"
@@ -102,13 +110,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "800",
-    color: "#003B57",
     marginBottom: 6,
   },
 
   sectionSubtitle: {
     fontSize: 15,
-    color: "#607D8B",
     marginBottom: 24,
     lineHeight: 22,
   },

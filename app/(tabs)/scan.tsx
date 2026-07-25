@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { askVisionAI } from "@/services/aiService";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -8,6 +9,7 @@ import {
   Easing,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -20,29 +22,6 @@ type ScanState =
   | "processing"
   | "done"
   | "error";
-
-const FAKE_RESULTS = [
-  {
-    label: "Oranda Goldfish",
-    confidence: 0.91,
-    note: "Rounded body, prominent wen growth.",
-  },
-  {
-    label: "Ryukin Goldfish",
-    confidence: 0.88,
-    note: "High back, deep body shape.",
-  },
-  {
-    label: "Fantail Goldfish",
-    confidence: 0.86,
-    note: "Double tail, egg-shaped body.",
-  },
-  {
-    label: "Common Goldfish",
-    confidence: 0.83,
-    note: "Single tail, slim body profile.",
-  },
-];
 
 export default function ScanScreen() {
   const cameraRef = useRef<CameraView>(null);
@@ -86,14 +65,6 @@ export default function ScanScreen() {
   }, [scanState, progress]);
 
   // Start/stop the scanner animation depending on state
-  useEffect(() => {
-    if (scanState === "ready" || scanState === "processing") {
-      startScanAnimations();
-    } else {
-      stopScanAnimations();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scanState]);
 
   const startScanAnimations = () => {
     scanLineY.setValue(0);
@@ -137,7 +108,7 @@ export default function ScanScreen() {
 
     setProgress(0);
     const start = Date.now();
-    const duration = 2400; // ms
+    const duration = 1200; // ms
 
     const t = setInterval(() => {
       const elapsed = Date.now() - start;
@@ -146,10 +117,10 @@ export default function ScanScreen() {
 
       if (p >= 100) {
         clearInterval(t);
-        const picked =
-          FAKE_RESULTS[Math.floor(Math.random() * FAKE_RESULTS.length)];
-        setResult(picked);
-        setScanState("done");
+        // Progress animation finished.
+        // Wait for the AI request to complete.
+        // Do not set a fake result here.
+        clearInterval(t);
       }
     }, 60);
 
@@ -177,7 +148,25 @@ export default function ScanScreen() {
     setProgress(0);
     setScanState(permission?.granted ? "ready" : "idle");
   };
+  const waitForProgress = () =>
+    new Promise<void>((resolve) => {
+      setProgress(0);
 
+      const start = Date.now();
+      const duration = 1400;
+
+      const timer = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const value = Math.min(100, Math.round((elapsed / duration) * 100));
+
+        setProgress(value);
+
+        if (value >= 100) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 30);
+    });
   const onScan = async () => {
     try {
       if (!cameraRef.current) return;
@@ -188,11 +177,52 @@ export default function ScanScreen() {
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.7,
         skipProcessing: true,
+        base64: true,
       });
 
-      setCapturedUri(photo?.uri ?? null);
+      if (!photo?.base64) {
+        throw new Error("Failed to capture image.");
+      }
+
+      setCapturedUri(photo.uri ?? null);
       setScanState("processing");
-    } catch (e) {
+
+      const aiTask = askVisionAI(
+        photo.base64,
+        `You are an ornamental fish identification expert.
+
+Identify the fish in this image.
+
+Reply ONLY in this JSON format:
+
+{
+  "label": "Fish Name",
+  "confidence": 0.95,
+  "note": "Short description"
+}
+
+Do not include markdown.
+Do not include explanations.
+Return valid JSON only.`,
+      );
+
+      const [response] = await Promise.all([aiTask, waitForProgress()]);
+
+      if (!response.success) {
+        throw new Error(response.error ?? "AI request failed.");
+      }
+
+      const aiResult = JSON.parse(response.message);
+
+      setResult({
+        label: aiResult.label,
+        confidence: aiResult.confidence,
+        note: aiResult.note,
+      });
+
+      setScanState("done");
+    } catch (error) {
+      console.error(error);
       setScanState("error");
     }
   };
@@ -211,10 +241,21 @@ export default function ScanScreen() {
     inputRange: [0, 1],
     outputRange: [1, 1.04],
   });
+  const confidence = result ? Math.round(result.confidence * 100) : 0;
 
+  const confidenceStatus =
+    confidence >= 90
+      ? "High Confidence"
+      : confidence >= 70
+        ? "Medium Confidence"
+        : "Low Confidence";
   return (
     <View style={styles.safe}>
-      <View style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 24 }}
+        showsVerticalScrollIndicator={false}
+      >
         <AppHeader
           title="AI Fish Scan"
           subtitle="Scan and identify ornamental fish"
@@ -312,34 +353,60 @@ export default function ScanScreen() {
           </View>
 
           {scanState === "done" && result && (
-            <View style={styles.resultBox}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={styles.resultTitle}>{result.label}</Text>
-                <Text style={styles.confidence}>
-                  {Math.round(result.confidence * 100)}%
-                </Text>
+            <View style={styles.resultCard}>
+              <View style={styles.resultHeader}>
+                <View style={styles.aiChip}>
+                  <Ionicons name="sparkles-outline" size={14} color="#fff" />
+                  <Text style={styles.aiChipText}>AI Identified</Text>
+                </View>
               </View>
-              <Text style={styles.resultNote}>{result.note}</Text>
 
-              <View style={styles.badgeRow}>
-                <View style={styles.badge}>
-                  <Ionicons
-                    name="information-circle-outline"
-                    size={14}
-                    color="#fff"
+              <Text style={styles.resultName}>
+                {result.label.toUpperCase()}
+              </Text>
+
+              <View style={styles.confidenceSection}>
+                <View style={styles.confidenceRow}>
+                  <Text style={styles.confidenceLabel}>Confidence</Text>
+                  <View style={{ alignItems: "flex-end" }}>
+                    <Text style={styles.confidencePercent}>{confidence}%</Text>
+
+                    <Text
+                      style={{
+                        color:
+                          confidence >= 90
+                            ? "#4ADE80"
+                            : confidence >= 70
+                              ? "#FACC15"
+                              : "#F87171",
+                        fontSize: 11,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {confidenceStatus}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.progressTrack}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      {
+                        width: `${Math.round(result.confidence * 100)}%`,
+                      },
+                    ]}
                   />
-                  <Text style={styles.badgeText}>Prototype Result</Text>
                 </View>
-                <View style={styles.badge}>
-                  <Ionicons name="cloud-outline" size={14} color="#fff" />
-                  <Text style={styles.badgeText}>API Coming Soon</Text>
-                </View>
+              </View>
+
+              <View style={styles.descriptionCard}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={18}
+                  color="#8EC5FF"
+                />
+                <Text style={styles.resultDescription}>{result.note}</Text>
               </View>
             </View>
           )}
@@ -410,7 +477,7 @@ export default function ScanScreen() {
             )}
           </View>
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -617,4 +684,94 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: { color: "#fff", fontSize: 13.5, fontWeight: "900" },
   btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
+  resultCard: {
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+    gap: 14,
+  },
+
+  resultHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+
+  aiChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(59,130,246,0.18)",
+    borderWidth: 1,
+    borderColor: "rgba(59,130,246,0.35)",
+  },
+
+  aiChipText: {
+    color: "#FFFFFF",
+    fontSize: 11.5,
+    fontWeight: "800",
+  },
+
+  resultName: {
+    color: "#FFFFFF",
+    fontSize: 22,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+  },
+
+  confidenceSection: {
+    gap: 8,
+  },
+
+  confidenceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  confidenceLabel: {
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  confidencePercent: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  progressTrack: {
+    height: 8,
+    borderRadius: 999,
+    overflow: "hidden",
+    backgroundColor: "rgba(255,255,255,0.10)",
+  },
+
+  progressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#4ADE80",
+  },
+
+  descriptionCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.05)",
+  },
+
+  resultDescription: {
+    flex: 1,
+    color: "rgba(255,255,255,0.82)",
+    fontSize: 13,
+    lineHeight: 20,
+  },
 });

@@ -1,17 +1,15 @@
 // app/(tabs)/new-fish-care/preparation.tsx
 
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const checklist = [
   "My aquarium is fully cycled",
@@ -23,6 +21,7 @@ const checklist = [
 ];
 
 export default function PreparationScreen() {
+  const colors = useAppColors();
   const [checked, setChecked] = useState<boolean[]>(
     new Array(checklist.length).fill(false),
   );
@@ -34,33 +33,63 @@ export default function PreparationScreen() {
     copy[index] = !copy[index];
     setChecked(copy);
   };
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
 
+    iconContainer: {
+      backgroundColor: colors.card,
+    },
+
+    progressCard: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    item: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    sectionText: {
+      color: colors.textPrimary,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="Preparation" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="Preparation" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="clipboard-outline" size={60} color="#00BCD4" />
+        <ThemeCard style={styles.header}>
+          <View style={[styles.iconContainer, dynamicStyles.iconContainer]}>
+            <Ionicons
+              name="clipboard-outline"
+              size={60}
+              color={colors.primary}
+            />
           </View>
 
-          <Text style={styles.title}>Preparation Checklist</Text>
+          <ThemeText variant="title" style={styles.title}>
+            Preparation Checklist
+          </ThemeText>
 
-          <Text style={styles.subtitle}>
+          <ThemeText variant="body" style={styles.subtitle}>
             Before introducing your new fish into the aquarium, make sure
             everything below is ready.
-          </Text>
-        </View>
+          </ThemeText>
+        </ThemeCard>
 
-        <View style={styles.progressCard}>
-          <Text style={styles.progressTitle}>Progress</Text>
+        <ThemeCard style={[styles.progressCard, dynamicStyles.progressCard]}>
+          <ThemeText variant="subtitle" style={styles.progressTitle}>
+            Progress
+          </ThemeText>
 
-          <Text style={styles.progressValue}>
+          <ThemeText variant="title" style={styles.progressValue}>
             {completed} / {checklist.length}
-          </Text>
+          </ThemeText>
 
           <View style={styles.progressBar}>
             <View
@@ -72,12 +101,12 @@ export default function PreparationScreen() {
               ]}
             />
           </View>
-        </View>
+        </ThemeCard>
 
         {checklist.map((item, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.item}
+            style={[styles.item, dynamicStyles.item]}
             activeOpacity={0.8}
             onPress={() => toggleItem(index)}
           >
@@ -87,37 +116,38 @@ export default function PreparationScreen() {
               color={checked[index] ? "#4CAF50" : "#90A4AE"}
             />
 
-            <Text style={styles.itemText}>{item}</Text>
+            <ThemeText variant="body" style={styles.itemText}>
+              {item}
+            </ThemeText>
           </TouchableOpacity>
         ))}
 
-        <View style={styles.tipCard}>
+        <ThemeCard style={styles.tipCard}>
           <Ionicons name="bulb" size={30} color="#FFC107" />
 
           <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.tipTitle}>AquaGuide AI Tip</Text>
+            <ThemeText variant="subtitle" style={styles.tipTitle}>
+              AquaGuide AI Tip
+            </ThemeText>
 
-            <Text style={styles.tipText}>
+            <ThemeText variant="body" style={styles.tipText}>
               Never open the transport bag until the temperature has adjusted.
               Sudden changes can cause severe stress and water shock.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
+        </ThemeCard>
 
         {completed === checklist.length ? (
-          <TouchableOpacity
-            style={styles.nextButton}
+          <ThemeButton
+            title="Continue to Acclimation"
             onPress={() => router.push("/new-fish-care/acclimation")}
-          >
-            <Text style={styles.nextText}>Continue to Acclimation</Text>
-
-            <Ionicons name="arrow-forward-circle" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
+            style={styles.nextButton}
+          />
         ) : (
           <View style={styles.disabledButton}>
-            <Text style={styles.disabledText}>
+            <ThemeText variant="subtitle" style={styles.disabledText}>
               Complete the checklist first
-            </Text>
+            </ThemeText>
           </View>
         )}
       </ScrollView>
@@ -138,6 +168,8 @@ const styles = StyleSheet.create({
 
   header: {
     alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     marginBottom: 25,
   },
 
@@ -145,7 +177,6 @@ const styles = StyleSheet.create({
     width: 110,
     height: 110,
     borderRadius: 55,
-    backgroundColor: "#E8FAFD",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,

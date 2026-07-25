@@ -1,17 +1,15 @@
 // app/(tabs)/new-fish-care/sevenDays.tsx
 
+import ThemeButton from "@/components/buttons/ThemeButton";
+import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
+import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const weekPlan = [
   {
@@ -52,6 +50,7 @@ const weekPlan = [
 ];
 
 export default function SevenDaysScreen() {
+  const colors = useAppColors();
   const [completed, setCompleted] = useState<boolean[]>(
     new Array(weekPlan.length).fill(false),
   );
@@ -65,31 +64,49 @@ export default function SevenDaysScreen() {
   };
 
   const progress = (finished / weekPlan.length) * 100;
+  const dynamicStyles = {
+    container: {
+      backgroundColor: colors.background,
+    },
 
+    header: {
+      backgroundColor: colors.card,
+    },
+
+    progressCard: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+
+    card: {
+      backgroundColor: colors.card,
+      borderColor: colors.border,
+    },
+  };
   return (
-    <View style={styles.container}>
-      <AppHeader title="New Fish Care" variant="light" />
+    <View style={[styles.container, dynamicStyles.container]}>
+      <AppHeader title="New Fish Care" />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Ionicons name="calendar" size={70} color="#00BCD4" />
-
-          <Text style={styles.title}>7-Day Care Plan</Text>
-
-          <Text style={styles.subtitle}>
+        <ThemeCard style={[styles.header, dynamicStyles.header]}>
+          <Ionicons name="calendar" size={70} color={colors.primary} />
+          <ThemeText variant="title" style={styles.title}>
+            7-Day Care Plan
+          </ThemeText>
+          <ThemeText variant="body" style={styles.subtitle}>
             Continue caring for your new fish during its first week. Complete
             each task as you go.
-          </Text>
-        </View>
-
-        <View style={styles.progressCard}>
-          <Text style={styles.progressTitle}>Weekly Progress</Text>
-
-          <Text style={styles.progressValue}>
+          </ThemeText>
+        </ThemeCard>
+        <ThemeCard style={[styles.progressCard, dynamicStyles.progressCard]}>
+          <ThemeText variant="subtitle" style={styles.progressTitle}>
+            Weekly Progress
+          </ThemeText>
+          <ThemeText variant="title" style={styles.progressValue}>
             {finished} / {weekPlan.length}
-          </Text>
+          </ThemeText>
 
           <View style={styles.progressBar}>
             <View
@@ -101,13 +118,12 @@ export default function SevenDaysScreen() {
               ]}
             />
           </View>
-        </View>
-
+        </ThemeCard>
         {weekPlan.map((item, index) => (
           <TouchableOpacity
             key={index}
             activeOpacity={0.8}
-            style={styles.card}
+            style={[styles.card, dynamicStyles.card]}
             onPress={() => toggle(index)}
           >
             <Ionicons
@@ -117,36 +133,37 @@ export default function SevenDaysScreen() {
             />
 
             <View style={styles.info}>
-              <Text style={styles.day}>{item.day}</Text>
-
-              <Text style={styles.cardTitle}>{item.title}</Text>
-
-              <Text style={styles.task}>{item.task}</Text>
+              <ThemeText variant="subtitle" style={styles.day}>
+                {item.day}
+              </ThemeText>
+              <ThemeText variant="subtitle" style={styles.cardTitle}>
+                {item.title}
+              </ThemeText>
+              <ThemeText variant="body" style={styles.task}>
+                {item.task}
+              </ThemeText>
             </View>
           </TouchableOpacity>
         ))}
 
-        <View style={styles.tipCard}>
+        <ThemeCard style={styles.tipCard}>
           <Ionicons name="bulb" size={30} color="#FFC107" />
 
           <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.tipTitle}>AquaGuide AI Tip</Text>
-
-            <Text style={styles.tipText}>
+            <ThemeText variant="subtitle" style={styles.tipTitle}>
+              AquaGuide AI Tip
+            </ThemeText>
+            <ThemeText variant="body" style={styles.tipText}>
               A healthy fish will become more active, show brighter colors, and
               begin eating regularly within its first week.
-            </Text>
+            </ThemeText>
           </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.button}
+        </ThemeCard>
+        <ThemeButton
+          title="Finish Guide"
           onPress={() => router.push("/new-fish-care/success")}
-        >
-          <Text style={styles.buttonText}>Finish Guide</Text>
-
-          <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
-        </TouchableOpacity>
+          style={styles.button}
+        />
       </ScrollView>
     </View>
   );
@@ -165,6 +182,8 @@ const styles = StyleSheet.create({
 
   header: {
     alignItems: "center",
+    padding: 24,
+    borderRadius: 24,
     marginBottom: 25,
   },
 
@@ -276,12 +295,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-  },
-
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 18,
-    marginRight: 10,
   },
 });

@@ -1,46 +1,110 @@
-import { Ionicons } from "@expo/vector-icons";
+import AppHeader from "@/components/layout/AppHeader";
+
+import NextButton from "@/components/onboarding/NextButton";
+import OnboardingSlide from "@/components/onboarding/OnboardingSlide";
+import Pagination from "@/components/onboarding/Pagination";
+import { onboardingData } from "@/constants/onboarding";
+import { useAppColors } from "@/theme/useAppColors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React from "react";
+import React, { useRef, useState } from "react";
+
 import {
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
-
 export default function OnboardingScreen() {
+  const colors = useAppColors();
+  const { width } = useWindowDimensions();
+
+  const flatListRef = useRef<FlatList>(null);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+    if (viewableItems.length > 0) {
+      setCurrentIndex(viewableItems[0].index);
+    }
+  }).current;
+
+  const viewabilityConfig = useRef({
+    viewAreaCoveragePercentThreshold: 50,
+  }).current;
+
+  const nextSlide = async () => {
+    if (currentIndex < onboardingData.length - 1) {
+      flatListRef.current?.scrollToIndex({
+        index: currentIndex + 1,
+      });
+    } else {
+      await AsyncStorage.setItem("hasSeenOnboarding", "true");
+      router.replace("/login-required");
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Ionicons name="fish" size={120} color="#00BCD4" />
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <AppHeader title="Welcome" />
 
-        <Text style={styles.title}>Welcome to AquaGuide AI</Text>
-
-        <Text style={styles.description}>
-          Your intelligent companion for ornamental fish keeping.
-        </Text>
-      </View>
+      <FlatList
+        ref={flatListRef}
+        data={onboardingData}
+        renderItem={({ item }) => (
+          <View style={{ width }}>
+            <OnboardingSlide item={item} />
+          </View>
+        )}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        bounces={false}
+        keyExtractor={(item) => item.id}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+      />
 
       <View style={styles.footer}>
-        <View style={styles.indicatorContainer}>
-          <View style={[styles.dot, styles.activeDot]} />
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-        </View>
+        <Pagination currentIndex={currentIndex} total={onboardingData.length} />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.replace("/auth/login")}
-        >
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
+        <NextButton
+          title={
+            currentIndex === onboardingData.length - 1 ? "Get Started" : "Next"
+          }
+          onPress={nextSlide}
+        />
 
-        <TouchableOpacity onPress={() => router.replace("/auth/login")}>
-          <Text style={styles.skip}>Skip</Text>
-        </TouchableOpacity>
+        {currentIndex !== onboardingData.length - 1 && (
+          <TouchableOpacity
+            style={styles.skipContainer}
+            onPress={async () => {
+              await AsyncStorage.setItem("hasSeenOnboarding", "true");
+              router.replace("/auth/login");
+            }}
+          >
+            <Text
+              style={[
+                styles.skipText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Skip
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -49,73 +113,19 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2FBFD",
-    justifyContent: "space-between",
-  },
-
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-
-  title: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: "#003B57",
-    marginTop: 30,
-    textAlign: "center",
-  },
-
-  description: {
-    fontSize: 17,
-    color: "#607D8B",
-    textAlign: "center",
-    marginTop: 15,
-    lineHeight: 26,
   },
 
   footer: {
-    padding: 30,
+    paddingHorizontal: 24,
+    paddingBottom: 30,
   },
 
-  indicatorContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 30,
-  },
-
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#CFD8DC",
-    marginHorizontal: 5,
-  },
-
-  activeDot: {
-    backgroundColor: "#00BCD4",
-    width: 26,
-  },
-
-  button: {
-    backgroundColor: "#00BCD4",
-    borderRadius: 15,
-    paddingVertical: 16,
+  skipContainer: {
     alignItems: "center",
-  },
-
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 18,
-  },
-
-  skip: {
-    textAlign: "center",
-    color: "#607D8B",
     marginTop: 18,
+  },
+
+  skipText: {
     fontSize: 16,
     fontWeight: "600",
   },

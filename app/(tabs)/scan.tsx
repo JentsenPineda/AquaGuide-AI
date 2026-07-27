@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { askVisionAI } from "@/services/aiService";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -24,6 +25,7 @@ type ScanState =
   | "error";
 
 export default function ScanScreen() {
+  const colors = useAppColors();
   const cameraRef = useRef<CameraView>(null);
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -50,7 +52,7 @@ export default function ScanScreen() {
       case "idle":
         return "Camera permission required";
       case "ready":
-        return "Align the goldfish inside the frame";
+        return "Align the ornamental fish inside the frame";
       case "capturing":
         return "Capturing image…";
       case "processing":
@@ -250,20 +252,39 @@ Return valid JSON only.`,
         ? "Medium Confidence"
         : "Low Confidence";
   return (
-    <View style={styles.safe}>
+    <View
+      style={[
+        styles.safe,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <ScrollView
-        style={styles.container}
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         <AppHeader
           title="AI Fish Scan"
           subtitle="Scan and identify ornamental fish"
-          variant="dark"
         />
 
         {/* Camera / Preview */}
-        <View style={styles.previewWrap}>
+        <View
+          style={[
+            styles.previewWrap,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+        >
           {permission?.granted ? (
             capturedUri ? (
               <Image source={{ uri: capturedUri }} style={styles.preview} />
@@ -279,10 +300,26 @@ Return valid JSON only.`,
               <Ionicons
                 name="lock-closed-outline"
                 size={22}
-                color="rgba(255,255,255,0.85)"
+                color={colors.primary}
               />
-              <Text style={styles.permissionTitle}>Camera Access Needed</Text>
-              <Text style={styles.permissionText}>
+              <Text
+                style={[
+                  styles.permissionTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Camera Access Needed
+              </Text>
+              <Text
+                style={[
+                  styles.permissionText,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
                 Allow camera permission to scan and identify goldfish.
               </Text>
               <Pressable
@@ -292,7 +329,16 @@ Return valid JSON only.`,
                   pressed && styles.btnPressed,
                 ]}
               >
-                <Text style={styles.primaryBtnText}>Grant Permission</Text>
+                <Text
+                  style={[
+                    styles.primaryBtnText,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Grant Permission
+                </Text>
               </Pressable>
             </View>
           )}
@@ -303,22 +349,53 @@ Return valid JSON only.`,
               <Animated.View
                 style={[
                   styles.scannerFrame,
-                  { transform: [{ scale: pulseScale }], opacity: 1 },
+                  {
+                    transform: [{ scale: pulseScale }],
+                    opacity: 1,
+                    borderColor: colors.primary,
+                  },
                 ]}
               />
 
               {/* Corner accents */}
               <Animated.View
-                style={[styles.cornerTL, { opacity: pulseOpacity }]}
+                style={[
+                  styles.cornerTL,
+                  {
+                    opacity: pulseOpacity,
+                    borderColor: colors.primary,
+                  },
+                ]}
               />
+
               <Animated.View
-                style={[styles.cornerTR, { opacity: pulseOpacity }]}
+                style={[
+                  styles.cornerTR,
+                  {
+                    opacity: pulseOpacity,
+                    borderColor: colors.primary,
+                  },
+                ]}
               />
+
               <Animated.View
-                style={[styles.cornerBL, { opacity: pulseOpacity }]}
+                style={[
+                  styles.cornerBL,
+                  {
+                    opacity: pulseOpacity,
+                    borderColor: colors.primary,
+                  },
+                ]}
               />
+
               <Animated.View
-                style={[styles.cornerBR, { opacity: pulseOpacity }]}
+                style={[
+                  styles.cornerBR,
+                  {
+                    opacity: pulseOpacity,
+                    borderColor: colors.primary,
+                  },
+                ]}
               />
 
               {/* Scan line */}
@@ -329,6 +406,7 @@ Return valid JSON only.`,
                     {
                       transform: [{ translateY: scanLineTranslateY }],
                       opacity: 0.9,
+                      backgroundColor: colors.primary,
                     },
                   ]}
                 />
@@ -338,39 +416,108 @@ Return valid JSON only.`,
         </View>
 
         {/* Status + Result */}
-        <View style={styles.panel}>
+        <View
+          style={[
+            styles.panel,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+        >
           <View style={styles.statusRow}>
             {scanState === "processing" ? (
-              <ActivityIndicator />
+              <ActivityIndicator size="small" color={colors.primary} />
             ) : (
               <Ionicons
                 name="sparkles-outline"
-                size={18}
-                color="rgba(255,255,255,0.85)"
+                size={22}
+                color={colors.primary}
               />
             )}
-            <Text style={styles.statusText}>{statusText}</Text>
-          </View>
 
+            <Text
+              style={{
+                color: colors.textPrimary,
+                fontSize: 15,
+                fontWeight: "800",
+                letterSpacing: 0.2,
+                flex: 1,
+              }}
+            >
+              {statusText}
+            </Text>
+          </View>
           {scanState === "done" && result && (
-            <View style={styles.resultCard}>
+            <View
+              style={[
+                styles.resultCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
               <View style={styles.resultHeader}>
-                <View style={styles.aiChip}>
+                <View
+                  style={[
+                    styles.aiChip,
+                    {
+                      backgroundColor: colors.primary + "22",
+                      borderColor: colors.primary,
+                    },
+                  ]}
+                >
                   <Ionicons name="sparkles-outline" size={14} color="#fff" />
-                  <Text style={styles.aiChipText}>AI Identified</Text>
+                  <Text
+                    style={[
+                      styles.aiChipText,
+                      {
+                        color: colors.textPrimary,
+                      },
+                    ]}
+                  >
+                    AI Analysis
+                  </Text>
                 </View>
               </View>
 
-              <Text style={styles.resultName}>
+              <Text
+                style={[
+                  styles.resultName,
+                  {
+                    color: colors.textPrimary,
+                    fontSize: 26,
+                    letterSpacing: 1,
+                  },
+                ]}
+              >
                 {result.label.toUpperCase()}
               </Text>
 
               <View style={styles.confidenceSection}>
                 <View style={styles.confidenceRow}>
-                  <Text style={styles.confidenceLabel}>Confidence</Text>
+                  <Text
+                    style={[
+                      styles.confidenceLabel,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    Confidence
+                  </Text>
                   <View style={{ alignItems: "flex-end" }}>
-                    <Text style={styles.confidencePercent}>{confidence}%</Text>
-
+                    <Text
+                      style={[
+                        styles.confidencePercent,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      {confidence}%
+                    </Text>
                     <Text
                       style={{
                         color:
@@ -400,21 +547,63 @@ Return valid JSON only.`,
                 </View>
               </View>
 
-              <View style={styles.descriptionCard}>
+              <View
+                style={[
+                  styles.descriptionCard,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                  },
+                ]}
+              >
                 <Ionicons
                   name="information-circle-outline"
                   size={18}
-                  color="#8EC5FF"
+                  color={colors.primary}
                 />
-                <Text style={styles.resultDescription}>{result.note}</Text>
+                <Text
+                  style={[
+                    styles.resultDescription,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {result.note}
+                </Text>
               </View>
             </View>
           )}
 
           {scanState === "error" && (
-            <View style={styles.resultBox}>
-              <Text style={styles.resultTitle}>Scan Failed</Text>
-              <Text style={styles.resultNote}>
+            <View
+              style={[
+                styles.resultBox,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.resultTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Scan Failed
+              </Text>
+              <Text
+                style={[
+                  styles.resultNote,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
                 Please try again. Make sure the camera is available.
               </Text>
             </View>
@@ -426,7 +615,16 @@ Return valid JSON only.`,
           <View style={styles.controls}>
             {scanState === "processing" ? (
               <View style={styles.disabledBtn}>
-                <Text style={styles.primaryBtnText}>Processing…</Text>
+                <Text
+                  style={[
+                    styles.primaryBtnText,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Processing…
+                </Text>
               </View>
             ) : scanState === "done" ? (
               <>
@@ -434,21 +632,41 @@ Return valid JSON only.`,
                   onPress={onReset}
                   style={({ pressed }) => [
                     styles.secondaryBtn,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                    },
                     pressed && styles.btnPressed,
                   ]}
                 >
-                  <Ionicons name="refresh" size={18} color="#fff" />
-                  <Text style={styles.secondaryBtnText}>Scan Again</Text>
+                  <Ionicons
+                    name="refresh"
+                    size={18}
+                    color={colors.textPrimary}
+                  />
+                  <Text
+                    style={[
+                      styles.secondaryBtnText,
+                      {
+                        color: colors.textPrimary,
+                      },
+                    ]}
+                  >
+                    Scan Again
+                  </Text>
                 </Pressable>
                 <Pressable
                   onPress={onScan}
                   style={({ pressed }) => [
                     styles.primaryBtn,
+                    {
+                      backgroundColor: colors.primary,
+                    },
                     pressed && styles.btnPressed,
                   ]}
                 >
-                  <Ionicons name="camera" size={18} color="#0B0F14" />
-                  <Text style={styles.primaryBtnTextDark}>Capture</Text>
+                  <Ionicons name="camera" size={18} color="#FFFFFF" />
+                  <Text style={styles.primaryBtnText}>Capture</Text>
                 </Pressable>
               </>
             ) : (
@@ -457,21 +675,37 @@ Return valid JSON only.`,
                   onPress={onReset}
                   style={({ pressed }) => [
                     styles.secondaryBtn,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                    },
                     pressed && styles.btnPressed,
                   ]}
                 >
-                  <Ionicons name="close" size={18} color="#fff" />
-                  <Text style={styles.secondaryBtnText}>Clear</Text>
+                  <Ionicons name="close" size={18} color={colors.textPrimary} />
+                  <Text
+                    style={[
+                      styles.secondaryBtnText,
+                      {
+                        color: colors.textPrimary,
+                      },
+                    ]}
+                  >
+                    Clear
+                  </Text>
                 </Pressable>
                 <Pressable
                   onPress={onScan}
                   style={({ pressed }) => [
                     styles.primaryBtn,
+                    {
+                      backgroundColor: colors.primary,
+                    },
                     pressed && styles.btnPressed,
                   ]}
                 >
-                  <Ionicons name="camera" size={18} color="#0B0F14" />
-                  <Text style={styles.primaryBtnTextDark}>Scan</Text>
+                  <Ionicons name="camera" size={18} color="#FFFFFF" />
+                  <Text style={styles.primaryBtnText}>Scan</Text>
                 </Pressable>
               </>
             )}
@@ -481,8 +715,6 @@ Return valid JSON only.`,
     </View>
   );
 }
-
-const ACCENT = "rgba(255, 255, 255, 0.92)";
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#0B0F14" },
@@ -509,10 +741,9 @@ const styles = StyleSheet.create({
   previewWrap: {
     borderRadius: 22,
     overflow: "hidden",
-    backgroundColor: "rgba(255,255,255,0.06)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
   },
+
   preview: {
     width: "100%",
     height: 360,
@@ -563,7 +794,6 @@ const styles = StyleSheet.create({
     height: 30,
     borderLeftWidth: 3,
     borderTopWidth: 3,
-    borderColor: ACCENT,
     borderTopLeftRadius: 12,
   },
   cornerTR: {
@@ -574,7 +804,6 @@ const styles = StyleSheet.create({
     height: 30,
     borderRightWidth: 3,
     borderTopWidth: 3,
-    borderColor: ACCENT,
     borderTopRightRadius: 12,
   },
   cornerBL: {
@@ -585,7 +814,6 @@ const styles = StyleSheet.create({
     height: 30,
     borderLeftWidth: 3,
     borderBottomWidth: 3,
-    borderColor: ACCENT,
     borderBottomLeftRadius: 12,
   },
   cornerBR: {
@@ -596,33 +824,30 @@ const styles = StyleSheet.create({
     height: 30,
     borderRightWidth: 3,
     borderBottomWidth: 3,
-    borderColor: ACCENT,
     borderBottomRightRadius: 12,
   },
 
   panel: {
     padding: 14,
     borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.06)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
     gap: 10,
   },
-  statusRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  statusText: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 12.8,
-    fontWeight: "700",
+
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 2,
   },
 
   resultBox: {
     padding: 12,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.07)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
     gap: 6,
   },
+
   resultTitle: { color: "#fff", fontSize: 14.5, fontWeight: "900" },
   confidence: { color: "#fff", fontSize: 13, fontWeight: "900", opacity: 0.9 },
   resultNote: {
@@ -684,12 +909,11 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: { color: "#fff", fontSize: 13.5, fontWeight: "900" },
   btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
+
   resultCard: {
     padding: 16,
     borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.07)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
     gap: 14,
   },
 
@@ -706,9 +930,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: "rgba(59,130,246,0.18)",
     borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.35)",
   },
 
   aiChipText: {
@@ -765,7 +987,6 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 12,
     borderRadius: 14,
-    backgroundColor: "rgba(255,255,255,0.05)",
   },
 
   resultDescription: {

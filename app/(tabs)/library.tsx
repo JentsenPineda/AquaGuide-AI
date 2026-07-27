@@ -1,6 +1,7 @@
 // app/(tabs)/library.tsx
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -24,6 +25,7 @@ type Category = "All" | "Beginner" | "Intermediate" | "Expert";
 const categories: Category[] = ["All", "Beginner", "Intermediate", "Expert"];
 
 export default function LibraryScreen() {
+  const colors = useAppColors();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
 
@@ -54,7 +56,14 @@ export default function LibraryScreen() {
   const renderFishCard = ({ item }: any) => (
     <TouchableOpacity
       activeOpacity={0.9}
-      style={styles.card}
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          borderWidth: 1,
+        },
+      ]}
       onPress={() =>
         router.push({
           pathname: "/fish/[id]",
@@ -69,15 +78,47 @@ export default function LibraryScreen() {
       <View style={styles.overlay} />
 
       <View style={styles.cardContent}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{item.category}</Text>
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor: colors.primaryLight,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.badgeText,
+              {
+                color: colors.primary,
+              },
+            ]}
+          >
+            {item.category}
+          </Text>
         </View>
 
-        <Text numberOfLines={1} style={styles.name}>
+        <Text
+          numberOfLines={1}
+          style={[
+            styles.name,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
           {item.commonName}
         </Text>
 
-        <Text numberOfLines={1} style={styles.scientific}>
+        <Text
+          numberOfLines={1}
+          style={[
+            styles.scientific,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
           {item.scientificName}
         </Text>
 
@@ -118,23 +159,41 @@ export default function LibraryScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader
         title="Species Library"
         subtitle="Explore ornamental fish species with AI-powered care information."
         showBack={false}
-        variant="light"
       />
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#888" />
-
+      <View
+        style={[
+          styles.searchContainer,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
+      >
+        <Ionicons name="search" size={20} color={colors.textSecondary} />
         <TextInput
           placeholder="Search fish..."
-          placeholderTextColor="#888"
+          placeholderTextColor={colors.textMuted}
           value={search}
           onChangeText={setSearch}
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
         />
       </View>
 
@@ -144,14 +203,23 @@ export default function LibraryScreen() {
             key={item}
             style={[
               styles.categoryButton,
-              selectedCategory === item && styles.activeCategory,
+              {
+                backgroundColor:
+                  selectedCategory === item ? colors.primary : colors.surface,
+                borderColor: colors.border,
+              },
             ]}
             onPress={() => setSelectedCategory(item)}
           >
             <Text
               style={[
                 styles.categoryText,
-                selectedCategory === item && styles.activeCategoryText,
+                {
+                  color:
+                    selectedCategory === item
+                      ? colors.white
+                      : colors.textPrimary,
+                },
               ]}
             >
               {item}
@@ -167,38 +235,161 @@ export default function LibraryScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
+            <View
+              style={[
+                styles.statCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
               <Ionicons name="fish" size={24} color="#00BCD4" />
-              <Text style={styles.statNumber}>{filteredFish.length}</Text>
-              <Text style={styles.statLabel}>Species</Text>
+              <Text
+                style={[
+                  styles.statNumber,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {filteredFish.length}
+              </Text>
+              <Text
+                style={[
+                  styles.statLabel,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Species
+              </Text>
             </View>
 
-            <View style={styles.statCard}>
+            <View
+              style={[
+                styles.statCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
               <Ionicons name="leaf" size={24} color="#4CAF50" />
-              <Text style={styles.statNumber}>{beginnerFish.length}</Text>
-              <Text style={styles.statLabel}>Beginner</Text>
+              <Text
+                style={[
+                  styles.statNumber,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {beginnerFish.length}
+              </Text>
+              <Text
+                style={[
+                  styles.statLabel,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Beginner
+              </Text>
             </View>
 
-            <View style={styles.statCard}>
+            <View
+              style={[
+                styles.statCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
               <Ionicons name="flask" size={24} color="#FF9800" />
-              <Text style={styles.statNumber}>{intermediateFish.length}</Text>
-              <Text style={styles.statLabel}>Intermediate</Text>
+              <Text
+                style={[
+                  styles.statNumber,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {intermediateFish.length}
+              </Text>
+              <Text
+                style={[
+                  styles.statLabel,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Intermediate
+              </Text>
             </View>
 
-            <View style={styles.statCard}>
+            <View
+              style={[
+                styles.statCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
               <Ionicons name="diamond" size={24} color="#E91E63" />
-              <Text style={styles.statNumber}>{expertFish.length}</Text>
-              <Text style={styles.statLabel}>Expert</Text>
+              <Text
+                style={[
+                  styles.statNumber,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {expertFish.length}
+              </Text>
+              <Text
+                style={[
+                  styles.statLabel,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Expert
+              </Text>
             </View>
           </View>
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="search" size={70} color="#BDBDBD" />
+            <Ionicons name="search" size={70} color={colors.textMuted} />
+            <Text
+              style={[
+                styles.emptyTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              No Fish Found
+            </Text>
 
-            <Text style={styles.emptyTitle}>No Fish Found</Text>
-
-            <Text style={styles.emptySubtitle}>
+            <Text
+              style={[
+                styles.emptySubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
               Try searching with another keyword.
             </Text>
           </View>

@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -7,24 +8,66 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { allFish } from "../data/allFish";
 
 export default function BreedingGuide() {
+  const colors = useAppColors();
   const [selectedFish, setSelectedFish] = useState("");
 
   return (
-    <View style={styles.safe}>
+    <View
+      style={[
+        styles.safe,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="Breeding Guide" />
 
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.hero}>
-          <Text style={styles.heroTitle}>🧬 Fish Breeding Guide </Text>
-          <Text style={styles.heroSubtitle}>
+        <View
+          style={[
+            styles.hero,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.heroTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            🧬 Fish Breeding Guide
+          </Text>
+          <Text
+            style={[
+              styles.heroSubtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Learn breeding methods, fry care, and breeding tips for ornamental
             fish.
           </Text>
         </View>
-        <Text style={styles.sectionTitle}>Select Fish Species</Text>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Select Fish Species
+        </Text>
         <View style={styles.chipContainer}>
           {allFish.map((fish) => (
             <Pressable
@@ -32,13 +75,24 @@ export default function BreedingGuide() {
               onPress={() => setSelectedFish(fish.id)}
               style={[
                 styles.chip,
-                selectedFish === fish.id && styles.activeChip,
+                {
+                  backgroundColor:
+                    selectedFish === fish.id ? colors.primary : colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
               ]}
             >
               <Text
                 style={[
                   styles.chipText,
-                  selectedFish === fish.id && styles.activeChipText,
+                  {
+                    color:
+                      selectedFish === fish.id
+                        ? colors.white
+                        : colors.textPrimary,
+                    fontWeight: selectedFish === fish.id ? "700" : "400",
+                  },
                 ]}
               >
                 {fish.commonName}
@@ -47,7 +101,12 @@ export default function BreedingGuide() {
           ))}
         </View>
         <Pressable
-          style={styles.generateButton}
+          style={[
+            styles.generateButton,
+            {
+              backgroundColor: colors.primary,
+            },
+          ]}
           onPress={() =>
             router.push({
               pathname: "/breeding-result",
@@ -57,7 +116,16 @@ export default function BreedingGuide() {
             })
           }
         >
-          <Text style={styles.generateText}>Generate Breeding Guide</Text>
+          <Text
+            style={[
+              styles.generateText,
+              {
+                color: colors.white,
+              },
+            ]}
+          >
+            Generate Breeding Guide
+          </Text>
         </Pressable>
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -116,17 +184,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  activeChip: {
-    backgroundColor: "#00D4FF",
-  },
-
   chipText: {
     color: "#FFFFFF",
-  },
-
-  activeChipText: {
-    color: "#08141F",
-    fontWeight: "700",
   },
 
   generateButton: {

@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -7,6 +8,7 @@ import { allFish } from "../data/allFish";
 import { fishCompatibility } from "../data/fishCompatibility";
 
 export default function CompatibilityChecker() {
+  const colors = useAppColors();
   const [fish1, setFish1] = useState("goldfish");
   const [fish2, setFish2] = useState("betta");
 
@@ -60,37 +62,118 @@ export default function CompatibilityChecker() {
   const compatibilityResult = result();
 
   return (
-    <View style={styles.safe}>
+    <View
+      style={[
+        styles.safe,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="Compatibility Checker" />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Fish Compatibility Checker</Text>
-        <Text style={styles.subtitle}>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Fish Compatibility Checker
+        </Text>
+        <Text
+          style={[
+            styles.subtitle,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
           Check whether two fish species can live together.
         </Text>
-        <Text style={styles.label}>Fish Species #1</Text>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Fish Species #1
+        </Text>
         <View style={styles.chips}>
           {allFish.map((fish) => (
             <Pressable
               key={fish.id}
               onPress={() => setFish1(fish.id)}
-              style={[styles.chip, fish1 === fish.id && styles.activeChip]}
+              style={[
+                styles.chip,
+                {
+                  backgroundColor:
+                    fish1 === fish.id ? colors.primary : colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
             >
-              <Text style={styles.chipText}>{fish.commonName}</Text>
+              <Text
+                style={[
+                  styles.chipText,
+                  {
+                    color:
+                      fish1 === fish.id || fish2 === fish.id
+                        ? colors.white
+                        : colors.textPrimary,
+                  },
+                ]}
+              >
+                {fish.commonName}
+              </Text>
             </Pressable>
           ))}
         </View>
-        <Text style={styles.label}>Fish Species #2</Text>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Fish Species #2
+        </Text>
         <View style={styles.chips}>
           {allFish.map((fish) => (
             <Pressable
               key={fish.id}
               onPress={() => setFish2(fish.id)}
-              style={[styles.chip, fish2 === fish.id && styles.activeChip]}
+              style={[
+                styles.chip,
+                {
+                  backgroundColor:
+                    fish2 === fish.id ? colors.primary : colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
             >
-              <Text style={styles.chipText}>{fish.commonName}</Text>
+              <Text
+                style={[
+                  styles.chipText,
+                  {
+                    color:
+                      fish1 === fish.id || fish2 === fish.id
+                        ? colors.white
+                        : colors.textPrimary,
+                  },
+                ]}
+              >
+                {fish.commonName}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -98,13 +181,14 @@ export default function CompatibilityChecker() {
           style={[
             styles.resultCard,
             {
+              backgroundColor: colors.card,
               borderWidth: 2,
               borderColor:
                 compatibilityResult.status === "Compatible"
-                  ? "#22C55E"
+                  ? colors.success
                   : compatibilityResult.status === "Use Caution"
-                    ? "#F59E0B"
-                    : "#EF4444",
+                    ? colors.warning
+                    : colors.danger,
             },
           ]}
         >
@@ -114,10 +198,10 @@ export default function CompatibilityChecker() {
               {
                 color:
                   compatibilityResult.status === "Compatible"
-                    ? "#22C55E"
+                    ? colors.success
                     : compatibilityResult.status === "Use Caution"
-                      ? "#F59E0B"
-                      : "#EF4444",
+                      ? colors.warning
+                      : colors.danger,
               },
             ]}
           >
@@ -128,7 +212,16 @@ export default function CompatibilityChecker() {
                 : "❌ Not Compatible"}
           </Text>
 
-          <Text style={styles.reason}>{compatibilityResult.reason}</Text>
+          <Text
+            style={[
+              styles.reason,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {compatibilityResult.reason}
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -177,10 +270,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 8,
     marginBottom: 8,
-  },
-
-  activeChip: {
-    backgroundColor: "#00D4FF",
   },
 
   chipText: {

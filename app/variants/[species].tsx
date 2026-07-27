@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -15,6 +16,7 @@ import {
 import { allGalleries } from "../../data/allGalleries";
 
 export default function VariantsScreen() {
+  const colors = useAppColors();
   const params = useLocalSearchParams();
 
   const species = Array.isArray(params.species)
@@ -35,7 +37,14 @@ export default function VariantsScreen() {
     .replace(/^./, (str) => str.toUpperCase());
 
   return (
-    <View style={styles.safe}>
+    <View
+      style={[
+        styles.safe,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="Fish Variants" />
       <FlatList
         data={filteredVariants}
@@ -48,44 +57,121 @@ export default function VariantsScreen() {
         }}
         ListHeaderComponent={
           <>
-            <View style={styles.hero}>
-              <Text style={styles.heroTitle}>{speciesTitle} Variants</Text>
+            <View
+              style={[
+                styles.hero,
+                {
+                  backgroundColor: colors.background,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.heroTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {speciesTitle} Variants
+              </Text>
 
-              <Text style={styles.heroSubtitle}>
+              <Text
+                style={[
+                  styles.heroSubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
                 Explore ornamental fish varieties, color morphs, fin types, and
                 pattern variations.
               </Text>
 
-              <View style={styles.statsCard}>
+              <View
+                style={[
+                  styles.statsCard,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
                 <View style={styles.stat}>
-                  <Text style={styles.statNumber}>
+                  <Text
+                    style={[
+                      styles.statNumber,
+                      {
+                        color: colors.primary,
+                      },
+                    ]}
+                  >
                     {Array.isArray(gallery) ? gallery.length : 0}
                   </Text>
 
-                  <Text style={styles.statLabel}>Variants</Text>
+                  <Text
+                    style={[
+                      styles.statLabel,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    Variants
+                  </Text>
                 </View>
 
-                <View style={styles.divider} />
-
+                <View
+                  style={[
+                    styles.divider,
+                    {
+                      backgroundColor: colors.divider,
+                    },
+                  ]}
+                />
                 <View style={styles.stat}>
-                  <Ionicons name="fish" size={22} color="#00BCD4" />
+                  <Ionicons name="fish" size={22} color={colors.primary} />
 
-                  <Text style={styles.statLabel}>AquaGuide AI</Text>
+                  <Text
+                    style={[
+                      styles.statLabel,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    AquaGuide AI
+                  </Text>
                 </View>
               </View>
 
               <TextInput
                 placeholder="Search variant..."
-                placeholderTextColor="#90A4AE"
+                placeholderTextColor={colors.textMuted}
                 value={search}
                 onChangeText={setSearch}
-                style={styles.searchInput}
+                style={[
+                  styles.searchInput,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  },
+                ]}
               />
             </View>
           </>
         }
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
             <Image
               source={item.image}
               style={styles.image}
@@ -93,13 +179,37 @@ export default function VariantsScreen() {
             />
 
             <View style={styles.content}>
-              <Text style={styles.name}>{item.name}</Text>
-
-              <View style={styles.badge}>
+              <Text
+                style={[
+                  styles.name,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {item.name}
+              </Text>
+              <View
+                style={[
+                  styles.badge,
+                  {
+                    backgroundColor: colors.primary,
+                  },
+                ]}
+              >
                 <Text style={styles.badgeText}>{item.type}</Text>
               </View>
 
-              <Text style={styles.description}>{item.description}</Text>
+              <Text
+                style={[
+                  styles.description,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                {item.description}
+              </Text>
             </View>
           </View>
         )}

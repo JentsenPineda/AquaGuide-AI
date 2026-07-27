@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
@@ -16,6 +17,7 @@ import { fishImages } from "../data/fishImages";
 import { allFish } from "../data/allFish";
 
 export default function AquaPlantScreen() {
+  const colors = useAppColors();
   const [search, setSearch] = useState("");
   const [selectedFish, setSelectedFish] = useState("goldfish");
 
@@ -26,17 +28,45 @@ export default function AquaPlantScreen() {
   }, [search]);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="Aqua Plants" />
       <View style={styles.content}>
         {/* Header */}
 
-        <View style={styles.hero}>
+        <View
+          style={[
+            styles.hero,
+            {
+              backgroundColor: colors.background,
+            },
+          ]}
+        >
           <Text style={styles.logo}>🌿</Text>
-
-          <Text style={styles.title}>Aqua Plant Guide</Text>
-
-          <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Aqua Plant Guide
+          </Text>
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Find compatible aquatic plants for your ornamental fish.
           </Text>
         </View>
@@ -45,10 +75,18 @@ export default function AquaPlantScreen() {
 
         <TextInput
           placeholder="Search fish species..."
-          placeholderTextColor="#7D8B99"
-          style={styles.search}
+          placeholderTextColor={colors.textMuted}
           value={search}
           onChangeText={setSearch}
+          style={[
+            styles.search,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+              color: colors.textPrimary,
+            },
+          ]}
         />
       </View>
 
@@ -66,14 +104,27 @@ export default function AquaPlantScreen() {
             onPress={() => setSelectedFish(item.id)}
             style={[
               styles.card,
-              selectedFish === item.id && styles.selectedCard,
+              {
+                backgroundColor: colors.card,
+                borderColor:
+                  selectedFish === item.id ? colors.primary : colors.border,
+              },
             ]}
           >
             <Image
               source={fishImages[item.id as keyof typeof fishImages]}
               style={styles.image}
             />
-            <Text style={styles.cardTitle}>{item.commonName}</Text>
+            <Text
+              style={[
+                styles.cardTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              {item.commonName}
+            </Text>
           </Pressable>
         )}
       />
@@ -81,7 +132,12 @@ export default function AquaPlantScreen() {
       {/* Button */}
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          {
+            backgroundColor: colors.primary,
+          },
+        ]}
         onPress={() =>
           router.push({
             pathname: "/plant-result",
@@ -91,7 +147,16 @@ export default function AquaPlantScreen() {
           })
         }
       >
-        <Text style={styles.buttonText}>Show Compatible Plants</Text>
+        <Text
+          style={[
+            styles.buttonText,
+            {
+              color: colors.white,
+            },
+          ]}
+        >
+          Show Compatible Plants
+        </Text>
       </Pressable>
     </View>
   );
@@ -146,10 +211,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 2,
     borderColor: "transparent",
-  },
-
-  selectedCard: {
-    borderColor: "#00D4FF",
   },
 
   image: {

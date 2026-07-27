@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -17,6 +18,7 @@ import { fishImages } from "../../data/fishImages";
 import { fishProfiles } from "../../data/fishProfiles";
 
 export default function FishDetailsScreen() {
+  const colors = useAppColors();
   const params = useLocalSearchParams();
   const router = useRouter();
 
@@ -26,11 +28,26 @@ export default function FishDetailsScreen() {
 
   if (!fish) {
     return (
-      <View style={styles.safe}>
-        <AppHeader title="Fish Details" variant="dark" />
-
+      <View
+        style={[
+          styles.safe,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        <AppHeader title="Fish Details" />
         <View style={styles.center}>
-          <Text style={styles.notFound}>Fish not found</Text>
+          <Text
+            style={[
+              styles.notFound,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Fish not found
+          </Text>
         </View>
       </View>
     );
@@ -39,7 +56,14 @@ export default function FishDetailsScreen() {
   const profile = fishProfiles[fish.id as keyof typeof fishProfiles];
 
   return (
-    <View style={styles.safe}>
+    <View
+      style={[
+        styles.safe,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="Fish Details" />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -53,20 +77,68 @@ export default function FishDetailsScreen() {
           style={styles.heroImage}
         />
         {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.badge}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.background,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+          >
             <Text style={styles.badgeText}>{fish.category}</Text>
           </View>
-
-          <Text style={styles.name}>{fish.commonName}</Text>
-
-          <Text style={styles.scientificName}>{fish.scientificName}</Text>
-
-          <Text style={styles.description}>{fish.description}</Text>
+          <Text
+            style={[
+              styles.name,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {fish.commonName}
+          </Text>
+          <Text
+            style={[
+              styles.scientificName,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {fish.scientificName}
+          </Text>
+          <Text
+            style={[
+              styles.description,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {fish.description}
+          </Text>
         </View>
+
         {/* Care Stats */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Care Requirements</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Care Requirements
+          </Text>
 
           <View style={styles.statsGrid}>
             <StatCard icon="water-outline" title="Tank" value={fish.tankSize} />
@@ -92,10 +164,24 @@ export default function FishDetailsScreen() {
         </View>
         {/* Variants */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Variants</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Variants
+          </Text>
 
           <Pressable
-            style={styles.variantButton}
+            style={[
+              styles.variantButton,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
             onPress={() =>
               router.push({
                 pathname: "/variants/[species]",
@@ -112,44 +198,156 @@ export default function FishDetailsScreen() {
         </View>
         {/* Diseases */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Common Diseases</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Common Diseases
+          </Text>
 
           <View style={styles.chipsContainer}>
             {profile?.diseases?.map((disease) => (
-              <View key={disease} style={styles.chip}>
-                <Text style={styles.chipText}>{disease}</Text>
+              <View
+                key={disease}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {disease}
+                </Text>
               </View>
             ))}
           </View>
         </View>
         {/* Equipment */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recommended Equipment</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Recommended Equipment
+          </Text>
 
           {profile?.equipment?.map((item) => (
-            <View key={item} style={styles.card}>
-              <Ionicons name="checkmark-circle" size={18} color="#00BCD4" />
+            <View
+              key={item}
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={colors.primary}
+              />
 
-              <Text style={styles.cardText}>{item}</Text>
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {item}
+              </Text>
             </View>
           ))}
         </View>
         {/* Breeding */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Breeding Guide</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Breeding Guide
+          </Text>
 
-          <View style={styles.infoCard}>
-            <Text style={styles.infoText}>{profile?.breedingGuide}</Text>
+          <View
+            style={[
+              styles.infoCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.infoText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              {profile?.breedingGuide}
+            </Text>
           </View>
         </View>
         {/* AI Recommendation */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>AquaGuide AI Recommendation</Text>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            AquaGuide AI Recommendation
+          </Text>
 
-          <View style={styles.aiCard}>
+          <View
+            style={[
+              styles.aiCard,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+          >
             <Ionicons name="sparkles" size={24} color="#FFFFFF" />
 
-            <Text style={styles.aiText}>{profile?.aiRecommendation}</Text>
+            <Text
+              style={[
+                styles.aiText,
+                {
+                  color: colors.white,
+                },
+              ]}
+            >
+              {profile?.aiRecommendation}
+            </Text>
           </View>
         </View>
         <View style={{ height: 40 }} />
@@ -167,13 +365,42 @@ function StatCard({
   title: string;
   value: string;
 }) {
+  const colors = useAppColors();
+
   return (
-    <View style={styles.statCard}>
-      <Ionicons name={icon} size={20} color="#00BCD4" />
+    <View
+      style={[
+        styles.statCard,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          borderWidth: 1,
+        },
+      ]}
+    >
+      <Ionicons name={icon} size={20} color={colors.primary} />
 
-      <Text style={styles.statTitle}>{title}</Text>
+      <Text
+        style={[
+          styles.statTitle,
+          {
+            color: colors.textSecondary,
+          },
+        ]}
+      >
+        {title}
+      </Text>
 
-      <Text style={styles.statValue}>{value}</Text>
+      <Text
+        style={[
+          styles.statValue,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        {value}
+      </Text>
     </View>
   );
 }

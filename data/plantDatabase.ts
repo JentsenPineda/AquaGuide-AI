@@ -1,7 +1,21 @@
-export const plantDatabase = {
+type PlantData = {
+  name: string;
+  image: any;
+  images?: any[];
+  difficulty: string;
+  lighting: string;
+  growthRate: string;
+  co2: string;
+  placement: string;
+};
+export const plantDatabase: Record<string, PlantData> = {
   anubias: {
     name: "Anubias",
+
     image: require("../assets/images/aquatic-plants/anubias.png"),
+
+    images: [require("../assets/images/aquatic-plants/anubias.png")],
+
     difficulty: "Beginner",
     lighting: "Low to Medium",
     growthRate: "Slow",

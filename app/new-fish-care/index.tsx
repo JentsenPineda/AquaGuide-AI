@@ -3,14 +3,45 @@ import ThemeCard from "@/components/cards/ThemeCard";
 import AppHeader from "@/components/layout/AppHeader";
 import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  FishCareProgram,
+  subscribeToPrograms,
+} from "@/services/newFishCareService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 export default function NewFishCareScreen() {
   const colors = useAppColors();
+  const { user } = useAuth();
+
+  const [programs, setPrograms] = useState<FishCareProgram[]>([]);
+  const [showEducation, setShowEducation] = useState(false);
+  const [showAcclimationModal, setShowAcclimationModal] = useState(false);
+  const [showActivePrograms, setShowActivePrograms] = useState(true);
+  const [showCompletedPrograms, setShowCompletedPrograms] = useState(false);
+  const activePrograms = programs.filter(
+    (program) => program.status === "active",
+  );
+
+  const completedPrograms = programs.filter(
+    (program) => program.status === "completed",
+  );
+
+  useEffect(() => {
+    if (!user) return;
+
+    return subscribeToPrograms(user.uid, setPrograms);
+  }, [user]);
   const dynamicStyles = {
     container: {
       backgroundColor: colors.background,
@@ -42,90 +73,255 @@ export default function NewFishCareScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Hero */}
-        <ThemeCard style={styles.hero}>
-          <View style={[styles.heroIcon, dynamicStyles.heroIcon]}>
-            <Ionicons name="fish" size={70} color={colors.primary} />
+        {/* Dashboard Header */}
+        <View style={styles.dashboardHeader}>
+          <View style={styles.dashboardTitleRow}>
+            <Image
+              source={require("@/assets/images/image-library-UI/aquaguide-icon.png")}
+              style={styles.dashboardIcon}
+            />
+
+            <ThemeText variant="title" style={styles.dashboardTitle}>
+              Fish Care Dashboard
+            </ThemeText>
           </View>
 
-          <ThemeText variant="title" style={styles.title}>
-            Welcome Your New Fish
+          <ThemeText variant="body" style={styles.dashboardSubtitle}>
+            Manage your active fish care programs and start new ones.
           </ThemeText>
+        </View>
 
-          <ThemeText variant="body" style={styles.subtitle}>
-            Follow this interactive guide to safely acclimate your newly
-            purchased fish. Proper acclimation reduces stress, prevents water
-            shock, and lowers the risk of diseases.
-          </ThemeText>
-        </ThemeCard>
-
-        {/* Benefits */}
-        <ThemeText
-          variant="title"
-          style={[styles.sectionTitle, dynamicStyles.sectionTitle]}
+        {/* Learn About Acclimation */}
+        <ThemeCard
+          style={[
+            styles.educationCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
         >
-          Why Proper Acclimation Matters
-        </ThemeText>
+          <TouchableOpacity
+            onPress={() => setShowEducation(!showEducation)}
+            style={styles.educationHeader}
+            activeOpacity={0.8}
+          >
+            <View style={styles.educationTitleRow}>
+              <Ionicons
+                name="school-outline"
+                size={26}
+                color={colors.primary}
+              />
 
-        <ThemeCard style={[styles.card, dynamicStyles.card]}>
-          <Ionicons name="heart" size={30} color={colors.primary} />
+              <ThemeText variant="subtitle" style={styles.educationTitle}>
+                Learn About Proper Acclimation
+              </ThemeText>
+            </View>
 
-          <View style={styles.cardContent}>
-            <ThemeText variant="subtitle">Reduce Stress</ThemeText>
+            <View style={styles.chevronContainer}>
+              <Ionicons
+                name={showEducation ? "chevron-up" : "chevron-down"}
+                size={20}
+                color={colors.textSecondary}
+              />
+            </View>
+          </TouchableOpacity>
 
-            <ThemeText variant="body" style={styles.cardText}>
-              Fish experience stress during transportation. Proper acclimation
-              helps them recover safely.
-            </ThemeText>
-          </View>
-        </ThemeCard>
+          {showEducation && (
+            <View style={styles.educationContent}>
+              <View style={styles.educationItem}>
+                <Ionicons name="heart" size={22} color="#E53935" />
+                <View style={styles.educationText}>
+                  <ThemeText variant="subtitle">Reduce Stress</ThemeText>
+                  <ThemeText variant="body">
+                    Fish experience stress during transportation. Proper
+                    acclimation helps them recover safely.
+                  </ThemeText>
+                </View>
+              </View>
 
-        <ThemeCard style={[styles.card, dynamicStyles.card]}>
-          <Ionicons name="water" size={30} color="#2196F3" />
+              <View style={styles.educationItem}>
+                <Ionicons name="water" size={22} color="#2196F3" />
+                <View style={styles.educationText}>
+                  <ThemeText variant="subtitle">Prevent Water Shock</ThemeText>
+                  <ThemeText variant="body">
+                    Sudden changes in water temperature or chemistry can
+                    seriously harm your fish.
+                  </ThemeText>
+                </View>
+              </View>
 
-          <View style={styles.cardContent}>
-            <ThemeText variant="subtitle">Prevent Water Shock</ThemeText>
+              <View style={styles.educationItem}>
+                <Ionicons name="shield-checkmark" size={22} color="#4CAF50" />
+                <View style={styles.educationText}>
+                  <ThemeText variant="subtitle">Prevent Diseases</ThemeText>
+                  <ThemeText variant="body">
+                    A proper acclimation process strengthens the immune system
+                    and lowers disease risk.
+                  </ThemeText>
+                </View>
+              </View>
 
-            <ThemeText variant="body" style={styles.cardText}>
-              Sudden changes in temperature or water chemistry can seriously
-              harm your fish.
-            </ThemeText>
-          </View>
-        </ThemeCard>
-
-        <ThemeCard style={[styles.card, dynamicStyles.card]}>
-          <Ionicons name="shield-checkmark" size={30} color="#4CAF50" />
-
-          <View style={styles.cardContent}>
-            <ThemeText variant="subtitle">Prevent Diseases</ThemeText>
-
-            <ThemeText variant="body" style={styles.cardText}>
-              A stress-free acclimation process strengthens the immune system
-              and reduces disease risk.
-            </ThemeText>
-          </View>
-        </ThemeCard>
-
-        {/* Time */}
-        <ThemeCard style={[styles.timeCard, dynamicStyles.timeCard]}>
-          <Ionicons name="time" size={32} color="#FF9800" />
-
-          <ThemeText variant="subtitle" style={styles.timeTitle}>
-            Estimated Guide Duration
-          </ThemeText>
-
-          <ThemeText variant="title" style={styles.timeValue}>
-            30 – 45 Minutes
-          </ThemeText>
+              <View style={styles.educationItem}>
+                <Ionicons name="time-outline" size={22} color="#FF9800" />
+                <View style={styles.educationText}>
+                  <ThemeText variant="subtitle">Estimated Duration</ThemeText>
+                  <ThemeText variant="body">
+                    Approximately 30–45 minutes.
+                  </ThemeText>
+                </View>
+              </View>
+            </View>
+          )}
         </ThemeCard>
 
         {/* Buttons */}
+        {/* My Fish Care Programs */}
+        {user && (
+          <>
+            <ThemeText
+              variant="title"
+              style={[styles.sectionTitle, dynamicStyles.sectionTitle]}
+            >
+              My Fish Care Programs
+            </ThemeText>
+            <>
+              {activePrograms.length > 0 && (
+                <>
+                  <TouchableOpacity
+                    style={styles.educationHeader}
+                    onPress={() => setShowActivePrograms(!showActivePrograms)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.educationTitleRow}>
+                      <Ionicons
+                        name="fish-outline"
+                        size={24}
+                        color={colors.primary}
+                      />
+
+                      <ThemeText
+                        variant="subtitle"
+                        style={styles.educationTitle}
+                      >
+                        Active Programs ({activePrograms.length})
+                      </ThemeText>
+                    </View>
+
+                    <View style={styles.chevronContainer}>
+                      <Ionicons
+                        name={
+                          showActivePrograms ? "chevron-up" : "chevron-down"
+                        }
+                        size={20}
+                        color={colors.textSecondary}
+                      />
+                    </View>
+                  </TouchableOpacity>
+
+                  {showActivePrograms &&
+                    activePrograms.map((program) => {
+                      const completedDays = program.days.filter(
+                        (day) => day.completed,
+                      ).length;
+
+                      return (
+                        <ThemeCard
+                          key={program.id}
+                          style={[styles.card, dynamicStyles.card]}
+                        >
+                          <View style={{ flex: 1 }}>
+                            <ThemeText variant="subtitle">
+                              {program.fishName}
+                            </ThemeText>
+
+                            <ThemeText variant="body">
+                              {program.species}
+                            </ThemeText>
+
+                            <ThemeText variant="body" style={{ marginTop: 6 }}>
+                              Day {completedDays + 1} of 7
+                            </ThemeText>
+                          </View>
+
+                          <ThemeButton
+                            title="Continue"
+                            onPress={() =>
+                              router.push({
+                                pathname: "/new-fish-care/sevenDays",
+                                params: {
+                                  programId: program.id,
+                                },
+                              })
+                            }
+                          />
+                        </ThemeCard>
+                      );
+                    })}
+                </>
+              )}
+
+              {completedPrograms.length > 0 && (
+                <>
+                  <ThemeText
+                    variant="subtitle"
+                    style={{
+                      marginTop: 20,
+                      marginBottom: 12,
+                    }}
+                  >
+                    Completed Programs
+                  </ThemeText>
+
+                  {completedPrograms.map((program) => (
+                    <ThemeCard
+                      key={program.id}
+                      style={[styles.card, dynamicStyles.card]}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <ThemeText variant="subtitle">
+                          {program.fishName}
+                        </ThemeText>
+
+                        <ThemeText variant="body">{program.species}</ThemeText>
+
+                        <ThemeText variant="body" style={{ marginTop: 6 }}>
+                          Completed
+                        </ThemeText>
+                      </View>
+
+                      <ThemeButton
+                        title="View"
+                        onPress={() =>
+                          router.push({
+                            pathname: "/new-fish-care/sevenDays",
+                            params: {
+                              programId: program.id,
+                            },
+                          })
+                        }
+                      />
+                    </ThemeCard>
+                  ))}
+                </>
+              )}
+            </>
+          </>
+        )}
         <ThemeButton
-          title="Start Guide"
+          title={
+            activePrograms.length > 0
+              ? "Start Another Fish Care Program"
+              : "Start Fish Care Guide"
+          }
           onPress={() => router.push("/new-fish-care/preparation")}
           style={styles.startButton}
         />
 
-        <TouchableOpacity style={styles.learnButton}>
+        <TouchableOpacity
+          style={styles.learnButton}
+          onPress={() => setShowAcclimationModal(true)}
+        >
           <Ionicons
             name="information-circle-outline"
             size={22}
@@ -136,6 +332,75 @@ export default function NewFishCareScreen() {
             Why Is Acclimation Important?
           </ThemeText>
         </TouchableOpacity>
+        <Modal
+          visible={showAcclimationModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowAcclimationModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: colors.card,
+                },
+              ]}
+            >
+              <ThemeText variant="title">🐟 Fish Acclimation Guide</ThemeText>
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <ThemeText variant="subtitle" style={styles.modalSection}>
+                  What is Fish Acclimation?
+                </ThemeText>
+
+                <ThemeText variant="body">
+                  Fish acclimation is the process of slowly adjusting a newly
+                  purchased fish to the conditions of its new aquarium. This
+                  prevents stress caused by sudden changes in temperature, pH,
+                  and water quality.
+                </ThemeText>
+
+                <ThemeText variant="subtitle" style={styles.modalSection}>
+                  ❤️ Why is it Important?
+                </ThemeText>
+
+                <ThemeText variant="body">
+                  • Reduces stress{"\n"}• Helps fish adapt safely{"\n"}•
+                  Improves survival rate{"\n"}• Encourages normal eating
+                  behavior{"\n"}• Strengthens fish immunity
+                </ThemeText>
+
+                <ThemeText variant="subtitle" style={styles.modalSection}>
+                  ⚠️ What Problems Can It Prevent?
+                </ThemeText>
+
+                <ThemeText variant="body">
+                  • Temperature shock{"\n"}• pH shock{"\n"}• Loss of appetite
+                  {"\n"}• Increased disease risk{"\n"}• Sudden death after
+                  introduction
+                </ThemeText>
+
+                <ThemeText variant="subtitle" style={styles.modalSection}>
+                  💧 Proper Acclimation Tips
+                </ThemeText>
+
+                <ThemeText variant="body">
+                  • Match water temperature first{"\n"}• Slowly mix aquarium
+                  water{"\n"}• Avoid sudden parameter changes{"\n"}• Observe
+                  fish behavior after release
+                </ThemeText>
+              </ScrollView>
+
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setShowAcclimationModal(false)}
+              >
+                <ThemeText style={styles.closeText}>Close</ThemeText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </View>
   );
@@ -158,6 +423,22 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginTop: 15,
     marginBottom: 30,
+  },
+
+  dashboardHeader: {
+    marginTop: 20,
+    marginBottom: 30,
+  },
+
+  dashboardTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+  },
+
+  dashboardSubtitle: {
+    marginTop: 6,
+    fontSize: 15,
+    lineHeight: 22,
   },
 
   heroIcon: {
@@ -193,8 +474,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#FFFFFF",
     borderRadius: 18,
-    padding: 18,
-    marginBottom: 15,
+    padding: 20,
+    marginBottom: 18,
     elevation: 2,
   },
 
@@ -202,7 +483,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 15,
   },
-
+  educationCard: {
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 20,
+  },
   cardText: {
     lineHeight: 22,
     fontSize: 15,
@@ -238,7 +523,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    marginBottom: 15,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+
+  modalContent: {
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 24,
+    maxHeight: "80%",
+  },
+
+  modalSection: {
+    marginTop: 20,
+    marginBottom: 8,
+  },
+
+  closeButton: {
+    marginTop: 20,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "#00BCD4",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  closeText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
   },
 
   learnButton: {
@@ -250,10 +567,62 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+  chevronContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
   learnText: {
     fontSize: 17,
     fontWeight: "700",
     marginLeft: 8,
+  },
+
+  educationHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  educationTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    paddingRight: 16,
+  },
+
+  educationTitle: {
+    marginLeft: 12,
+    fontSize: 17,
+    fontWeight: "700",
+  },
+
+  educationContent: {
+    marginTop: 22,
+  },
+
+  educationItem: {
+    flexDirection: "row",
+    marginBottom: 18,
+  },
+
+  educationText: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  dashboardTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  dashboardIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    marginRight: 10,
   },
 });

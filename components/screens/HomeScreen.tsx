@@ -1,8 +1,14 @@
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  FishCareProgram,
+  subscribeToPrograms,
+} from "@/services/newFishCareService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Image,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -34,6 +40,33 @@ function ModuleCard({ title, icon, route }: ModuleCardProps) {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { user } = useAuth();
+
+  const [programs, setPrograms] = useState<FishCareProgram[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    return subscribeToPrograms(user.uid, setPrograms);
+  }, [user]);
+
+  const activePrograms = useMemo(
+    () => programs.filter((p) => p.status === "active"),
+    [programs],
+  );
+
+  const completedPrograms = useMemo(
+    () => programs.filter((p) => p.status === "completed"),
+    [programs],
+  );
+
+  const totalPrograms = programs.length;
+
+  const nextProgram = activePrograms[0];
+
+  const nextProgramCompletedDays = nextProgram
+    ? nextProgram.days.filter((day) => day.completed).length
+    : 0;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -43,7 +76,14 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.appName}>🐠 AquaGuide AI</Text>
+          <View style={styles.appTitleRow}>
+            <Image
+              source={require("@/assets/images/image-library-UI/aquaguide-icon.png")}
+              style={styles.appIcon}
+            />
+
+            <Text style={styles.appName}>AquaGuide AI</Text>
+          </View>
 
           <Text style={styles.tagline}>
             Ornamental Fish Management Assistant
@@ -78,79 +118,94 @@ export default function HomeScreen() {
         </Pressable>
 
         {/* Statistics */}
+        {/* Statistics */}
+        <Text style={styles.sectionTitle}>Dashboard Statistics</Text>
+
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Scans</Text>
+            <Ionicons name="scan-outline" size={24} color="#00BCD4" />
+            <Text style={styles.statValue}>0 / 3</Text>
+            <Text style={styles.statLabel}>Scans Today</Text>
           </View>
 
           <View style={styles.statCard}>
+            <Ionicons name="alarm-outline" size={24} color="#00BCD4" />
             <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Reminders</Text>
+            <Text style={styles.statLabel}>Active Reminders</Text>
           </View>
 
           <View style={styles.statCard}>
+            <Ionicons name="book-outline" size={24} color="#00BCD4" />
             <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Logs</Text>
+            <Text style={styles.statLabel}>Logbook Entries</Text>
           </View>
         </View>
 
-        {/* Modules */}
-        <Text style={styles.sectionTitle}>Modules</Text>
+        {/* Continue Fish Care */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.continueCard,
+            pressed && { opacity: 0.9 },
+          ]}
+          onPress={() => {
+            if (activePrograms.length === 0) {
+              router.push("/new-fish-care");
+              return;
+            }
 
-        <View style={styles.moduleGrid}>
-          <ModuleCard
-            title="Species Library"
-            icon="book-outline"
-            route="/(tabs)/library"
-          />
+            if (activePrograms.length === 1) {
+              router.push({
+                pathname: "/new-fish-care/sevenDays",
+                params: {
+                  programId: activePrograms[0].id,
+                },
+              });
+              return;
+            }
 
-          <ModuleCard
-            title="Tank & Care"
-            icon="water-outline"
-            route="/tank-care"
-          />
+            router.push("/new-fish-care");
+          }}
+        >
+          <View style={styles.continueHeader}>
+            <Ionicons name="fish-outline" size={30} color="#00BCD4" />
 
-          <ModuleCard
-            title="Disease Guide"
-            icon="medkit-outline"
-            route="/disease-guide"
-          />
+            <Text style={styles.continueTitle}>Continue 7-Day Fish Care</Text>
+          </View>
 
-          <ModuleCard
-            title="Breeding Guide"
-            icon="fish-outline"
-            route="/breeding-guide"
-          />
+          <Text style={styles.continueDay}>
+            {activePrograms.length} Active Program
+            {activePrograms.length === 1 ? "" : "s"}
+          </Text>
 
-          <ModuleCard
-            title="Aqua Plants"
-            icon="leaf-outline"
-            route="/aqua-plant"
-          />
+          <Text style={styles.continueTask}>
+            {nextProgram
+              ? `${nextProgram.fishName} • Day ${nextProgramCompletedDays + 1} of 7`
+              : "No active fish care program. Tap to start your first 7-Day Fish Care Guide."}
+          </Text>
 
-          <ModuleCard
-            title="Equipment"
-            icon="construct-outline"
-            route="/equipment/equipment-guide"
-          />
+          <View style={styles.progressBackground}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  width: nextProgram
+                    ? `${(nextProgramCompletedDays / 7) * 100}%`
+                    : "0%",
+                },
+              ]}
+            />
+          </View>
 
-          <ModuleCard
-            title="New Fish Care"
-            icon="sparkles-outline"
-            route="/new-fish-care"
-          />
+          <Text style={styles.progressText}>
+            {totalPrograms} Total • {completedPrograms.length} Completed
+          </Text>
 
-          <ModuleCard title="Reminder" icon="alarm-outline" route="/reminder" />
-
-          <ModuleCard title="Logbook" icon="book-outline" route="/logbook" />
-
-          <ModuleCard
-            title="Compatibility"
-            icon="git-compare-outline"
-            route="/compatibility-checker"
-          />
-        </View>
+          <View style={styles.continueButton}>
+            <Text style={styles.continueButtonText}>
+              {nextProgram ? "Open Fish Care →" : "Start Fish Care →"}
+            </Text>
+          </View>
+        </Pressable>
 
         <View style={{ height: 30 }} />
       </ScrollView>
@@ -276,5 +331,86 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
     fontWeight: "600",
+  },
+
+  continueCard: {
+    backgroundColor: "#102331",
+    borderRadius: 22,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#1F3A4A",
+  },
+
+  continueHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  continueTitle: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontWeight: "700",
+    marginLeft: 10,
+  },
+
+  continueDay: {
+    color: "#00BCD4",
+    fontSize: 17,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+
+  continueTask: {
+    color: "#B0BEC5",
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 18,
+  },
+
+  progressBackground: {
+    height: 10,
+    backgroundColor: "#1E3645",
+    borderRadius: 999,
+    overflow: "hidden",
+    marginBottom: 10,
+  },
+
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#00BCD4",
+    borderRadius: 999,
+  },
+
+  progressText: {
+    color: "#B0BEC5",
+    fontSize: 14,
+    marginBottom: 18,
+  },
+
+  appTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  appIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+
+  continueButton: {
+    backgroundColor: "#00BCD4",
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+
+  continueButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });

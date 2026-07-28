@@ -150,7 +150,7 @@ export default function First24HoursScreen() {
         </ThemeCard>
         <ThemeButton
           title="Continue"
-          onPress={() => router.push("/new-fish-care/sevenDays")}
+          onPress={() => router.push("/new-fish-care/create")}
           style={styles.button}
         />
       </ScrollView>

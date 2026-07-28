@@ -7,7 +7,7 @@ import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { fishCareDatabase } from "../data/fishCareDatabase";
 
 import { allFish } from "../data/allFish";
@@ -59,7 +59,34 @@ export default function TankCareScreen() {
     },
 
     hero: {
-      backgroundColor: colors.card,
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 24,
+    },
+
+    heroHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+
+    statusBadge: {
+      marginTop: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 20,
+      alignSelf: "flex-start",
+    },
+
+    heroIcon: {
+      width: 55,
+      height: 55,
+      borderRadius: 16,
+      marginRight: 14,
+    },
+
+    heroSubtitle: {
+      marginTop: 10,
+      lineHeight: 22,
     },
 
     sectionTitle: {
@@ -113,7 +140,20 @@ export default function TankCareScreen() {
         {/* HERO */}
 
         <ThemeCard style={[styles.hero, dynamicStyles.hero]}>
-          <ThemeText variant="title">Tank & Pond Advisor</ThemeText>
+          <View style={styles.heroHeader}>
+            <Image
+              source={require("@/assets/images/image-library-UI/aquaguide-icon.png")}
+              style={styles.heroIcon}
+            />
+
+            <View>
+              <ThemeText variant="title">Tank & Pond Advisor</ThemeText>
+
+              <ThemeText variant="caption">
+                AI Aquarium Planning Assistant
+              </ThemeText>
+            </View>
+          </View>
           <ThemeText variant="subtitle" style={styles.heroSubtitle}>
             Get personalized aquarium and pond recommendations based on your
             fish species.
@@ -273,14 +313,29 @@ export default function TankCareScreen() {
             <ThemeText variant="body">{actualVolume} Gallons</ThemeText>
 
             <ThemeText variant="subtitle">Stocking Status</ThemeText>
-            <ThemeText
-              variant="body"
-              style={{
-                color: stockingStatus === "Suitable" ? "#4CAF50" : "#FF6B6B",
-              }}
+            <ThemeText variant="subtitle">Stocking Status</ThemeText>
+
+            <View
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor:
+                    stockingStatus === "Suitable" ? "#163B2A" : "#402020",
+                },
+              ]}
             >
-              {stockingStatus === "Suitable" ? "✅ Suitable" : "⚠ Overcrowded"}
-            </ThemeText>
+              <ThemeText
+                variant="body"
+                style={{
+                  color: stockingStatus === "Suitable" ? "#4CAF50" : "#FF6B6B",
+                  fontWeight: "700",
+                }}
+              >
+                {stockingStatus === "Suitable"
+                  ? "✓ Suitable Setup"
+                  : "⚠ Needs Adjustment"}
+              </ThemeText>
+            </View>
             <ThemeText variant="subtitle">Temperature</ThemeText>
 
             <ThemeText variant="body">
@@ -344,6 +399,25 @@ export default function TankCareScreen() {
 }
 
 const styles = StyleSheet.create({
+  heroHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  heroIcon: {
+    width: 55,
+    height: 55,
+    borderRadius: 16,
+    marginRight: 14,
+  },
+
+  statusBadge: {
+    marginTop: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+  },
   safe: {
     flex: 1,
     backgroundColor: "#08141F",

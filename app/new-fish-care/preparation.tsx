@@ -185,7 +185,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#003B57",
   },
 
   subtitle: {
@@ -193,11 +192,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 15,
     lineHeight: 24,
-    color: "#607D8B",
+    opacity: 0.85,
   },
 
   progressCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 20,
     marginBottom: 25,
@@ -206,7 +204,7 @@ const styles = StyleSheet.create({
 
   progressTitle: {
     fontSize: 16,
-    color: "#607D8B",
+    opacity: 0.8,
   },
 
   progressValue: {
@@ -220,6 +218,7 @@ const styles = StyleSheet.create({
     height: 10,
     backgroundColor: "#E0E0E0",
     borderRadius: 20,
+    overflow: "hidden",
   },
 
   progressFill: {
@@ -229,7 +228,6 @@ const styles = StyleSheet.create({
   },
 
   item: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
     flexDirection: "row",
@@ -242,13 +240,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 15,
     fontSize: 16,
-    color: "#37474F",
     lineHeight: 24,
   },
 
   tipCard: {
     flexDirection: "row",
-    backgroundColor: "#FFF8E1",
     borderRadius: 18,
     padding: 18,
     marginTop: 20,
@@ -258,14 +254,13 @@ const styles = StyleSheet.create({
   tipTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#795548",
     marginBottom: 6,
   },
 
   tipText: {
-    color: "#6D4C41",
-    lineHeight: 22,
     fontSize: 14,
+    lineHeight: 22,
+    opacity: 0.85,
   },
 
   nextButton: {
@@ -287,14 +282,13 @@ const styles = StyleSheet.create({
   disabledButton: {
     height: 58,
     borderRadius: 18,
-    backgroundColor: "#CFD8DC",
     justifyContent: "center",
     alignItems: "center",
   },
 
   disabledText: {
-    color: "#607D8B",
     fontWeight: "700",
     fontSize: 16,
+    opacity: 0.7,
   },
 });

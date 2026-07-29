@@ -180,15 +180,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 28,
     fontWeight: "800",
-    color: "#003B57",
+    textAlign: "center",
   },
 
   subtitle: {
     marginTop: 10,
     textAlign: "center",
-    color: "#607D8B",
     fontSize: 15,
     lineHeight: 24,
+    opacity: 0.85,
   },
 
   timelineContainer: {
@@ -218,7 +218,6 @@ const styles = StyleSheet.create({
 
   card: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
     marginLeft: 12,
@@ -228,13 +227,14 @@ const styles = StyleSheet.create({
   time: {
     color: "#00BCD4",
     fontWeight: "700",
+    fontSize: 14,
     marginBottom: 6,
+    letterSpacing: 0.3,
   },
 
   cardTitle: {
     fontSize: 19,
     fontWeight: "700",
-    color: "#003B57",
     marginBottom: 12,
   },
 
@@ -246,15 +246,14 @@ const styles = StyleSheet.create({
 
   taskText: {
     marginLeft: 8,
-    color: "#546E7A",
     fontSize: 15,
     flex: 1,
     lineHeight: 22,
+    opacity: 0.9,
   },
 
   tipCard: {
     flexDirection: "row",
-    backgroundColor: "#FFF8E1",
     borderRadius: 18,
     padding: 18,
     marginTop: 10,
@@ -263,15 +262,14 @@ const styles = StyleSheet.create({
 
   tipTitle: {
     fontWeight: "700",
-    color: "#795548",
     fontSize: 17,
     marginBottom: 8,
   },
 
   tipText: {
-    color: "#6D4C41",
-    lineHeight: 22,
     fontSize: 15,
+    lineHeight: 22,
+    opacity: 0.85,
   },
 
   button: {

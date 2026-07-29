@@ -12,15 +12,15 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 
 import {
-    Alert,
-    Modal,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const SPECIES = [
@@ -134,14 +134,18 @@ export default function CreateFishCareProgramScreen() {
               style={[
                 styles.selectorText,
                 {
-                  color: species ? colors.textPrimary : "#94A3B8",
+                  color: species ? colors.textPrimary : colors.textSecondary,
                 },
               ]}
             >
               {species || "Select Species"}
             </Text>
 
-            <Ionicons name="chevron-down" size={22} color="#64748B" />
+            <Ionicons
+              name="chevron-down"
+              size={22}
+              color={colors.textSecondary}
+            />
           </TouchableOpacity>
 
           <ThemeText variant="body" style={styles.label}>
@@ -277,7 +281,16 @@ export default function CreateFishCareProgramScreen() {
             <Pressable style={[styles.bottomSheet, dynamicStyles.modal]}>
               <View style={styles.handle} />
 
-              <Text style={styles.modalTitle}>Select Species</Text>
+              <Text
+                style={[
+                  styles.modalTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Select Species
+              </Text>
 
               <ScrollView showsVerticalScrollIndicator={false}>
                 {SPECIES.map((item) => (
@@ -296,8 +309,16 @@ export default function CreateFishCareProgramScreen() {
                       color={colors.primary}
                     />
 
-                    <Text style={styles.speciesText}>{item}</Text>
-
+                    <Text
+                      style={[
+                        styles.speciesText,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      {item}
+                    </Text>
                     {species === item && (
                       <Ionicons
                         name="checkmark-circle"

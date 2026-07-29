@@ -410,19 +410,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 28,
     fontWeight: "800",
-    color: "#003B57",
+    textAlign: "center",
   },
 
   subtitle: {
     marginTop: 10,
     textAlign: "center",
-    color: "#607D8B",
     lineHeight: 24,
     fontSize: 15,
+    opacity: 0.85,
   },
 
   progressCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 20,
     marginBottom: 25,
@@ -430,8 +429,8 @@ const styles = StyleSheet.create({
   },
 
   progressTitle: {
-    color: "#607D8B",
     fontSize: 15,
+    opacity: 0.8,
   },
 
   progressValue: {
@@ -445,6 +444,7 @@ const styles = StyleSheet.create({
     height: 10,
     backgroundColor: "#E0E0E0",
     borderRadius: 20,
+    overflow: "hidden",
   },
 
   progressFill: {
@@ -479,13 +479,12 @@ const styles = StyleSheet.create({
   recommendedTask: {
     marginTop: 8,
     fontWeight: "700",
-    color: "#003B57",
   },
 
   recommendedDescription: {
     marginTop: 10,
     lineHeight: 23,
-    color: "#607D8B",
+    opacity: 0.85,
   },
 
   statusRow: {
@@ -501,7 +500,6 @@ const styles = StyleSheet.create({
 
   card: {
     flexDirection: "row",
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
     marginBottom: 15,
@@ -522,19 +520,17 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#003B57",
     marginBottom: 8,
   },
 
   task: {
-    color: "#607D8B",
     lineHeight: 23,
     fontSize: 15,
+    opacity: 0.85,
   },
 
   tipCard: {
     flexDirection: "row",
-    backgroundColor: "#FFF8E1",
     borderRadius: 18,
     padding: 18,
     marginVertical: 20,
@@ -542,15 +538,14 @@ const styles = StyleSheet.create({
 
   tipTitle: {
     fontWeight: "700",
-    color: "#795548",
     fontSize: 17,
     marginBottom: 8,
   },
 
   tipText: {
-    color: "#6D4C41",
     lineHeight: 22,
     fontSize: 15,
+    opacity: 0.85,
   },
 
   button: {

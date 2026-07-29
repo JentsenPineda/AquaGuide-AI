@@ -214,19 +214,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 28,
     fontWeight: "800",
-    color: "#003B57",
+    textAlign: "center",
   },
 
   subtitle: {
     marginTop: 10,
     textAlign: "center",
-    color: "#607D8B",
     lineHeight: 24,
     fontSize: 15,
+    opacity: 0.85,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
     marginBottom: 15,
@@ -247,16 +246,15 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#003B57",
   },
 
   status: {
     marginTop: 4,
     fontWeight: "700",
+    fontSize: 14,
   },
 
   resultCard: {
-    backgroundColor: "#E8F8FD",
     borderRadius: 18,
     padding: 20,
     marginTop: 10,
@@ -266,18 +264,16 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#003B57",
     marginBottom: 10,
   },
 
   resultText: {
-    color: "#546E7A",
     lineHeight: 24,
     fontSize: 15,
+    opacity: 0.9,
   },
 
   warning: {
-    backgroundColor: "#FFEBEE",
     borderRadius: 18,
     padding: 18,
     flexDirection: "row",
@@ -286,15 +282,14 @@ const styles = StyleSheet.create({
 
   warningTitle: {
     fontWeight: "700",
-    color: "#C62828",
     fontSize: 17,
     marginBottom: 8,
   },
 
   warningText: {
-    color: "#7B1F1F",
     lineHeight: 22,
     fontSize: 14,
+    opacity: 0.9,
   },
 
   button: {

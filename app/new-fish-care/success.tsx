@@ -160,20 +160,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: "800",
-    color: "#003B57",
+    textAlign: "center",
   },
 
   subtitle: {
     marginTop: 12,
     textAlign: "center",
-    color: "#607D8B",
     fontSize: 16,
     lineHeight: 26,
+    opacity: 0.85,
   },
 
   achievementCard: {
     flexDirection: "row",
-    backgroundColor: "#FFF8E1",
     borderRadius: 18,
     padding: 18,
     marginBottom: 25,
@@ -188,26 +187,23 @@ const styles = StyleSheet.create({
   achievementTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#795548",
   },
 
   achievementText: {
     marginTop: 5,
-    color: "#5D4037",
     fontSize: 15,
+    opacity: 0.85,
   },
 
   sectionTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#003B57",
     marginBottom: 15,
   },
 
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -216,14 +212,14 @@ const styles = StyleSheet.create({
 
   cardText: {
     marginLeft: 12,
-    color: "#455A64",
     fontSize: 15,
     flex: 1,
+    lineHeight: 22,
+    opacity: 0.9,
   },
 
   tipCard: {
     flexDirection: "row",
-    backgroundColor: "#E8F8FD",
     borderRadius: 18,
     padding: 18,
     marginVertical: 25,
@@ -232,14 +228,13 @@ const styles = StyleSheet.create({
   tipTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#003B57",
     marginBottom: 8,
   },
 
   tipText: {
-    color: "#607D8B",
     lineHeight: 23,
     fontSize: 15,
+    opacity: 0.85,
   },
 
   primaryButton: {

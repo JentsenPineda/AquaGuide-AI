@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     color: "#00BCD4",
     fontWeight: "700",
     fontSize: 15,
+    letterSpacing: 0.3,
   },
 
   progressBackground: {
@@ -186,6 +187,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9EEF3",
     marginTop: 15,
     marginBottom: 30,
+    overflow: "hidden",
   },
 
   progressFill: {
@@ -205,13 +207,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#003B57",
     textAlign: "center",
     marginBottom: 25,
   },
 
   durationCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 20,
     alignItems: "center",
@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
 
   duration: {
     marginTop: 8,
-    color: "#607D8B",
     fontSize: 15,
+    opacity: 0.8,
   },
 
   durationValue: {
@@ -233,7 +233,6 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 20,
     marginBottom: 20,
@@ -243,19 +242,17 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#003B57",
     marginBottom: 10,
   },
 
   description: {
     fontSize: 16,
-    color: "#607D8B",
     lineHeight: 26,
+    opacity: 0.85,
   },
 
   tipCard: {
     flexDirection: "row",
-    backgroundColor: "#FFF8E1",
     borderRadius: 18,
     padding: 18,
     marginBottom: 30,
@@ -264,14 +261,13 @@ const styles = StyleSheet.create({
   tipTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#795548",
     marginBottom: 8,
   },
 
   tipText: {
-    color: "#6D4C41",
-    lineHeight: 23,
     fontSize: 15,
+    lineHeight: 23,
+    opacity: 0.85,
   },
 
   button: {

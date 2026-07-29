@@ -236,8 +236,9 @@ export default function DiseaseGuide() {
           Select Symptoms
         </ThemeText>
         <ThemeCard style={styles.searchCard}>
-          <Text style={styles.searchTitle}>Fish Observation</Text>
-
+          <ThemeText variant="subtitle" style={styles.searchTitle}>
+            Fish Observation
+          </ThemeText>
           <ThemeInput
             icon="search"
             placeholder="Describe what you observe..."
@@ -932,9 +933,9 @@ const styles = StyleSheet.create({
   },
 
   searchTitle: {
-    color: "#000000ff",
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
+    marginBottom: 16,
   },
 
   searchDescription: {

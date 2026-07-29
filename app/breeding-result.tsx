@@ -1,6 +1,7 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -56,7 +57,46 @@ export default function BreedingResult() {
             },
           ]}
         >
-          🐟 {guide.name}
+          <View style={styles.titleContainer}>
+            <View
+              style={[
+                styles.iconContainer,
+                {
+                  backgroundColor: colors.primary + "15",
+                },
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="fishbowl"
+                size={36}
+                color={colors.primary}
+              />
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {guide.name}
+              </Text>
+
+              <Text
+                style={[
+                  styles.subtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Step-by-Step Breeding Guide
+              </Text>
+            </View>
+          </View>
         </Text>
 
         <Text
@@ -313,5 +353,26 @@ const styles = StyleSheet.create({
   stepDescription: {
     color: "#CFD8DC",
     lineHeight: 22,
+  },
+
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+
+  iconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+    borderWidth: 1,
+    elevation: 3, // Android
+    shadowColor: "#000", // iOS
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
   },
 });

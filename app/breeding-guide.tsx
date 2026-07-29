@@ -3,13 +3,22 @@ import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-
+import {
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { allFish } from "../data/allFish";
 
 export default function BreedingGuide() {
   const colors = useAppColors();
   const [selectedFish, setSelectedFish] = useState("");
+  const [showFishModal, setShowFishModal] = useState(false);
+  const selectedFishData = allFish.find((fish) => fish.id === selectedFish);
 
   return (
     <View
@@ -26,37 +35,37 @@ export default function BreedingGuide() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <View
-          style={[
-            styles.hero,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: 1,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.heroTitle,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            🧬 Fish Breeding Guide
-          </Text>
-          <Text
-            style={[
-              styles.heroSubtitle,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Learn breeding methods, fry care, and breeding tips for ornamental
-            fish.
-          </Text>
+        <View style={styles.heroHeader}>
+          <Image
+            source={require("@/assets/images/image-library-UI/aquaguide-icon.png")} // Change to your actual app icon path
+            style={styles.heroIcon}
+            resizeMode="contain"
+          />
+
+          <View style={{ flex: 1 }}>
+            <Text
+              style={[
+                styles.heroTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Fish Breeding Guide
+            </Text>
+
+            <Text
+              style={[
+                styles.heroSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Generate species-specific breeding instructions, spawning
+              requirements, fry care, and expert breeding recommendations.
+            </Text>
+          </View>
         </View>
         <Text
           style={[
@@ -68,38 +77,76 @@ export default function BreedingGuide() {
         >
           Select Fish Species
         </Text>
-        <View style={styles.chipContainer}>
-          {allFish.map((fish) => (
-            <Pressable
-              key={fish.id}
-              onPress={() => setSelectedFish(fish.id)}
-              style={[
-                styles.chip,
-                {
-                  backgroundColor:
-                    selectedFish === fish.id ? colors.primary : colors.surface,
-                  borderColor: colors.border,
-                  borderWidth: 1,
-                },
-              ]}
-            >
+
+        <Pressable
+          onPress={() => setShowFishModal(true)}
+          style={[
+            styles.selectorCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: selectedFish ? colors.textPrimary : colors.textSecondary,
+              fontSize: 16,
+              fontWeight: "600",
+            }}
+          >
+            {selectedFish
+              ? allFish.find((f) => f.id === selectedFish)?.commonName
+              : "Choose a fish species"}
+          </Text>
+
+          <Text
+            style={{
+              color: colors.primary,
+              fontWeight: "700",
+            }}
+          >
+            ▼
+          </Text>
+        </Pressable>
+        {selectedFishData && (
+          <View
+            style={[
+              styles.selectedFishCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Image
+              source={selectedFishData.image}
+              style={styles.selectedFishImage}
+              resizeMode="cover"
+            />
+
+            <View style={{ flex: 1 }}>
               <Text
-                style={[
-                  styles.chipText,
-                  {
-                    color:
-                      selectedFish === fish.id
-                        ? colors.white
-                        : colors.textPrimary,
-                    fontWeight: selectedFish === fish.id ? "700" : "400",
-                  },
-                ]}
+                style={{
+                  color: colors.textPrimary,
+                  fontSize: 18,
+                  fontWeight: "700",
+                }}
               >
-                {fish.commonName}
+                {selectedFishData.commonName}
               </Text>
-            </Pressable>
-          ))}
-        </View>
+
+              <Text
+                style={{
+                  color: colors.textSecondary,
+                  marginTop: 4,
+                }}
+              >
+                Ready to generate a breeding guide.
+              </Text>
+            </View>
+          </View>
+        )}
         <Pressable
           style={[
             styles.generateButton,
@@ -129,6 +176,61 @@ export default function BreedingGuide() {
         </Pressable>
         <View style={{ height: 40 }} />
       </ScrollView>
+      <Modal
+        visible={showFishModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowFishModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.card,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.modalTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Select Fish Species
+            </Text>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {allFish.map((fish) => (
+                <Pressable
+                  key={fish.id}
+                  style={[
+                    styles.fishItem,
+                    {
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={() => {
+                    setSelectedFish(fish.id);
+                    setShowFishModal(false);
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: colors.textPrimary,
+                      fontSize: 16,
+                    }}
+                  >
+                    {fish.commonName}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -236,5 +338,66 @@ const styles = StyleSheet.create({
     color: "#CFD8DC",
     lineHeight: 22,
     marginTop: 5,
+  },
+
+  selectorCard: {
+    borderWidth: 1,
+    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.45)",
+  },
+
+  modalCard: {
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 20,
+    maxHeight: "75%",
+  },
+
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 20,
+  },
+
+  fishItem: {
+    borderBottomWidth: 1,
+    paddingVertical: 18,
+  },
+  heroHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  heroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    marginRight: 16,
+  },
+  selectedFishCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 24,
+  },
+
+  selectedFishImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 14,
+    marginRight: 16,
   },
 });

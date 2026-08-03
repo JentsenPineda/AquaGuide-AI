@@ -1,6 +1,10 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -9,65 +13,230 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 function SettingRow({
   icon,
   title,
   subtitle,
   value,
   onValueChange,
+  disabled = false,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   subtitle: string;
   value: boolean;
   onValueChange: (value: boolean) => void;
+  disabled?: boolean;
 }) {
+  const colors = useAppColors();
+
   return (
-    <View style={styles.row}>
+    <View
+      style={[
+        styles.row,
+        {
+          borderBottomColor: colors.border,
+          opacity: disabled ? 0.45 : 1,
+        },
+      ]}
+    >
       <View style={styles.left}>
-        <View style={styles.iconCircle}>
-          <Ionicons name={icon} size={22} color="#00BCD4" />
+        <View
+          style={[
+            styles.iconCircle,
+            {
+              backgroundColor: colors.surface,
+            },
+          ]}
+        >
+          <Ionicons name={icon} size={22} color={colors.primary} />
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {title}
+          </Text>
+
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {subtitle}
+          </Text>
         </View>
       </View>
 
-      <Switch value={value} onValueChange={onValueChange} />
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        disabled={disabled}
+        trackColor={{
+          false: colors.border,
+          true: colors.primary,
+        }}
+        thumbColor={value ? "#FFFFFF" : "#F4F4F5"}
+      />
     </View>
   );
 }
 
 export default function NotificationsScreen() {
+  const colors = useAppColors();
   const [reminders, setReminders] = useState(true);
   const [sound, setSound] = useState(true);
   const [vibration, setVibration] = useState(true);
   const [tips, setTips] = useState(false);
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const saved = await AsyncStorage.getItem("notification_settings");
+
+        if (!saved) return;
+
+        const settings = JSON.parse(saved);
+
+        setReminders(settings.reminders ?? true);
+        setSound(settings.sound ?? true);
+        setVibration(settings.vibration ?? true);
+        setTips(settings.tips ?? false);
+      } catch (error) {
+        console.log("Failed to load notification settings:", error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    const saveSettings = async () => {
+      try {
+        await AsyncStorage.setItem(
+          "notification_settings",
+          JSON.stringify({
+            reminders,
+            sound,
+            vibration,
+            tips,
+          }),
+        );
+      } catch (error) {
+        console.log("Failed to save notification settings:", error);
+      }
+    };
+
+    saveSettings();
+  }, [reminders, sound, vibration, tips]);
+
+  useEffect(() => {
+    const registerForNotifications = async () => {
+      if (!Device.isDevice) return;
+
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        console.log("Notification permission not granted.");
+      }
+    };
+
+    registerForNotifications();
+  }, []);
+
+  const sendTestNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "🐠 AquaGuide AI",
+        body: "This is a test notification. Your reminder settings are working correctly!",
+        sound: sound ? "default" : false,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 2,
+      },
+    });
+  };
+
   return (
-    <View style={styles.screen}>
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader
         title="Notifications"
         subtitle="Manage your notification preferences"
         showBack
-        variant="light"
       />
 
       <ScrollView
-        style={styles.container}
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.header}>Notification Settings</Text>
-
-        <Text style={styles.description}>
+        <Text
+          style={[
+            styles.header,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Notification Settings
+        </Text>
+        <Text
+          style={[
+            styles.description,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
           Manage how AquaGuide AI keeps you informed about your aquarium.
         </Text>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+            },
+          ]}
+        >
           <SettingRow
             icon="notifications-outline"
             title="Reminder Notifications"
@@ -82,6 +251,7 @@ export default function NotificationsScreen() {
             subtitle="Play a sound when reminders are triggered."
             value={sound}
             onValueChange={setSound}
+            disabled={!reminders}
           />
 
           <SettingRow
@@ -90,6 +260,7 @@ export default function NotificationsScreen() {
             subtitle="Vibrate your phone for reminder alerts."
             value={vibration}
             onValueChange={setVibration}
+            disabled={!reminders}
           />
 
           <SettingRow
@@ -101,13 +272,28 @@ export default function NotificationsScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.testButton}>
+        <TouchableOpacity
+          style={[
+            styles.testButton,
+            {
+              backgroundColor: colors.primary,
+            },
+          ]}
+          onPress={sendTestNotification}
+        >
           <Ionicons name="paper-plane-outline" size={20} color="#FFFFFF" />
 
           <Text style={styles.testText}>Send Test Notification</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footer}>
+        <Text
+          style={[
+            styles.footer,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
           These preferences will be synchronized with your account in a future
           update.
         </Text>

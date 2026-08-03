@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   addDoc,
   collection,
@@ -10,9 +11,8 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-
 import { db } from "../config/firebase";
-
+import { scheduleReminderNotification } from "./notificationService";
 export interface Reminder {
   id: string;
 
@@ -31,6 +31,10 @@ export interface Reminder {
   monthDay?: number;
 
   time: string;
+
+  hour: number;
+
+  minute: number;
 
   note?: string;
 
@@ -89,6 +93,33 @@ export const addReminder = async (
       data[key] = value;
     }
   });
+
+  // Read notification settings
+  const saved = await AsyncStorage.getItem("notification_settings");
+
+  let notificationsEnabled = true;
+
+  if (saved) {
+    const settings = JSON.parse(saved);
+    notificationsEnabled = settings.reminders ?? true;
+  }
+
+  // Schedule a test notification (5 seconds after saving)
+  if (notificationsEnabled) {
+    const notificationId = await scheduleReminderNotification(
+      `🐠 ${reminder.type}`,
+      reminder.note || `${reminder.type} reminder`,
+      {
+        repeat: reminder.repeat,
+        hour: reminder.hour,
+        minute: reminder.minute,
+        weekDay: reminder.weekDay,
+        monthDay: reminder.monthDay,
+      },
+    );
+
+    data.notificationId = notificationId;
+  }
 
   await addDoc(collection(db, "users", uid, "reminders"), data);
 };

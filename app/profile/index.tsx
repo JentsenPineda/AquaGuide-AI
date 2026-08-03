@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import LoginRequired from "../../components/LoginRequired";
 import { useAuth } from "../../contexts/AuthContext";
 import { subscribeToLogs } from "../../services/logbookService";
 import { subscribeToReminders } from "../../services/reminderService";
@@ -28,19 +28,44 @@ function SettingItem({
   title: string;
   onPress?: () => void;
 }) {
+  const colors = useAppColors();
   return (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+    <TouchableOpacity
+      style={[
+        styles.settingItem,
+        {
+          borderBottomColor: colors.border,
+        },
+      ]}
+      onPress={onPress}
+    >
       <View style={styles.settingLeft}>
-        <Ionicons name={icon} size={22} color="#00BCD4" />
-        <Text style={styles.settingText}>{title}</Text>
+        <Ionicons name={icon} size={22} color={colors.primary} />
+        <Text
+          style={[
+            styles.settingText,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          {title}
+        </Text>
       </View>
 
-      <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 }
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  useEffect(() => {
+    if (!user) {
+      router.replace("/auth/login");
+    }
+  }, [user]);
+
+  const colors = useAppColors();
 
   const [reminderCount, setReminderCount] = useState(0);
   const [logCount, setLogCount] = useState(0);
@@ -73,9 +98,8 @@ export default function ProfileScreen() {
       unsubscribeLogs();
     };
   }, [user]);
-
   if (!user) {
-    return <LoginRequired />;
+    return null;
   }
   const saveDisplayName = async () => {
     if (!user) return;
@@ -165,20 +189,40 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.screen}>
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader
         title="Profile"
         subtitle="Manage your AquaGuide AI account"
         showBack
-        variant="light"
       />
 
       <ScrollView
-        style={styles.container}
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+            },
+          ]}
+        >
           <View style={styles.avatarContainer}>
             <Image
               source={{
@@ -193,7 +237,16 @@ export default function ProfileScreen() {
               <Ionicons name="camera" size={20} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.name}>{displayName || "AquaGuide User"}</Text>
+          <Text
+            style={[
+              styles.name,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {displayName || "AquaGuide User"}
+          </Text>
 
           <TouchableOpacity
             onPress={() =>
@@ -204,40 +257,155 @@ export default function ProfileScreen() {
             }
           ></TouchableOpacity>
 
-          <Text style={styles.email}>{user.email}</Text>
+          <Text
+            style={[
+              styles.email,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {user.email}
+          </Text>
 
-          <View style={styles.badge}>
-            <Ionicons name="cloud-done" size={16} color="#16A34A" />
-            <Text style={styles.badgeText}>Cloud Sync</Text>
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: colors.success + "20",
+              },
+            ]}
+          >
+            <Ionicons name="cloud-done" size={16} color={colors.success} />
+            <Text
+              style={[
+                styles.badgeText,
+                {
+                  color: colors.success,
+                },
+              ]}
+            >
+              Cloud Sync
+            </Text>
           </View>
         </View>
 
         {/* Statistics */}
-        <View style={styles.statsContainer}>
-          <Text style={styles.sectionTitle}>Your Statistics</Text>
+        <View
+          style={[
+            styles.statsContainer,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Your Statistics
+          </Text>
 
           <View style={styles.stats}>
-            <View style={styles.card}>
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
               <Ionicons
                 name="notifications-outline"
                 size={28}
                 color="#00BCD4"
               />
-              <Text style={styles.number}>{reminderCount}</Text>
-              <Text style={styles.label}>Reminders</Text>
+              <Text
+                style={[
+                  styles.number,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {reminderCount}
+              </Text>
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Reminders
+              </Text>
             </View>
 
-            <View style={styles.card}>
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
               <Ionicons name="book-outline" size={28} color="#00BCD4" />
-              <Text style={styles.number}>{logCount}</Text>
-              <Text style={styles.label}>Logbooks</Text>
+              <Text
+                style={[
+                  styles.number,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {logCount}
+              </Text>
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Logbooks
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Settings */}
-        <View style={styles.settingsCard}>
-          <Text style={styles.settingsTitle}>Settings</Text>
+        <View
+          style={[
+            styles.settingsCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.settingsTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Settings
+          </Text>
 
           <SettingItem
             icon="notifications-outline"
@@ -270,7 +438,15 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <TouchableOpacity
+          style={[
+            styles.logoutButton,
+            {
+              backgroundColor: colors.danger,
+            },
+          ]}
+          onPress={handleLogout}
+        >
           <Ionicons name="log-out-outline" size={22} color="#fff" />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
@@ -295,6 +471,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 25,
     marginBottom: 35,
+    borderRadius: 24,
+    padding: 24,
   },
 
   name: {
@@ -339,11 +517,12 @@ const styles = StyleSheet.create({
   },
 
   logoutText: {
-    color: "#fff",
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     marginLeft: 8,
   },
+
   input: {
     width: "90%",
     backgroundColor: "#fff",
@@ -443,8 +622,9 @@ const styles = StyleSheet.create({
 
   statsContainer: {
     marginBottom: 25,
+    borderRadius: 22,
+    padding: 20,
   },
-
   stats: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -452,12 +632,10 @@ const styles = StyleSheet.create({
 
   card: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    paddingVertical: 24,
+    borderRadius: 18,
+    paddingVertical: 26,
     marginHorizontal: 6,
     alignItems: "center",
-    elevation: 3,
   },
 
   avatar: {
@@ -470,9 +648,8 @@ const styles = StyleSheet.create({
   },
 
   logoutButton: {
-    backgroundColor: "#EF4444",
-    borderRadius: 14,
-    height: 56,
+    borderRadius: 18,
+    height: 58,
     marginTop: 10,
     marginBottom: 40,
     justifyContent: "center",

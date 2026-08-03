@@ -11,57 +11,132 @@ import {
 } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAppColors } from "@/theme/useAppColors";
 
 export default function DarkModeScreen() {
   const { mode, colorScheme, setMode } = useTheme();
+  const colors = useAppColors();
   console.log("Theme Mode:", mode);
   console.log("Color Scheme:", colorScheme);
   return (
-    <View style={styles.screen}>
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader
         title="Appearance"
         subtitle="Customize the look and feel of AquaGuide AI"
         showBack
-        variant="light"
       />
 
       <ScrollView
-        style={styles.container}
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.background,
+            },
+          ]}
+        >
           <Ionicons name="moon" size={60} color="#00BCD4" />
 
-          <Text style={styles.title}>Appearance</Text>
-
-          <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Appearance
+          </Text>
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Personalize how AquaGuide AI looks on your device.
           </Text>
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderWidth: 1,
+            },
+          ]}
+        >
           <View style={styles.row}>
             <View style={styles.left}>
               <Ionicons name="moon-outline" size={22} color="#00BCD4" />
 
               <View style={styles.textContainer}>
-                <Text style={styles.rowTitle}>Dark Mode</Text>
+                <Text
+                  style={[
+                    styles.rowTitle,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Dark Mode
+                </Text>
 
-                <Text style={styles.rowSubtitle}>
+                <Text
+                  style={[
+                    styles.rowSubtitle,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
                   Reduce eye strain in low-light environments.
                 </Text>
               </View>
             </View>
-
             <Switch
               value={mode === "dark"}
               onValueChange={(value) => setMode(value ? "dark" : "light")}
+              trackColor={{
+                false: colors.border,
+                true: colors.primary,
+              }}
+              thumbColor={
+                mode === "dark"
+                  ? "#FFFFFF"
+                  : colorScheme === "dark"
+                    ? "#D1D5DB"
+                    : "#FFFFFF"
+              }
             />
           </View>
-
-          <View style={styles.divider} />
-
+          <View
+            style={[
+              styles.divider,
+              {
+                backgroundColor: colors.border,
+              },
+            ]}
+          />
           <View style={styles.row}>
             <View style={styles.left}>
               <Ionicons
@@ -82,6 +157,17 @@ export default function DarkModeScreen() {
             <Switch
               value={mode === "system"}
               onValueChange={(value) => setMode(value ? "system" : "light")}
+              trackColor={{
+                false: colors.border,
+                true: colors.primary,
+              }}
+              thumbColor={
+                mode === "system"
+                  ? "#FFFFFF"
+                  : colorScheme === "dark"
+                    ? "#D1D5DB"
+                    : "#FFFFFF"
+              }
             />
           </View>
         </View>

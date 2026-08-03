@@ -77,6 +77,10 @@ export default function CreateReminderScreen() {
 
         time: formatTime(time),
 
+        hour: time.getHours(),
+
+        minute: time.getMinutes(),
+
         note: notes.trim() || undefined,
       });
 

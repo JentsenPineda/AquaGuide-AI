@@ -21,6 +21,7 @@ export default function MenuScreen() {
           onPress: async () => {
             try {
               await logout();
+              console.log("User logged out");
 
               router.dismissAll();
 

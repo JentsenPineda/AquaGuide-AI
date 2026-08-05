@@ -31,7 +31,7 @@ export default function LoginScreen() {
 
   const [loading, setLoading] = useState(false);
 
-  type LoginRedirect = "reminder" | "logbook";
+  type LoginRedirect = "reminder" | "logbook" | "profile";
 
   const { redirect } = useLocalSearchParams<{
     redirect?: LoginRedirect;
@@ -66,6 +66,10 @@ export default function LoginScreen() {
 
         case "logbook":
           router.replace("/logbook");
+          break;
+
+        case "profile":
+          router.replace("/profile");
           break;
 
         default:

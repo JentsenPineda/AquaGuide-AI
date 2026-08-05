@@ -1,6 +1,5 @@
 import SectionCard from "@/components/cards/SectionCard";
 import AppHeader from "@/components/layout/AppHeader";
-import LoginRequired from "@/components/LoginRequired";
 import ReminderCard, {
   ReminderRepeat,
   ReminderType,
@@ -62,8 +61,33 @@ export default function ReminderScreen() {
       console.log("Delete Reminder Error:", error);
     }
   };
+  useEffect(() => {
+    if (!user) {
+      router.replace({
+        pathname: "/auth/login",
+        params: {
+          redirect: "reminder",
+        },
+      });
+    }
+  }, [user]);
+
   if (!user) {
-    return <LoginRequired redirect="reminder" />;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#F5F7FA",
+        }}
+      >
+        <Ionicons name="lock-closed" size={48} color="#00BCD4" />
+        <Text style={{ marginTop: 16, fontSize: 16 }}>
+          Redirecting to login...
+        </Text>
+      </View>
+    );
   }
 
   return (

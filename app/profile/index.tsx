@@ -61,7 +61,12 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
   useEffect(() => {
     if (!user) {
-      router.replace("/auth/login");
+      router.replace({
+        pathname: "/auth/login",
+        params: {
+          redirect: "profile",
+        },
+      });
     }
   }, [user]);
 

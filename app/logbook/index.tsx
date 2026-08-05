@@ -1,5 +1,4 @@
 import AppHeader from "@/components/layout/AppHeader";
-import LoginRequired from "@/components/LoginRequired";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteLog, LogItem, subscribeToLogs } from "@/services/logbookService";
 import { Ionicons } from "@expo/vector-icons";
@@ -123,8 +122,30 @@ export default function LogbookScreen() {
       },
     ]);
   };
+  useEffect(() => {
+    if (!user) {
+      router.replace({
+        pathname: "/auth/login",
+        params: {
+          redirect: "logbook",
+        },
+      });
+    }
+  }, [user]);
+
   if (!user) {
-    return <LoginRequired redirect="logbook" />;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Ionicons name="lock-closed" size={48} color="#00BCD4" />
+        <Text style={{ marginTop: 16 }}>Redirecting to login...</Text>
+      </View>
+    );
   }
   return (
     <View style={styles.screen}>

@@ -4,6 +4,7 @@ import {
   FishCareProgram,
   subscribeToPrograms,
 } from "@/services/newFishCareService";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -25,20 +26,39 @@ type ModuleCardProps = {
 
 function ModuleCard({ title, icon, route }: ModuleCardProps) {
   const router = useRouter();
-
+  const colors = useAppColors();
   return (
     <Pressable
       onPress={() => router.push(route as any)}
-      style={({ pressed }) => [styles.moduleCard, pressed && { opacity: 0.9 }]}
+      style={({ pressed }) => [
+        styles.moduleCard,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          borderWidth: 1,
+        },
+        pressed && { opacity: 0.9 },
+      ]}
     >
       <Ionicons name={icon} size={26} color="#00BCD4" />
 
-      <Text style={styles.moduleTitle}>{title}</Text>
+      <Text
+        style={[
+          styles.moduleTitle,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }
 
 export default function HomeScreen() {
+  const colors = useAppColors();
+
   const router = useRouter();
   const { user } = useAuth();
 
@@ -69,9 +89,21 @@ export default function HomeScreen() {
     : 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView
+      style={[
+        styles.safe,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -82,24 +114,61 @@ export default function HomeScreen() {
               style={styles.appIcon}
             />
 
-            <Text style={styles.appName}>AquaGuide AI</Text>
+            <Text
+              style={[
+                styles.appName,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              AquaGuide AI
+            </Text>
           </View>
 
-          <Text style={styles.tagline}>
+          <Text
+            style={[
+              styles.tagline,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Ornamental Fish Management Assistant
           </Text>
         </View>
-
         {/* Welcome Banner */}
-        <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>Welcome to AquaGuide AI</Text>
+        <View
+          style={[
+            styles.banner,
+            {
+              backgroundColor: colors.card,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.bannerTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Welcome to AquaGuide AI
+          </Text>
 
-          <Text style={styles.bannerText}>
+          <Text
+            style={[
+              styles.bannerText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Scan ornamental fish, access species information, receive care
             recommendations, and manage your aquarium in one application.
           </Text>
         </View>
-
         {/* Scan Button */}
         <Pressable
           style={({ pressed }) => [
@@ -116,35 +185,133 @@ export default function HomeScreen() {
             AI-powered fish identification and care recommendation
           </Text>
         </Pressable>
-
         {/* Statistics */}
         {/* Statistics */}
-        <Text style={styles.sectionTitle}>Dashboard Statistics</Text>
-
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Dashboard Statistics
+        </Text>
         <View style={styles.statsRow}>
-          <View style={styles.statCard}>
+          <View
+            style={[
+              styles.statCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Ionicons name="scan-outline" size={24} color="#00BCD4" />
-            <Text style={styles.statValue}>0 / 3</Text>
-            <Text style={styles.statLabel}>Scans Today</Text>
+
+            <Text
+              style={[
+                styles.statValue,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              0 / 3
+            </Text>
+
+            <Text
+              style={[
+                styles.statLabel,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Scans Today
+            </Text>
           </View>
 
-          <View style={styles.statCard}>
+          <View
+            style={[
+              styles.statCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Ionicons name="alarm-outline" size={24} color="#00BCD4" />
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Active Reminders</Text>
+
+            <Text
+              style={[
+                styles.statValue,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              0
+            </Text>
+
+            <Text
+              style={[
+                styles.statLabel,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Active Reminders
+            </Text>
           </View>
 
-          <View style={styles.statCard}>
+          <View
+            style={[
+              styles.statCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Ionicons name="book-outline" size={24} color="#00BCD4" />
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Logbook Entries</Text>
+
+            <Text
+              style={[
+                styles.statValue,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              0
+            </Text>
+
+            <Text
+              style={[
+                styles.statLabel,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Logbook Entries
+            </Text>
           </View>
         </View>
-
         {/* Continue Fish Care */}
+
         <Pressable
           style={({ pressed }) => [
             styles.continueCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
             pressed && { opacity: 0.9 },
           ]}
           onPress={() => {
@@ -169,7 +336,16 @@ export default function HomeScreen() {
           <View style={styles.continueHeader}>
             <Ionicons name="fish-outline" size={30} color="#00BCD4" />
 
-            <Text style={styles.continueTitle}>Continue 7-Day Fish Care</Text>
+            <Text
+              style={[
+                styles.continueTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Continue 7-Day Fish Care
+            </Text>
           </View>
 
           <Text style={styles.continueDay}>
@@ -177,13 +353,27 @@ export default function HomeScreen() {
             {activePrograms.length === 1 ? "" : "s"}
           </Text>
 
-          <Text style={styles.continueTask}>
+          <Text
+            style={[
+              styles.continueTask,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             {nextProgram
               ? `${nextProgram.fishName} • Day ${nextProgramCompletedDays + 1} of 7`
               : "No active fish care program. Tap to start your first 7-Day Fish Care Guide."}
           </Text>
 
-          <View style={styles.progressBackground}>
+          <View
+            style={[
+              styles.progressBackground,
+              {
+                backgroundColor: colors.border,
+              },
+            ]}
+          >
             <View
               style={[
                 styles.progressFill,
@@ -196,7 +386,14 @@ export default function HomeScreen() {
             />
           </View>
 
-          <Text style={styles.progressText}>
+          <Text
+            style={[
+              styles.progressText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             {totalPrograms} Total • {completedPrograms.length} Completed
           </Text>
 
@@ -206,8 +403,6 @@ export default function HomeScreen() {
             </Text>
           </View>
         </Pressable>
-
-        <View style={{ height: 30 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -216,7 +411,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
   },
 
   container: {
@@ -231,29 +425,24 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#FFFFFF",
   },
 
   tagline: {
-    color: "#B0BEC5",
     marginTop: 5,
   },
 
   banner: {
-    backgroundColor: "#102331",
     borderRadius: 20,
     padding: 20,
     marginBottom: 20,
   },
 
   bannerTitle: {
-    color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "bold",
   },
 
   bannerText: {
-    color: "#B0BEC5",
     marginTop: 10,
     lineHeight: 22,
   },
@@ -267,7 +456,6 @@ const styles = StyleSheet.create({
   },
 
   scanTitle: {
-    color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 10,
@@ -287,25 +475,21 @@ const styles = StyleSheet.create({
 
   statCard: {
     width: "31%",
-    backgroundColor: "#102331",
     borderRadius: 16,
     padding: 15,
     alignItems: "center",
   },
 
   statValue: {
-    color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "bold",
   },
 
   statLabel: {
-    color: "#B0BEC5",
     marginTop: 5,
   },
 
   sectionTitle: {
-    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 15,
@@ -319,7 +503,6 @@ const styles = StyleSheet.create({
 
   moduleCard: {
     width: "48%",
-    backgroundColor: "#102331",
     borderRadius: 18,
     padding: 18,
     marginBottom: 15,
@@ -327,19 +510,16 @@ const styles = StyleSheet.create({
   },
 
   moduleTitle: {
-    color: "#FFFFFF",
     textAlign: "center",
     marginTop: 10,
     fontWeight: "600",
   },
 
   continueCard: {
-    backgroundColor: "#102331",
     borderRadius: 22,
     padding: 20,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#1F3A4A",
   },
 
   continueHeader: {
@@ -349,7 +529,6 @@ const styles = StyleSheet.create({
   },
 
   continueTitle: {
-    color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "700",
     marginLeft: 10,
@@ -363,7 +542,6 @@ const styles = StyleSheet.create({
   },
 
   continueTask: {
-    color: "#B0BEC5",
     fontSize: 15,
     lineHeight: 22,
     marginBottom: 18,
@@ -371,7 +549,6 @@ const styles = StyleSheet.create({
 
   progressBackground: {
     height: 10,
-    backgroundColor: "#1E3645",
     borderRadius: 999,
     overflow: "hidden",
     marginBottom: 10,
@@ -384,7 +561,6 @@ const styles = StyleSheet.create({
   },
 
   progressText: {
-    color: "#B0BEC5",
     fontSize: 14,
     marginBottom: 18,
   },

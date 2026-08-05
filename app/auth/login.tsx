@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -19,6 +20,7 @@ import { useEffect } from "react";
 import { loginUser } from "../../services/authService";
 
 export default function LoginScreen() {
+  const colors = useAppColors();
   useEffect(() => {
     console.log("LOGIN SCREEN MOUNTED");
   }, []);
@@ -101,12 +103,18 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader
         title="Welcome Back"
         subtitle="Sign in to continue using AquaGuide AI"
         showBack
-        variant="light"
       />
 
       <KeyboardAvoidingView
@@ -125,26 +133,64 @@ export default function LoginScreen() {
             style={{ alignSelf: "center" }}
           />
 
-          <Text style={styles.title}>Welcome Back</Text>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Welcome Back
+          </Text>
 
-          <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Sign in to continue using AquaGuide AI.
           </Text>
 
           <TextInput
             placeholder="Email Address"
-            style={styles.input}
+            placeholderTextColor={colors.textSecondary}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.textPrimary,
+              },
+            ]}
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
           />
 
-          <View style={styles.passwordContainer}>
+          <View
+            style={[
+              styles.passwordContainer,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
             <TextInput
               placeholder="Password"
+              placeholderTextColor={colors.textSecondary}
               secureTextEntry={secure}
-              style={styles.passwordInput}
+              style={[
+                styles.passwordInput,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
               value={password}
               onChangeText={setPassword}
             />
@@ -153,7 +199,7 @@ export default function LoginScreen() {
               <Ionicons
                 name={secure ? "eye-off-outline" : "eye-outline"}
                 size={24}
-                color="#607D8B"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>

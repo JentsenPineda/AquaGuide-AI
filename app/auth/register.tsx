@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -18,6 +19,7 @@ import {
 import { registerUser } from "../../services/authService";
 
 export default function RegisterScreen() {
+  const colors = useAppColors();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -64,13 +66,15 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <AppHeader
-        title="Create Account"
-        subtitle="Join AquaGuide AI"
-        showBack
-        variant="light"
-      />
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <AppHeader title="Create Account" subtitle="Join AquaGuide AI" showBack />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -87,40 +91,94 @@ export default function RegisterScreen() {
             style={{ alignSelf: "center" }}
           />
 
-          <Text style={styles.title}>Create Account</Text>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Create Account
+          </Text>
 
-          <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Join AquaGuide AI and manage your aquarium smarter.
           </Text>
 
           <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.textPrimary,
+              },
+            ]}
+            placeholderTextColor={colors.textSecondary}
             placeholder="Full Name"
-            style={styles.input}
             value={fullName}
             onChangeText={setFullName}
           />
 
           <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.textPrimary,
+              },
+            ]}
+            placeholderTextColor={colors.textSecondary}
             placeholder="Username"
-            style={styles.input}
             value={username}
             onChangeText={setUsername}
           />
 
           <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.textPrimary,
+              },
+            ]}
+            placeholderTextColor={colors.textSecondary}
             placeholder="Email Address"
-            style={styles.input}
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
           />
 
-          <View style={styles.passwordContainer}>
+          <View
+            style={[
+              styles.passwordContainer,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
             <TextInput
+              style={[
+                styles.passwordInput,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+              placeholderTextColor={colors.textSecondary}
               placeholder="Password"
               secureTextEntry={secure1}
-              style={styles.passwordInput}
               value={password}
               onChangeText={setPassword}
             />
@@ -129,16 +187,30 @@ export default function RegisterScreen() {
               <Ionicons
                 name={secure1 ? "eye-off-outline" : "eye-outline"}
                 size={24}
-                color="#607D8B"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.passwordContainer}>
+          <View
+            style={[
+              styles.passwordContainer,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
             <TextInput
               placeholder="Confirm Password"
+              placeholderTextColor={colors.textSecondary}
               secureTextEntry={secure2}
-              style={styles.passwordInput}
+              style={[
+                styles.passwordInput,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
@@ -147,7 +219,7 @@ export default function RegisterScreen() {
               <Ionicons
                 name={secure2 ? "eye-off-outline" : "eye-outline"}
                 size={24}
-                color="#607D8B"
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
@@ -176,7 +248,6 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2FBFD",
   },
 
   content: {
@@ -204,12 +275,12 @@ const styles = StyleSheet.create({
 
   input: {
     backgroundColor: "#FFFFFF",
+    borderColor: "#E0E0E0",
     borderRadius: 14,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
   },
 
   passwordContainer: {
@@ -227,6 +298,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     fontSize: 16,
+    color: "#003B57",
   },
 
   button: {

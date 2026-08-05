@@ -35,6 +35,10 @@ export default function LoginScreen() {
     redirect?: LoginRedirect;
   }>();
 
+  useEffect(() => {
+    console.log("LOGIN REDIRECT PARAM:", redirect);
+  }, [redirect]);
+
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert(
@@ -63,7 +67,7 @@ export default function LoginScreen() {
           break;
 
         default:
-          router.replace("/(tabs)/menu");
+          router.replace("/(tabs)");
           break;
       }
     } catch (error: any) {

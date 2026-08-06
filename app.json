@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "AquaGuide AI",
-    "slug": "aquaguide-ai",
+    "slug": "GoldfishCareAI",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./Icon/icon.png",
@@ -51,6 +51,7 @@
       "eas": {
         "projectId": "e5649447-0b04-4550-89d3-9ac021a27185"
       }
-    }
+    },
+    "owner": "zeiappdev"
   }
 }

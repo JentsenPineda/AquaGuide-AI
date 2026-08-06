@@ -43,7 +43,7 @@ export default function OnboardingScreen() {
       });
     } else {
       await AsyncStorage.setItem("hasSeenOnboarding", "true");
-      router.replace("/login-required");
+      router.replace("/welcome");
     }
   };
 

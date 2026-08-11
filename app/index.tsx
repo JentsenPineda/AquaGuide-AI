@@ -9,10 +9,16 @@ export default function Index() {
 
   useEffect(() => {
     async function check() {
-      const value = await AsyncStorage.getItem("hasSeenOnboarding");
+      try {
+        const value = await AsyncStorage.getItem("hasSeenOnboarding");
 
-      setSeen(value === "true");
-      setLoading(false);
+        setSeen(value === "true");
+      } catch (error) {
+        console.error("Failed to check onboarding status:", error);
+        setSeen(false);
+      } finally {
+        setLoading(false);
+      }
     }
 
     check();
@@ -32,9 +38,12 @@ export default function Index() {
     );
   }
 
+  // FIRST-TIME USER
   if (!seen) {
     return <Redirect href="/onboarding" />;
   }
 
-  return <Redirect href="/welcome" />;
+  // RETURNING USER
+  // Always show the launch animation first.
+  return <Redirect href="/launch-animation" />;
 }

@@ -43,7 +43,7 @@ export default function OnboardingScreen() {
       });
     } else {
       await AsyncStorage.setItem("hasSeenOnboarding", "true");
-      router.replace("/welcome");
+      router.replace("/launch-animation");
     }
   };
 
@@ -90,7 +90,7 @@ export default function OnboardingScreen() {
             style={styles.skipContainer}
             onPress={async () => {
               await AsyncStorage.setItem("hasSeenOnboarding", "true");
-              router.replace("/auth/login");
+              router.replace("/launch-animation");
             }}
           >
             <Text

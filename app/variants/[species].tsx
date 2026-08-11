@@ -45,7 +45,7 @@ export default function VariantsScreen() {
         },
       ]}
     >
-      <AppHeader title="Fish Variants" />
+      <AppHeader title="Fish Variants" showBack />
       <FlatList
         data={filteredVariants}
         keyExtractor={(item) => item.id}

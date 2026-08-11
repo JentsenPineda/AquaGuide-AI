@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -18,10 +19,8 @@ export interface ReminderCardProps {
   repeat: ReminderRepeat;
   weekDay?: string;
   monthDay?: number;
-
   time: string;
   note?: string;
-
   onDelete: (id: string) => void;
 }
 
@@ -76,6 +75,7 @@ const getAccentColor = (type: ReminderType) => {
       return "#00BCD4";
   }
 };
+
 export default function ReminderCard({
   id,
   type,
@@ -86,15 +86,27 @@ export default function ReminderCard({
   note,
   onDelete,
 }: ReminderCardProps) {
+  const colors = useAppColors();
   const accentColor = getAccentColor(type);
+
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+        },
+      ]}
+    >
       <View style={styles.header}>
         <View style={styles.titleSection}>
           <View
             style={[
               styles.iconContainer,
-              { backgroundColor: `${accentColor}15` },
+              {
+                backgroundColor: `${accentColor}15`,
+              },
             ]}
           >
             <Ionicons
@@ -114,9 +126,20 @@ export default function ReminderCard({
 
       <View style={styles.details}>
         <View style={styles.detailRow}>
-          <Ionicons name="repeat-outline" size={18} color="#64748B" />
+          <Ionicons
+            name="repeat-outline"
+            size={18}
+            color={colors.textSecondary}
+          />
 
-          <Text style={styles.detailText}>
+          <Text
+            style={[
+              styles.detailText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             {repeat === "Daily"
               ? "Every Day"
               : repeat === "Weekly"
@@ -126,16 +149,41 @@ export default function ReminderCard({
         </View>
 
         <View style={styles.detailRow}>
-          <Ionicons name="time-outline" size={18} color="#64748B" />
+          <Ionicons
+            name="time-outline"
+            size={18}
+            color={colors.textSecondary}
+          />
 
-          <Text style={styles.detailText}>{time}</Text>
+          <Text
+            style={[
+              styles.detailText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {time}
+          </Text>
         </View>
 
         {!!note && (
           <View style={styles.detailRow}>
-            <Ionicons name="document-text-outline" size={18} color="#64748B" />
+            <Ionicons
+              name="document-text-outline"
+              size={18}
+              color={colors.textSecondary}
+            />
 
-            <Text numberOfLines={2} style={styles.detailText}>
+            <Text
+              numberOfLines={2}
+              style={[
+                styles.detailText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
               {note}
             </Text>
           </View>
@@ -147,13 +195,11 @@ export default function ReminderCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-
     borderRadius: 22,
-
     padding: 18,
-
     marginBottom: 16,
+
+    borderWidth: 1,
 
     shadowColor: "#000",
     shadowOpacity: 0.08,
@@ -213,7 +259,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     fontSize: 15,
-    color: "#475569",
     lineHeight: 22,
   },
 });

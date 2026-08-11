@@ -15,7 +15,7 @@ type AppHeaderProps = {
 export default function AppHeader({
   title,
   subtitle,
-  showBack = true,
+  showBack = false,
   variant,
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();

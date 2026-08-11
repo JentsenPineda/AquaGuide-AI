@@ -1,19 +1,23 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import { allFish } from "@/data/allFish";
+import { fishCareDatabase } from "@/data/fishCareDatabase";
 import { askVisionAI } from "@/services/aiService";
+import { addScan } from "@/services/scanService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Animated,
-  Easing,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    Animated,
+    Easing,
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
 type ScanState =
@@ -27,7 +31,7 @@ type ScanState =
 export default function ScanScreen() {
   const colors = useAppColors();
   const cameraRef = useRef<CameraView>(null);
-
+  const { user } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<"back" | "front">("back");
 
@@ -222,6 +226,14 @@ Return valid JSON only.`,
         note: aiResult.note,
       });
 
+      if (user) {
+        await addScan(user.uid, {
+          label: aiResult.label,
+          confidence: aiResult.confidence,
+          note: aiResult.note,
+        });
+      }
+
       setScanState("done");
     } catch (error) {
       console.error(error);
@@ -251,6 +263,51 @@ Return valid JSON only.`,
       : confidence >= 70
         ? "Medium Confidence"
         : "Low Confidence";
+
+  const matchedFish = useMemo(() => {
+    if (!result?.label) return undefined;
+
+    const normalize = (value: string) =>
+      value
+        .trim()
+        .toLowerCase()
+        .replace(/fish/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+
+    const normalizedLabel = normalize(result.label);
+
+    // First: exact normalized match
+    const exactMatch = allFish.find((fish) => {
+      const commonName = normalize(fish.commonName);
+      const id = normalize(fish.id);
+
+      return commonName === normalizedLabel || id === normalizedLabel;
+    });
+
+    if (exactMatch) {
+      return exactMatch;
+    }
+
+    // Second: partial match
+    const partialMatch = allFish.find((fish) => {
+      const commonName = normalize(fish.commonName);
+      const id = normalize(fish.id);
+
+      return (
+        normalizedLabel.includes(commonName) ||
+        commonName.includes(normalizedLabel) ||
+        normalizedLabel.includes(id) ||
+        id.includes(normalizedLabel)
+      );
+    });
+
+    return partialMatch;
+  }, [result]);
+
+  const matchedCare = matchedFish
+    ? fishCareDatabase[matchedFish.id as keyof typeof fishCareDatabase]
+    : undefined;
   return (
     <View
       style={[
@@ -260,6 +317,8 @@ Return valid JSON only.`,
         },
       ]}
     >
+      <AppHeader title="AI Fish Scan" showBack />
+
       <ScrollView
         style={[
           styles.container,
@@ -270,10 +329,7 @@ Return valid JSON only.`,
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
-        <AppHeader
-          title="AI Fish Scan"
-          subtitle="Scan and identify ornamental fish"
-        />
+        {/* Camera / Preview */}
 
         {/* Camera / Preview */}
         <View
@@ -320,7 +376,7 @@ Return valid JSON only.`,
                   },
                 ]}
               >
-                Allow camera permission to scan and identify goldfish.
+                Allow camera permission to scan and identify ornamental fish.
               </Text>
               <Pressable
                 onPress={onRequestPermission}
@@ -425,6 +481,7 @@ Return valid JSON only.`,
             },
           ]}
         >
+          {/* Status */}
           <View style={styles.statusRow}>
             {scanState === "processing" ? (
               <ActivityIndicator size="small" color={colors.primary} />
@@ -448,6 +505,8 @@ Return valid JSON only.`,
               {statusText}
             </Text>
           </View>
+
+          {/* SUCCESSFUL SCAN */}
           {scanState === "done" && result && (
             <View
               style={[
@@ -458,6 +517,7 @@ Return valid JSON only.`,
                 },
               ]}
             >
+              {/* AI Analysis */}
               <View style={styles.resultHeader}>
                 <View
                   style={[
@@ -468,7 +528,12 @@ Return valid JSON only.`,
                     },
                   ]}
                 >
-                  <Ionicons name="sparkles-outline" size={14} color="#fff" />
+                  <Ionicons
+                    name="sparkles-outline"
+                    size={14}
+                    color={colors.primary}
+                  />
+
                   <Text
                     style={[
                       styles.aiChipText,
@@ -482,6 +547,7 @@ Return valid JSON only.`,
                 </View>
               </View>
 
+              {/* Fish Name */}
               <Text
                 style={[
                   styles.resultName,
@@ -495,6 +561,7 @@ Return valid JSON only.`,
                 {result.label.toUpperCase()}
               </Text>
 
+              {/* Confidence */}
               <View style={styles.confidenceSection}>
                 <View style={styles.confidenceRow}>
                   <Text
@@ -507,6 +574,7 @@ Return valid JSON only.`,
                   >
                     Confidence
                   </Text>
+
                   <View style={{ alignItems: "flex-end" }}>
                     <Text
                       style={[
@@ -518,6 +586,7 @@ Return valid JSON only.`,
                     >
                       {confidence}%
                     </Text>
+
                     <Text
                       style={{
                         color:
@@ -547,35 +616,405 @@ Return valid JSON only.`,
                 </View>
               </View>
 
-              <View
-                style={[
-                  styles.descriptionCard,
-                  {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    borderWidth: 1,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="information-circle-outline"
-                  size={18}
-                  color={colors.primary}
-                />
-                <Text
+              {/* Quick Care */}
+              {matchedFish && (
+                <View
                   style={[
-                    styles.resultDescription,
+                    styles.quickCareCard,
                     {
-                      color: colors.textSecondary,
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
                     },
                   ]}
                 >
-                  {result.note}
-                </Text>
-              </View>
+                  {/* Quick Care Header */}
+                  <View style={styles.quickCareHeader}>
+                    <View
+                      style={[
+                        styles.quickCareIcon,
+                        {
+                          backgroundColor: colors.primary + "18",
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name="water-outline"
+                        size={20}
+                        color={colors.primary}
+                      />
+                    </View>
+
+                    <View style={styles.quickCareHeaderText}>
+                      <Text
+                        style={[
+                          styles.quickCareTitle,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        Quick Care
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.quickCareSubtitle,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        Essential care information
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Care Information */}
+                  <View style={styles.careGrid}>
+                    {/* Temperature */}
+                    <View
+                      style={[
+                        styles.careItem,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name="thermometer-outline"
+                        size={22}
+                        color="#F97316"
+                      />
+
+                      <Text
+                        style={[
+                          styles.careLabel,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        Temperature
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.careValue,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {matchedFish.temperature}
+                      </Text>
+                    </View>
+
+                    {/* pH */}
+                    <View
+                      style={[
+                        styles.careItem,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name="flask-outline"
+                        size={22}
+                        color="#8B5CF6"
+                      />
+
+                      <Text
+                        style={[
+                          styles.careLabel,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        pH Level
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.careValue,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {matchedCare?.idealPH ?? matchedFish.pH}
+                      </Text>
+                    </View>
+
+                    {/* Tank Size */}
+                    <View
+                      style={[
+                        styles.careItem,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Ionicons name="home-outline" size={22} color="#3B82F6" />
+
+                      <Text
+                        style={[
+                          styles.careLabel,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        Tank Size
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.careValue,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {matchedFish.tankSize}
+                      </Text>
+                    </View>
+
+                    {/* Diet */}
+                    <View
+                      style={[
+                        styles.careItem,
+                        {
+                          backgroundColor: colors.card,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name="restaurant-outline"
+                        size={22}
+                        color="#22C55E"
+                      />
+
+                      <Text
+                        style={[
+                          styles.careLabel,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        Diet
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.careValue,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {matchedFish.diet}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Care Recommendations */}
+                  {matchedCare && (
+                    <View
+                      style={[
+                        styles.careDetails,
+                        {
+                          borderTopColor: colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.careDetailsTitle,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        Care Recommendations
+                      </Text>
+
+                      {/* Water Change */}
+                      {!!matchedCare.waterChange && (
+                        <View style={styles.careDetailRow}>
+                          <Ionicons
+                            name="water-outline"
+                            size={20}
+                            color={colors.primary}
+                          />
+
+                          <View style={styles.careDetailContent}>
+                            <Text
+                              style={[
+                                styles.careDetailLabel,
+                                {
+                                  color: colors.textSecondary,
+                                },
+                              ]}
+                            >
+                              Water Change
+                            </Text>
+
+                            <Text
+                              style={[
+                                styles.careDetailValue,
+                                {
+                                  color: colors.textPrimary,
+                                },
+                              ]}
+                            >
+                              {matchedCare.waterChange}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+
+                      {/* Filtration */}
+                      {!!matchedCare.filtration && (
+                        <View style={styles.careDetailRow}>
+                          <Ionicons
+                            name="filter-outline"
+                            size={20}
+                            color={colors.primary}
+                          />
+
+                          <View style={styles.careDetailContent}>
+                            <Text
+                              style={[
+                                styles.careDetailLabel,
+                                {
+                                  color: colors.textSecondary,
+                                },
+                              ]}
+                            >
+                              Filtration
+                            </Text>
+
+                            <Text
+                              style={[
+                                styles.careDetailValue,
+                                {
+                                  color: colors.textPrimary,
+                                },
+                              ]}
+                            >
+                              {matchedCare.filtration}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+
+                      {/* Compatibility */}
+                      {!!matchedCare.compatibility && (
+                        <View style={styles.careDetailRow}>
+                          <Ionicons
+                            name="git-compare-outline"
+                            size={20}
+                            color={colors.primary}
+                          />
+
+                          <View style={styles.careDetailContent}>
+                            <Text
+                              style={[
+                                styles.careDetailLabel,
+                                {
+                                  color: colors.textSecondary,
+                                },
+                              ]}
+                            >
+                              Compatibility
+                            </Text>
+
+                            <Text
+                              style={[
+                                styles.careDetailValue,
+                                {
+                                  color: colors.textPrimary,
+                                },
+                              ]}
+                            >
+                              {matchedCare.compatibility}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+                  )}
+
+                  {/* AI Description */}
+                  <View
+                    style={[
+                      styles.descriptionCard,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name="information-circle-outline"
+                      size={18}
+                      color={colors.primary}
+                    />
+
+                    <Text
+                      style={[
+                        styles.resultDescription,
+                        {
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {result.note}
+                    </Text>
+                  </View>
+                </View>
+              )}
+
+              {/* AI Description when no database match */}
+              {!matchedFish && (
+                <View
+                  style={[
+                    styles.descriptionCard,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="information-circle-outline"
+                    size={18}
+                    color={colors.primary}
+                  />
+
+                  <Text
+                    style={[
+                      styles.resultDescription,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    {result.note}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
 
+          {/* Scan Error */}
           {scanState === "error" && (
             <View
               style={[
@@ -596,6 +1035,7 @@ Return valid JSON only.`,
               >
                 Scan Failed
               </Text>
+
               <Text
                 style={[
                   styles.resultNote,
@@ -609,7 +1049,6 @@ Return valid JSON only.`,
             </View>
           )}
         </View>
-
         {/* Controls */}
         {permission?.granted && (
           <View style={styles.controls}>
@@ -739,15 +1178,16 @@ const styles = StyleSheet.create({
   },
 
   previewWrap: {
-    borderRadius: 22,
+    borderRadius: 24,
     overflow: "hidden",
     borderWidth: 1,
   },
 
   preview: {
     width: "100%",
-    height: 360,
+    height: 430,
   },
+
   permissionBox: {
     alignItems: "center",
     justifyContent: "center",
@@ -769,8 +1209,8 @@ const styles = StyleSheet.create({
   },
 
   scannerFrame: {
-    width: "82%",
-    height: 260,
+    width: "86%",
+    height: 320,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.22)",
@@ -779,8 +1219,8 @@ const styles = StyleSheet.create({
 
   scanLine: {
     position: "absolute",
-    top: (360 - 260) / 2,
-    width: "82%",
+    top: (430 - 320) / 2,
+    width: "86%",
     height: 2,
     backgroundColor: "rgba(255,255,255,0.85)",
     borderRadius: 999,
@@ -788,8 +1228,8 @@ const styles = StyleSheet.create({
 
   cornerTL: {
     position: "absolute",
-    left: "9%",
-    top: (360 - 260) / 2,
+    left: "7%",
+    top: (430 - 320) / 2,
     width: 30,
     height: 30,
     borderLeftWidth: 3,
@@ -798,8 +1238,8 @@ const styles = StyleSheet.create({
   },
   cornerTR: {
     position: "absolute",
-    right: "9%",
-    top: (360 - 260) / 2,
+    right: "7%",
+    top: (430 - 320) / 2,
     width: 30,
     height: 30,
     borderRightWidth: 3,
@@ -808,8 +1248,8 @@ const styles = StyleSheet.create({
   },
   cornerBL: {
     position: "absolute",
-    left: "9%",
-    bottom: (360 - 260) / 2,
+    left: "7%",
+    bottom: (430 - 320) / 2,
     width: 30,
     height: 30,
     borderLeftWidth: 3,
@@ -818,8 +1258,8 @@ const styles = StyleSheet.create({
   },
   cornerBR: {
     position: "absolute",
-    right: "9%",
-    bottom: (360 - 260) / 2,
+    right: "7%",
+    bottom: (430 - 320) / 2,
     width: 30,
     height: 30,
     borderRightWidth: 3,
@@ -848,12 +1288,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
 
-  resultTitle: { color: "#fff", fontSize: 14.5, fontWeight: "900" },
+  resultTitle: {
+    marginTop: 6,
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
   confidence: { color: "#fff", fontSize: 13, fontWeight: "900", opacity: 0.9 },
+
   resultNote: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 12.5,
-    lineHeight: 18,
+    marginTop: 6,
+    fontSize: 13,
   },
 
   badgeRow: { flexDirection: "row", gap: 8, marginTop: 6, flexWrap: "wrap" },
@@ -872,32 +1317,34 @@ const styles = StyleSheet.create({
 
   controls: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: 2,
+    gap: 12,
+    marginTop: 4,
+    marginBottom: 8,
   },
+
   primaryBtn: {
     flex: 1,
-    height: 48,
-    borderRadius: 16,
+    height: 52,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
     flexDirection: "row",
     gap: 8,
   },
+
   primaryBtnTextDark: { color: "#0B0F14", fontSize: 13.5, fontWeight: "900" },
+
   secondaryBtn: {
     flex: 1,
-    height: 48,
-    borderRadius: 16,
+    height: 52,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.10)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
     flexDirection: "row",
     gap: 8,
   },
+
   secondaryBtnText: { color: "#fff", fontSize: 13.5, fontWeight: "900" },
   disabledBtn: {
     flex: 1,
@@ -907,6 +1354,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.12)",
   },
+
   primaryBtnText: { color: "#fff", fontSize: 13.5, fontWeight: "900" },
   btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
 
@@ -993,6 +1441,105 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "rgba(255,255,255,0.82)",
     fontSize: 13,
+    lineHeight: 20,
+  },
+
+  quickCareCard: {
+    marginTop: 18,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+  },
+
+  quickCareHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  quickCareIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  quickCareHeaderText: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  quickCareTitle: {
+    fontSize: 17,
+    fontWeight: "800",
+  },
+
+  quickCareSubtitle: {
+    marginTop: 3,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+
+  careGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+
+  careItem: {
+    width: "48%",
+    minHeight: 105,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+
+  careLabel: {
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  careValue: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  careDetails: {
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+  },
+
+  careDetailsTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    marginBottom: 14,
+  },
+
+  careDetailRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 14,
+  },
+
+  careDetailContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  careDetailLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginBottom: 3,
+  },
+
+  careDetailValue: {
+    fontSize: 14,
+    fontWeight: "600",
     lineHeight: 20,
   },
 });

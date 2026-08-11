@@ -90,7 +90,7 @@ export default function AcclimationScreen() {
   };
   return (
     <View style={[styles.container, dynamicStyles.container]}>
-      <AppHeader title="New Fish Care" />
+      <AppHeader title="New Fish Care" showBack />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}

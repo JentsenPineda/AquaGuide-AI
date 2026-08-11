@@ -192,11 +192,7 @@ export default function NotificationsScreen() {
         },
       ]}
     >
-      <AppHeader
-        title="Notifications"
-        subtitle="Manage your notification preferences"
-        showBack
-      />
+      <AppHeader title="Notifications" showBack />
 
       <ScrollView
         style={[

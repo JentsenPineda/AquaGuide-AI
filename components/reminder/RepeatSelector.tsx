@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -16,11 +17,30 @@ export default function RepeatSelector({
   accentColor,
   onChange,
 }: Props) {
+  const colors = useAppColors();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Repeat</Text>
+      <Text
+        style={[
+          styles.title,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        Repeat
+      </Text>
 
-      <View style={styles.segment}>
+      <View
+        style={[
+          styles.segment,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+          },
+        ]}
+      >
         {options.map((item) => {
           const selected = item === value;
 
@@ -35,7 +55,14 @@ export default function RepeatSelector({
                 },
               ]}
             >
-              <Text style={[styles.text, selected && styles.selectedText]}>
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color: selected ? "#FFFFFF" : colors.textSecondary,
+                  },
+                ]}
+              >
                 {item}
               </Text>
             </Pressable>
@@ -54,15 +81,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: "700",
-    color: "#0F172A",
     marginBottom: 14,
   },
 
   segment: {
     flexDirection: "row",
-    backgroundColor: "#E2E8F0",
     borderRadius: 18,
     padding: 4,
+    borderWidth: 1,
   },
 
   button: {
@@ -76,11 +102,5 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#475569",
-  },
-
-  selectedText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
   },
 });

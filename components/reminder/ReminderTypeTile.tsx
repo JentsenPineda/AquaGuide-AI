@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -19,14 +20,16 @@ export default function ReminderTypeTile({
   selected,
   onPress,
 }: Props) {
+  const colors = useAppColors();
+
   return (
     <Pressable
       onPress={onPress}
       style={[
         styles.container,
-        selected && {
-          borderColor: accentColor,
-          backgroundColor: `${accentColor}12`,
+        {
+          backgroundColor: selected ? `${accentColor}12` : colors.card,
+          borderColor: selected ? accentColor : colors.border,
         },
       ]}
     >
@@ -46,9 +49,27 @@ export default function ReminderTypeTile({
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          {title}
+        </Text>
 
-        <Text style={styles.description}>{description}</Text>
+        <Text
+          style={[
+            styles.description,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
+          {description}
+        </Text>
       </View>
 
       {selected && (
@@ -71,11 +92,9 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 22,
     padding: 18,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
     marginBottom: 14,
 
     shadowColor: "#000",
@@ -105,13 +124,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#0F172A",
     marginBottom: 4,
   },
 
   description: {
     fontSize: 14,
-    color: "#64748B",
     lineHeight: 20,
   },
 

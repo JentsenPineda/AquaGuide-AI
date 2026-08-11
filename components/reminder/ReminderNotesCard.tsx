@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import React from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -7,11 +8,29 @@ type Props = {
 };
 
 export default function ReminderNotesCard({ value, onChangeText }: Props) {
+  const colors = useAppColors();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notes (Optional)</Text>
+      <Text
+        style={[
+          styles.title,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        Notes (Optional)
+      </Text>
 
-      <Text style={styles.subtitle}>
+      <Text
+        style={[
+          styles.subtitle,
+          {
+            color: colors.textSecondary,
+          },
+        ]}
+      >
         Add extra information about this reminder.
       </Text>
 
@@ -19,10 +38,17 @@ export default function ReminderNotesCard({ value, onChangeText }: Props) {
         value={value}
         onChangeText={onChangeText}
         placeholder="Anything you'd like to remember?"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor={colors.textMuted}
         multiline
         textAlignVertical="top"
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
+        ]}
       />
     </View>
   );
@@ -36,27 +62,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: "700",
-    color: "#0F172A",
     marginBottom: 6,
   },
 
   subtitle: {
     fontSize: 14,
-    color: "#64748B",
     marginBottom: 14,
     lineHeight: 22,
   },
 
   input: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
     minHeight: 130,
     paddingHorizontal: 18,
     paddingVertical: 16,
     fontSize: 15,
-    color: "#0F172A",
     lineHeight: 22,
 
     shadowColor: "#000",

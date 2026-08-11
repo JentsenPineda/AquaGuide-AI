@@ -74,7 +74,7 @@ export default function RegisterScreen() {
         },
       ]}
     >
-      <AppHeader title="Create Account" subtitle="Join AquaGuide AI" showBack />
+      <AppHeader title="Create Account" showBack />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}

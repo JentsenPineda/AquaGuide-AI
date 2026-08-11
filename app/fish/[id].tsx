@@ -64,7 +64,7 @@ export default function FishDetailsScreen() {
         },
       ]}
     >
-      <AppHeader title="Fish Details" />
+      <AppHeader title="Fish Details" showBack />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{

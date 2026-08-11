@@ -58,7 +58,7 @@ export default function PreparationScreen() {
   };
   return (
     <View style={[styles.container, dynamicStyles.container]}>
-      <AppHeader title="Preparation" />
+      <AppHeader title="Preparation" showBack />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}

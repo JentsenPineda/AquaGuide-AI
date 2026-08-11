@@ -27,12 +27,13 @@ export default function ModuleCard({
 
   return (
     <Pressable
-      style={[
+      style={({ pressed }) => [
         styles.moduleCard,
         {
           backgroundColor: colors.card,
           borderColor: colors.border,
         },
+        pressed && styles.pressed,
       ]}
       onPress={() => {
         if (onPress) {
@@ -42,86 +43,95 @@ export default function ModuleCard({
         }
       }}
     >
-      <View style={styles.moduleLeft}>
-        <View
+      {/* Icon */}
+      <View
+        style={[
+          styles.iconContainer,
+          {
+            backgroundColor: iconBackground,
+          },
+        ]}
+      >
+        <Ionicons name={icon} size={28} color={iconColor} />
+      </View>
+
+      {/* Text */}
+      <View style={styles.textContainer}>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
           style={[
-            styles.iconContainer,
+            styles.moduleTitle,
             {
-              backgroundColor: iconBackground,
+              color: colors.textPrimary,
             },
           ]}
         >
-          <Ionicons name={icon} size={28} color={iconColor} />
-        </View>
+          {title}
+        </Text>
 
-        <View style={styles.textContainer}>
-          <Text
-            style={[
-              styles.moduleTitle,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            {title}
-          </Text>
-
-          <Text
-            style={[
-              styles.moduleSubtitle,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            {subtitle}
-          </Text>
-        </View>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={[
+            styles.moduleSubtitle,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
+          {subtitle}
+        </Text>
       </View>
 
-      <Ionicons name="chevron-forward" size={22} color={colors.textMuted} />
+      {/* Arrow */}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   moduleCard: {
-    borderRadius: 18,
-    padding: 18,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 14,
+    height: 132,
+    borderRadius: 20,
     borderWidth: 1,
-  },
+    padding: 14,
 
-  moduleLeft: {
-    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    flex: 1,
+
+    position: "relative",
   },
 
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 52,
+    height: 52,
+    borderRadius: 15,
+
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
+
+    marginBottom: 8,
   },
 
   textContainer: {
-    flex: 1,
+    width: "100%",
+    alignItems: "center",
   },
 
   moduleTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 17,
+    fontWeight: "800",
+    textAlign: "center",
   },
 
   moduleSubtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    lineHeight: 20,
+    marginTop: 3,
+    fontSize: 13,
+    lineHeight: 17,
+    textAlign: "center",
+  },
+
+  pressed: {
+    opacity: 0.82,
   },
 });

@@ -175,7 +175,7 @@ export default function TankCareScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={[styles.safe, dynamicStyles.safe]}>
-        <AppHeader title="Tank & Care" />
+        <AppHeader title="Tank & Care" showBack />
         <ScrollView
           contentContainerStyle={styles.container}
           showsVerticalScrollIndicator={false}

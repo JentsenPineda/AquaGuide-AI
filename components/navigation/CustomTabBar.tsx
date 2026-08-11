@@ -73,7 +73,7 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
             bottom: Math.max(insets.bottom, 12) + 30,
           },
         ]}
-        onPress={() => router.push("/(tabs)/scan")}
+        onPress={() => router.push("/scan")}
       >
         <Ionicons name="scan" size={34} color="#FFFFFF" />
       </Pressable>

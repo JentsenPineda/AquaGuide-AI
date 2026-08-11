@@ -29,7 +29,7 @@ export default function BreedingGuide() {
         },
       ]}
     >
-      <AppHeader title="Breeding Guide" />
+      <AppHeader title="Breeding Guide" showBack />
 
       <ScrollView
         contentContainerStyle={styles.container}

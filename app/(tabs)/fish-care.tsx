@@ -4,94 +4,101 @@ import ThemeText from "@/components/text/ThemeText";
 import { useAppColors } from "@/theme/useAppColors";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+
 export default function FishCareScreen() {
   const colors = useAppColors();
-  const dynamicStyles = {
-    container: {
-      backgroundColor: colors.background,
-    },
-  };
+
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
-      <AppHeader
-        title="Fish Care"
-        subtitle="Everything you need to keep your ornamental fish healthy."
-        showBack={false}
-      />
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <AppHeader title="Fish Care" showBack={false} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
+        {/* SECTION HEADER */}
+
         <ThemeText variant="title" style={styles.sectionTitle}>
-          Care Modules
+          Features
         </ThemeText>
+
         <ThemeText variant="body" style={styles.sectionSubtitle}>
           Choose a fish care topic to learn more.
         </ThemeText>
 
-        <ModuleCard
-          icon="fish"
-          title="New Fish Care"
-          subtitle="Safe acclimation and first-week guide"
-          route="/new-fish-care"
-          iconColor="#00BCD4"
-          iconBackground="#E8FAFD"
-        />
+        {/* MODULE CARDS */}
 
-        <ModuleCard
-          icon="water"
-          title="Tank & Care"
-          subtitle="Water quality, maintenance and aquarium care"
-          route="/tank-care"
-          iconColor="#1976D2"
-          iconBackground="#E3F2FD"
-        />
+        <View style={styles.cards}>
+          <ModuleCard
+            icon="leaf"
+            title="Aqua Plants"
+            subtitle="Compatible aquatic plants for ornamental fish"
+            route="/aqua-plant"
+            iconColor="#43A047"
+            iconBackground="#E8F5E9"
+          />
 
-        <ModuleCard
-          icon="medkit"
-          title="Disease Guide"
-          subtitle="Identify symptoms and recommended treatments"
-          route="/disease-guide"
-          iconColor="#E53935"
-          iconBackground="#FFEBEE"
-        />
+          <ModuleCard
+            icon="flask"
+            title="Breeding Guide"
+            subtitle="Breeding techniques and fry care information"
+            route="/breeding-guide"
+            iconColor="#D81B60"
+            iconBackground="#FCE4EC"
+          />
 
-        <ModuleCard
-          icon="leaf"
-          title="Aqua Plants"
-          subtitle="Compatible aquatic plants for ornamental fish"
-          route="/aqua-plant"
-          iconColor="#43A047"
-          iconBackground="#E8F5E9"
-        />
+          <ModuleCard
+            icon="git-compare"
+            title="Compatibility Checker"
+            subtitle="Check fish compatibility before keeping them together"
+            route="/compatibility-checker"
+            iconColor="#8E24AA"
+            iconBackground="#F3E5F5"
+          />
 
-        <ModuleCard
-          icon="git-compare"
-          title="Compatibility Checker"
-          subtitle="Check fish compatibility before keeping them together"
-          route="/compatibility-checker"
-          iconColor="#8E24AA"
-          iconBackground="#F3E5F5"
-        />
+          <ModuleCard
+            icon="medkit"
+            title="Disease Guide"
+            subtitle="Identify symptoms and recommended treatments"
+            route="/disease-guide"
+            iconColor="#E53935"
+            iconBackground="#FFEBEE"
+          />
 
-        <ModuleCard
-          icon="build"
-          title="Equipment Guide"
-          subtitle="Filters, heaters, lighting and aquarium accessories"
-          route="/equipment/equipment-guide"
-          iconColor="#FB8C00"
-          iconBackground="#FFF3E0"
-        />
+          <ModuleCard
+            icon="build"
+            title="Equipment Guide"
+            subtitle="Filters, heaters, lighting and aquarium accessories"
+            route="/equipment/equipment-guide"
+            iconColor="#FB8C00"
+            iconBackground="#FFF3E0"
+          />
 
-        <ModuleCard
-          icon="flask"
-          title="Breeding Guide"
-          subtitle="Breeding techniques and fry care information"
-          route="/breeding-guide"
-          iconColor="#D81B60"
-          iconBackground="#FCE4EC"
-        />
+          <ModuleCard
+            icon="fish"
+            title="New Fish Care"
+            subtitle="Safe acclimation and first-week guide"
+            route="/new-fish-care"
+            iconColor="#00BCD4"
+            iconBackground="#E8FAFD"
+          />
+
+          <ModuleCard
+            icon="water"
+            title="Tank & Care"
+            subtitle="Water quality, maintenance and aquarium care"
+            route="/tank-care"
+            iconColor="#1976D2"
+            iconBackground="#E3F2FD"
+          />
+        </View>
       </ScrollView>
     </View>
   );
@@ -100,11 +107,11 @@ export default function FishCareScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2FBFD",
   },
 
   content: {
     padding: 20,
+    paddingBottom: 40,
   },
 
   sectionTitle: {
@@ -117,5 +124,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 24,
     lineHeight: 22,
+  },
+
+  cards: {
+    gap: 14,
   },
 });

@@ -80,7 +80,7 @@ export default function CompatibilityChecker() {
         },
       ]}
     >
-      <AppHeader title="Compatibility Checker" />
+      <AppHeader title="Compatibility Checker" showBack />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

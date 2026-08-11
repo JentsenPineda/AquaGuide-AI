@@ -202,11 +202,7 @@ export default function ProfileScreen() {
         },
       ]}
     >
-      <AppHeader
-        title="Profile"
-        subtitle="Manage your AquaGuide AI account"
-        showBack
-      />
+      <AppHeader title="Profile" showBack />
 
       <ScrollView
         style={[
@@ -422,24 +418,6 @@ export default function ProfileScreen() {
             icon="moon-outline"
             title="Dark Mode"
             onPress={() => router.push("/profile/dark-mode")}
-          />
-
-          <SettingItem
-            icon="lock-closed-outline"
-            title="Change Password"
-            onPress={() => router.push("/profile/change-password")}
-          />
-
-          <SettingItem
-            icon="document-text-outline"
-            title="Privacy Policy"
-            onPress={() => router.push("/profile/privacy-policy")}
-          />
-
-          <SettingItem
-            icon="information-circle-outline"
-            title="About AquaGuide AI"
-            onPress={() => router.push("/profile/about")}
           />
         </View>
 

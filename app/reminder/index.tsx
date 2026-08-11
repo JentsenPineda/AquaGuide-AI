@@ -9,6 +9,7 @@ import {
   deleteReminder as deleteReminderFromFirestore,
   subscribeToReminders,
 } from "@/services/reminderService";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 type ReminderItem = {
   id: string;
   type: ReminderType;
@@ -31,14 +33,17 @@ type ReminderItem = {
 
 export default function ReminderScreen() {
   const { user } = useAuth();
+  const colors = useAppColors();
 
   const firstName = user?.displayName?.split(" ")[0] || "Aquarist";
 
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
+
   const hour = new Date().getHours();
 
   const greeting =
     hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+
   useEffect(() => {
     if (!user) return;
 
@@ -61,6 +66,7 @@ export default function ReminderScreen() {
       console.log("Delete Reminder Error:", error);
     }
   };
+
   useEffect(() => {
     if (!user) {
       router.replace({
@@ -75,15 +81,23 @@ export default function ReminderScreen() {
   if (!user) {
     return (
       <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#F5F7FA",
-        }}
+        style={[
+          styles.loginContainer,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
       >
-        <Ionicons name="lock-closed" size={48} color="#00BCD4" />
-        <Text style={{ marginTop: 16, fontSize: 16 }}>
+        <Ionicons name="lock-closed" size={48} color={colors.primary} />
+
+        <Text
+          style={[
+            styles.loginText,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
           Redirecting to login...
         </Text>
       </View>
@@ -91,18 +105,21 @@ export default function ReminderScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      <AppHeader
-        title="Reminder"
-        subtitle="Manage your upcoming fish care tasks"
-        showBack
-        variant="light"
-      />
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <AppHeader title=" Reminder " showBack />
 
       <ScrollView
         contentContainerStyle={[styles.container, styles.content]}
         showsVerticalScrollIndicator={false}
       >
+        {/* Hero */}
         <View style={styles.heroCard}>
           <Text style={styles.heroGreeting}>{greeting}</Text>
 
@@ -138,17 +155,39 @@ export default function ReminderScreen() {
             </>
           )}
         </View>
+
+        {/* Today's Schedule */}
         <SectionCard
           title="Today's Schedule"
           subtitle="Your scheduled fish care reminders."
         >
           {reminders.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="calendar-outline" size={42} color="#B0BEC5" />
+              <Ionicons
+                name="calendar-outline"
+                size={42}
+                color={colors.textMuted}
+              />
 
-              <Text style={styles.emptyTitle}>No reminders scheduled</Text>
+              <Text
+                style={[
+                  styles.emptyTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                No reminders scheduled
+              </Text>
 
-              <Text style={styles.emptySubtitle}>
+              <Text
+                style={[
+                  styles.emptySubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
                 Tap the + button above to create your first reminder.
               </Text>
             </View>
@@ -170,8 +209,14 @@ export default function ReminderScreen() {
         </SectionCard>
       </ScrollView>
 
+      {/* Add Reminder */}
       <TouchableOpacity
-        style={styles.fab}
+        style={[
+          styles.fab,
+          {
+            backgroundColor: colors.primary,
+          },
+        ]}
         activeOpacity={0.85}
         onPress={() => router.push("/reminder/create")}
       >
@@ -184,7 +229,17 @@ export default function ReminderScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+  },
+
+  loginContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loginText: {
+    marginTop: 16,
+    fontSize: 16,
   },
 
   container: {
@@ -194,15 +249,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingBottom: 40,
-  },
-
-  addButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "#00BCD4",
-    justifyContent: "center",
-    alignItems: "center",
   },
 
   heroCard: {
@@ -270,30 +316,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "rgba(255,255,255,0.92)",
   },
-  nextReminderLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#64748B",
-    marginBottom: 8,
-  },
-
-  nextReminderTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#0F172A",
-  },
-
-  nextReminderTime: {
-    marginTop: 6,
-    fontSize: 15,
-    color: "#00BCD4",
-    fontWeight: "600",
-  },
-
-  nextReminderEmpty: {
-    fontSize: 15,
-    color: "#94A3B8",
-  },
 
   emptyState: {
     alignItems: "center",
@@ -304,30 +326,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     fontWeight: "700",
-    color: "#374151",
   },
 
   emptySubtitle: {
     marginTop: 8,
     textAlign: "center",
-    color: "#6B7280",
     lineHeight: 22,
     paddingHorizontal: 10,
-  },
-
-  heroHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  heroAddButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
   },
 
   fab: {
@@ -338,8 +343,6 @@ const styles = StyleSheet.create({
     width: 62,
     height: 62,
     borderRadius: 31,
-
-    backgroundColor: "#00BCD4",
 
     justifyContent: "center",
     alignItems: "center",

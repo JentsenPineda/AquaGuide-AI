@@ -1,52 +1,61 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteLog, LogItem, subscribeToLogs } from "@/services/logbookService";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
-
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+
 const activityConfig = {
   Feeding: {
     icon: "restaurant-outline",
     color: "#F59E0B",
   },
+
   "Water Change": {
     icon: "water-outline",
     color: "#3B82F6",
   },
+
   "Water Test": {
     icon: "flask-outline",
     color: "#8B5CF6",
   },
+
   Medication: {
     icon: "medical-outline",
     color: "#EF4444",
   },
+
   Cleaning: {
     icon: "sparkles-outline",
     color: "#06B6D4",
   },
+
   "Plant Care": {
     icon: "leaf-outline",
     color: "#22C55E",
   },
+
   "New Fish": {
     icon: "fish-outline",
     color: "#0EA5E9",
   },
+
   Observation: {
     icon: "eye-outline",
     color: "#F97316",
   },
 } as const;
+
 const formatLogDate = (dateString: string) => {
   const date = new Date(dateString);
 
@@ -56,7 +65,6 @@ const formatLogDate = (dateString: string) => {
   yesterday.setDate(today.getDate() - 1);
 
   const isToday = date.toDateString() === today.toDateString();
-
   const isYesterday = date.toDateString() === yesterday.toDateString();
 
   const time = date.toLocaleTimeString([], {
@@ -80,8 +88,11 @@ const formatLogDate = (dateString: string) => {
     }) + ` • ${time}`
   );
 };
+
 export default function LogbookScreen() {
   const { user } = useAuth();
+  const colors = useAppColors();
+
   const [logs, setLogs] = useState<LogItem[]>([]);
 
   const hour = new Date().getHours();
@@ -90,17 +101,18 @@ export default function LogbookScreen() {
     hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
   const firstName = user?.displayName?.trim().split(" ")[0] || "Aquarist";
+
   useEffect(() => {
     if (!user) return;
 
     const unsubscribe = subscribeToLogs(user.uid, (updatedLogs) => {
       console.log("ALL LOGS:", updatedLogs);
-
       setLogs(updatedLogs);
     });
 
     return unsubscribe;
   }, [user]);
+
   const handleDelete = (log: LogItem) => {
     if (!user) return;
 
@@ -122,6 +134,7 @@ export default function LogbookScreen() {
       },
     ]);
   };
+
   useEffect(() => {
     if (!user) {
       router.replace({
@@ -136,30 +149,45 @@ export default function LogbookScreen() {
   if (!user) {
     return (
       <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        style={[
+          styles.loginContainer,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
       >
-        <Ionicons name="lock-closed" size={48} color="#00BCD4" />
-        <Text style={{ marginTop: 16 }}>Redirecting to login...</Text>
+        <Ionicons name="lock-closed" size={48} color={colors.primary} />
+
+        <Text
+          style={[
+            styles.loginText,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Redirecting to login...
+        </Text>
       </View>
     );
   }
+
   return (
-    <View style={styles.screen}>
-      <AppHeader
-        title="Logbook"
-        subtitle="Track your aquarium care history"
-        showBack
-        variant="light"
-      />
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <AppHeader title="Logbook" showBack />
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* HERO */}
         <View style={styles.heroCard}>
           <Text style={styles.heroGreeting}>{greeting}</Text>
 
@@ -167,6 +195,7 @@ export default function LogbookScreen() {
 
           <View style={styles.heroStats}>
             <Text style={styles.heroCount}>{logs.length}</Text>
+
             <Text style={styles.heroCountLabel}>Total Log Entries</Text>
           </View>
 
@@ -192,22 +221,62 @@ export default function LogbookScreen() {
             </>
           )}
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
 
-          <Text style={styles.sectionSubtitle}>
+        {/* RECENT ACTIVITY */}
+        <View style={styles.section}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Recent Activity
+          </Text>
+
+          <Text
+            style={[
+              styles.sectionSubtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Your aquarium care history will appear here.
           </Text>
 
           {logs.length === 0 ? (
-            <View style={styles.emptyCard}>
+            <View
+              style={[
+                styles.emptyCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
               <Text style={styles.emptyEmoji}>📖</Text>
 
-              <Text style={styles.emptyTitle}>
+              <Text
+                style={[
+                  styles.emptyTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
                 Your aquarium journal starts here
               </Text>
 
-              <Text style={styles.emptyDescription}>
+              <Text
+                style={[
+                  styles.emptyDescription,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
                 Record feedings, water changes, treatments, maintenance, and
                 observations to build your aquarium care history.
               </Text>
@@ -224,55 +293,87 @@ export default function LogbookScreen() {
             </View>
           ) : (
             <View>
-              {logs.map((log) => (
-                <TouchableOpacity
-                  key={log.id}
-                  style={styles.logCard}
-                  activeOpacity={0.9}
-                  onLongPress={() => handleDelete(log)}
-                >
-                  <View
+              {logs.map((log) => {
+                const activity =
+                  activityConfig[log.type as keyof typeof activityConfig];
+
+                const accentColor = activity?.color ?? colors.primary;
+
+                return (
+                  <TouchableOpacity
+                    key={log.id}
                     style={[
-                      styles.logIcon,
+                      styles.logCard,
                       {
-                        backgroundColor: `${
-                          activityConfig[
-                            log.type as keyof typeof activityConfig
-                          ]?.color ?? "#00BCD4"
-                        }15`,
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
                       },
                     ]}
+                    activeOpacity={0.9}
+                    onLongPress={() => handleDelete(log)}
                   >
-                    <Ionicons
-                      name={
-                        activityConfig[log.type as keyof typeof activityConfig]
-                          ?.icon ?? "book-outline"
-                      }
-                      size={20}
-                      color={
-                        activityConfig[log.type as keyof typeof activityConfig]
-                          ?.color ?? "#00BCD4"
-                      }
-                    />
-                  </View>
-                  <View style={styles.logHeader}>
-                    <View style={styles.logInfo}>
-                      <Text style={styles.logTitle}>{log.type}</Text>
-
-                      <Text style={styles.logDate}>
-                        {formatLogDate(log.date)}
-                      </Text>
+                    <View
+                      style={[
+                        styles.logIcon,
+                        {
+                          backgroundColor: `${accentColor}15`,
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name={activity?.icon ?? "book-outline"}
+                        size={20}
+                        color={accentColor}
+                      />
                     </View>
-                  </View>
-                  {log.note ? (
-                    <Text style={styles.logNote}>{log.note}</Text>
-                  ) : null}
-                </TouchableOpacity>
-              ))}
+
+                    <View style={styles.logHeader}>
+                      <View style={styles.logInfo}>
+                        <Text
+                          style={[
+                            styles.logTitle,
+                            {
+                              color: colors.textPrimary,
+                            },
+                          ]}
+                        >
+                          {log.type}
+                        </Text>
+
+                        <Text
+                          style={[
+                            styles.logDate,
+                            {
+                              color: colors.textSecondary,
+                            },
+                          ]}
+                        >
+                          {formatLogDate(log.date)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {log.note ? (
+                      <Text
+                        style={[
+                          styles.logNote,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        {log.note}
+                      </Text>
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           )}
         </View>
       </ScrollView>
+
+      {/* FAB */}
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.85}
@@ -287,13 +388,25 @@ export default function LogbookScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
   },
 
   content: {
     padding: 20,
     paddingBottom: 40,
   },
+
+  loginContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loginText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+
+  /* HERO */
 
   heroCard: {
     backgroundColor: "#0EA5E9",
@@ -359,6 +472,8 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.92)",
   },
 
+  /* RECENT ACTIVITY */
+
   section: {
     marginTop: 28,
   },
@@ -366,24 +481,22 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#0F172A",
   },
 
   sectionSubtitle: {
     marginTop: 6,
     fontSize: 15,
-    color: "#64748B",
   },
+
+  /* EMPTY STATE */
 
   emptyCard: {
     marginTop: 18,
-    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     paddingVertical: 36,
     paddingHorizontal: 24,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
   },
 
   emptyEmoji: {
@@ -394,68 +507,22 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 20,
     fontWeight: "700",
-    color: "#0F172A",
   },
 
   emptyDescription: {
     marginTop: 10,
     fontSize: 15,
-    color: "#64748B",
     textAlign: "center",
     lineHeight: 22,
   },
-  fab: {
-    position: "absolute",
-    right: 24,
-    bottom: 28,
 
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-
-    backgroundColor: "#00BCD4",
-
-    justifyContent: "center",
-    alignItems: "center",
-
-    elevation: 8,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-  },
-
-  createButton: {
-    marginTop: 24,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: "#00BCD4",
-
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-
-    paddingHorizontal: 22,
-  },
-
-  createButtonText: {
-    marginLeft: 8,
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  /* LOG CARD */
 
   logCard: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 18,
-    marginBottom: 14,
+    marginTop: 14,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
   },
 
   logHeader: {
@@ -467,7 +534,6 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: "#E6FAFD",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -480,19 +546,56 @@ const styles = StyleSheet.create({
   logTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#0F172A",
   },
 
   logDate: {
     marginTop: 4,
     fontSize: 13,
-    color: "#64748B",
   },
 
   logNote: {
     marginTop: 16,
     fontSize: 15,
-    color: "#475569",
     lineHeight: 22,
+  },
+
+  /* BUTTONS */
+
+  createButton: {
+    marginTop: 24,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "#00BCD4",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 22,
+  },
+
+  createButtonText: {
+    marginLeft: 8,
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  fab: {
+    position: "absolute",
+    right: 24,
+    bottom: 28,
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#00BCD4",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
   },
 });

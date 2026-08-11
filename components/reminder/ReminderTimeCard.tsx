@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -13,15 +14,27 @@ export default function ReminderTimeCard({
   accentColor,
   onPress,
 }: Props) {
+  const colors = useAppColors();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reminder Time</Text>
+      <Text
+        style={[
+          styles.title,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        Reminder Time
+      </Text>
 
       <Pressable
         onPress={onPress}
         style={[
           styles.card,
           {
+            backgroundColor: colors.card,
             borderColor: accentColor,
           },
         ]}
@@ -38,9 +51,27 @@ export default function ReminderTimeCard({
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.time}>{time}</Text>
+          <Text
+            style={[
+              styles.time,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {time}
+          </Text>
 
-          <Text style={styles.subtitle}>Tap to change reminder time</Text>
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Tap to change reminder time
+          </Text>
         </View>
 
         <Ionicons name="chevron-forward" size={22} color={accentColor} />
@@ -57,14 +88,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: "700",
-    color: "#0F172A",
     marginBottom: 14,
   },
 
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 22,
     borderWidth: 2,
     padding: 20,
@@ -96,13 +125,11 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 30,
     fontWeight: "800",
-    color: "#0F172A",
     letterSpacing: -0.5,
   },
 
   subtitle: {
     marginTop: 4,
     fontSize: 14,
-    color: "#64748B",
   },
 });

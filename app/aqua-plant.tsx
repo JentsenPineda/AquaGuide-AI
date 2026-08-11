@@ -36,7 +36,7 @@ export default function AquaPlantScreen() {
         },
       ]}
     >
-      <AppHeader title="Aqua Plants" />
+      <AppHeader title="Aqua Plants" showBack />
       <View style={styles.content}>
         {/* Header */}
 

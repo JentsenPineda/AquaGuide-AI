@@ -6,20 +6,22 @@ import ReminderDatePickerModal from "@/components/reminder/ReminderDatePickerMod
 import ReminderTimePickerModal from "@/components/reminder/ReminderTimePickerModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { addLog } from "@/services/logbookService";
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    FlatList,
-    Modal,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 const activities = [
   {
     title: "Feeding",
@@ -73,15 +75,24 @@ const activities = [
 
 export default function CreateLogbookScreen() {
   const { user } = useAuth();
+  const colors = useAppColors();
   const insets = useSafeAreaInsets();
-  const [notes, setNotes] = useState("");
 
+  const [notes, setNotes] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const [saving, setSaving] = useState(false);
+
+  const [selectedActivity, setSelectedActivity] = useState("Feeding");
+  const [activityMenuVisible, setActivityMenuVisible] = useState(false);
+
+  const selectedActivityData = activities.find(
+    (activity) => activity.title === selectedActivity,
+  );
+
   const formatDate = (date: Date) =>
     date.toLocaleDateString([], {
       month: "long",
@@ -94,11 +105,7 @@ export default function CreateLogbookScreen() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  const [selectedActivity, setSelectedActivity] = useState("Feeding");
-  const [activityMenuVisible, setActivityMenuVisible] = useState(false);
-  const selectedActivityData = activities.find(
-    (activity) => activity.title === selectedActivity,
-  );
+
   const saveLog = async () => {
     console.log("1. Save button pressed");
 
@@ -132,13 +139,16 @@ export default function CreateLogbookScreen() {
   };
 
   return (
-    <View style={styles.screen}>
-      <AppHeader
-        title="New Log Entry"
-        subtitle="Record today's aquarium activity"
-        showBack
-        variant="light"
-      />
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
+      <AppHeader title="New Log Entry" showBack />
+
       <KeyboardAwareScrollView
         enableOnAndroid
         extraScrollHeight={32}
@@ -148,22 +158,65 @@ export default function CreateLogbookScreen() {
         keyboardOpeningTime={0}
         enableAutomaticScroll
       >
-        <View style={styles.hero}>
-          <Text style={styles.heroTitle}>Create a new log</Text>
+        {/* HERO */}
 
-          <Text style={styles.heroDescription}>
+        <View style={styles.hero}>
+          <Text
+            style={[
+              styles.heroTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Create a new log
+          </Text>
+
+          <Text
+            style={[
+              styles.heroDescription,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             Keep a complete history of your aquarium maintenance, feeding,
             treatments and observations.
           </Text>
         </View>
-        <Text style={styles.sectionTitle}>Activity</Text>
 
-        <Text style={styles.sectionSubtitle}>
+        {/* ACTIVITY */}
+
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          Activity
+        </Text>
+
+        <Text
+          style={[
+            styles.sectionSubtitle,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
           Select the aquarium activity you performed.
         </Text>
 
         <TouchableOpacity
-          style={styles.activitySelector}
+          style={[
+            styles.activitySelector,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
           activeOpacity={0.85}
           onPress={() => setActivityMenuVisible(true)}
         >
@@ -179,19 +232,44 @@ export default function CreateLogbookScreen() {
               <Ionicons
                 name={selectedActivityData?.icon ?? "bookmark-outline"}
                 size={22}
-                color={selectedActivityData?.color ?? "#00BCD4"}
+                color={selectedActivityData?.color ?? colors.primary}
               />
             </View>
 
             <View style={styles.activityText}>
-              <Text style={styles.activityLabel}>Activity</Text>
+              <Text
+                style={[
+                  styles.activityLabel,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Activity
+              </Text>
 
-              <Text style={styles.activityValue}>{selectedActivity}</Text>
+              <Text
+                style={[
+                  styles.activityValue,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {selectedActivity}
+              </Text>
             </View>
           </View>
 
-          <Ionicons name="chevron-down" size={22} color="#64748B" />
+          <Ionicons
+            name="chevron-down"
+            size={22}
+            color={colors.textSecondary}
+          />
         </TouchableOpacity>
+
+        {/* ACTIVITY MODAL */}
+
         <Modal
           visible={activityMenuVisible}
           animationType="slide"
@@ -199,13 +277,42 @@ export default function CreateLogbookScreen() {
           onRequestClose={() => setActivityMenuVisible(false)}
         >
           <Pressable
-            style={styles.modalOverlay}
+            style={[
+              styles.modalOverlay,
+              {
+                backgroundColor: "rgba(0,0,0,0.45)",
+              },
+            ]}
             onPress={() => setActivityMenuVisible(false)}
           >
-            <Pressable style={styles.bottomSheet} onPress={() => {}}>
-              <View style={styles.sheetHandle} />
+            <Pressable
+              style={[
+                styles.bottomSheet,
+                {
+                  backgroundColor: colors.card,
+                },
+              ]}
+              onPress={() => {}}
+            >
+              <View
+                style={[
+                  styles.sheetHandle,
+                  {
+                    backgroundColor: colors.border,
+                  },
+                ]}
+              />
 
-              <Text style={styles.sheetTitle}>Select Activity</Text>
+              <Text
+                style={[
+                  styles.sheetTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Select Activity
+              </Text>
 
               <FlatList
                 data={activities}
@@ -236,9 +343,25 @@ export default function CreateLogbookScreen() {
                       </View>
 
                       <View style={styles.sheetInfo}>
-                        <Text style={styles.sheetItemTitle}>{item.title}</Text>
+                        <Text
+                          style={[
+                            styles.sheetItemTitle,
+                            {
+                              color: colors.textPrimary,
+                            },
+                          ]}
+                        >
+                          {item.title}
+                        </Text>
 
-                        <Text style={styles.sheetItemDescription}>
+                        <Text
+                          style={[
+                            styles.sheetItemDescription,
+                            {
+                              color: colors.textSecondary,
+                            },
+                          ]}
+                        >
                           {item.description}
                         </Text>
                       </View>
@@ -247,27 +370,53 @@ export default function CreateLogbookScreen() {
                         <Ionicons
                           name="checkmark-circle"
                           size={24}
-                          color="#00BCD4"
+                          color={colors.primary}
                         />
                       )}
                     </TouchableOpacity>
 
                     {index !== activities.length - 1 && (
-                      <View style={styles.separator} />
+                      <View
+                        style={[
+                          styles.separator,
+                          {
+                            backgroundColor: colors.border,
+                          },
+                        ]}
+                      />
                     )}
                   </View>
                 )}
               />
+
               <TouchableOpacity
-                style={styles.cancelButton}
+                style={[
+                  styles.cancelButton,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
+                ]}
                 activeOpacity={0.85}
                 onPress={() => setActivityMenuVisible(false)}
               >
-                <Text style={styles.cancelText}>Cancel</Text>
+                <Text
+                  style={[
+                    styles.cancelText,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </Pressable>
           </Pressable>
         </Modal>
+
+        {/* DATE & TIME */}
+
         <LogDateTimeCard
           date={formatDate(selectedDate)}
           time={formatTime(selectedDate)}
@@ -275,7 +424,11 @@ export default function CreateLogbookScreen() {
           onTimePress={() => setShowTimePicker(true)}
         />
 
+        {/* NOTES */}
+
         <LogNotesCard value={notes} onChangeText={setNotes} />
+
+        {/* DATE PICKER */}
 
         <ReminderDatePickerModal
           visible={showDatePicker}
@@ -294,6 +447,9 @@ export default function CreateLogbookScreen() {
             setShowDatePicker(false);
           }}
         />
+
+        {/* TIME PICKER */}
+
         <ReminderTimePickerModal
           visible={showTimePicker}
           hours={selectedDate.getHours()}
@@ -310,11 +466,16 @@ export default function CreateLogbookScreen() {
           }}
         />
       </KeyboardAwareScrollView>
+
+      {/* SAVE BUTTON */}
+
       <View
         style={[
           styles.bottomAction,
           {
             paddingBottom: Math.max(insets.bottom, 16),
+            backgroundColor: colors.background,
+            borderTopColor: colors.border,
           },
         ]}
       >
@@ -327,7 +488,6 @@ export default function CreateLogbookScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
   },
 
   content: {
@@ -342,7 +502,6 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 34,
     fontWeight: "800",
-    color: "#0F172A",
     letterSpacing: -0.8,
   },
 
@@ -350,70 +509,62 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 17,
     lineHeight: 28,
-    color: "#64748B",
   },
 
   sectionTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#0F172A",
   },
 
   sectionSubtitle: {
     marginTop: 6,
     marginBottom: 18,
     fontSize: 15,
-    color: "#64748B",
-  },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-
-  bottomAction: {
-    backgroundColor: "#F5F7FA",
-    paddingHorizontal: 22,
-    paddingTop: 12,
-
-    borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
   },
 
   activitySelector: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
     paddingHorizontal: 18,
     paddingVertical: 18,
-
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
+  activityLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  activityIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  activityText: {
+    marginLeft: 14,
+  },
+
   activityLabel: {
     fontSize: 13,
-    color: "#64748B",
     marginBottom: 4,
   },
 
   activityValue: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#0F172A",
   },
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
     justifyContent: "flex-end",
   },
 
   bottomSheet: {
-    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 22,
@@ -427,14 +578,12 @@ const styles = StyleSheet.create({
     width: 54,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#CBD5E1",
     marginBottom: 18,
   },
 
   sheetTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#0F172A",
     marginBottom: 18,
   },
 
@@ -442,14 +591,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 18,
-  },
-
-  sheetItemText: {
-    flex: 1,
-    marginLeft: 16,
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#0F172A",
   },
 
   sheetIcon: {
@@ -468,52 +609,35 @@ const styles = StyleSheet.create({
   sheetItemTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#0F172A",
   },
 
   sheetItemDescription: {
     marginTop: 4,
     fontSize: 13,
-    color: "#64748B",
   },
 
   cancelButton: {
     marginTop: 18,
     height: 54,
     borderRadius: 16,
-    backgroundColor: "#F8FAFC",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
   },
 
   cancelText: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#475569",
   },
 
   separator: {
     height: 1,
-    backgroundColor: "#EEF2F7",
     marginLeft: 60,
   },
 
-  activityLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  activityIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  activityText: {
-    marginLeft: 14,
+  bottomAction: {
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    borderTopWidth: 1,
   },
 });

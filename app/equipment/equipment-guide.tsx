@@ -36,7 +36,7 @@ export default function EquipmentGuide() {
         },
       ]}
     >
-      <AppHeader title="Equipment Guide" />
+      <AppHeader title="Equipment Guide" showBack />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

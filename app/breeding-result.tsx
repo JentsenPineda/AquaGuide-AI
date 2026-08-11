@@ -41,7 +41,7 @@ export default function BreedingResult() {
 
   return (
     <View style={styles.safe}>
-      <AppHeader title="Breeding Guide" />
+      <AppHeader title="Breeding Guide" showBack />
       <ScrollView
         style={{
           backgroundColor: colors.background,

@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -17,14 +18,16 @@ export default function LogActivityTile({
   selected,
   onPress,
 }: Props) {
+  const colors = useAppColors();
+
   return (
     <Pressable
       onPress={onPress}
       style={[
         styles.card,
-        selected && {
-          borderColor: color,
-          backgroundColor: `${color}10`,
+        {
+          backgroundColor: selected ? `${color}10` : colors.card,
+          borderColor: selected ? color : colors.border,
         },
       ]}
     >
@@ -42,8 +45,8 @@ export default function LogActivityTile({
       <Text
         style={[
           styles.title,
-          selected && {
-            color,
+          {
+            color: selected ? color : colors.textPrimary,
           },
         ]}
       >
@@ -56,12 +59,10 @@ export default function LogActivityTile({
 const styles = StyleSheet.create({
   card: {
     width: "48%",
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     paddingVertical: 22,
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#E2E8F0",
     marginBottom: 14,
   },
 
@@ -77,7 +78,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#0F172A",
     textAlign: "center",
   },
 });

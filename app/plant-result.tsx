@@ -32,7 +32,7 @@ export default function PlantResult() {
         },
       ]}
     >
-      <AppHeader title="Compatible Plants" />
+      <AppHeader title="Compatible Plants" showBack />
 
       <ScrollView
         contentContainerStyle={[

@@ -1,7 +1,7 @@
 import {
-    DarkTheme,
-    DefaultTheme,
-    ThemeProvider as NavigationThemeProvider,
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -28,6 +28,14 @@ export default function RootNavigation() {
 
         {/* Main Tabs */}
         <Stack.Screen name="(tabs)" />
+
+        {/* AI Fish Scanner */}
+        <Stack.Screen
+          name="scan"
+          options={{
+            headerShown: false,
+          }}
+        />
 
         {/* Library */}
         <Stack.Screen

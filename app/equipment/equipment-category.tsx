@@ -29,7 +29,7 @@ export default function EquipmentCategory() {
         },
       ]}
     >
-      <AppHeader title="Equipment Categories" />
+      <AppHeader title="Equipment Categories" showBack />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

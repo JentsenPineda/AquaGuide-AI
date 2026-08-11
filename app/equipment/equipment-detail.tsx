@@ -27,7 +27,7 @@ export default function EquipmentDetail() {
         },
       ]}
     >
-      <AppHeader title="Equipment Details" />
+      <AppHeader title="Equipment Details" showBack />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

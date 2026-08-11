@@ -215,7 +215,7 @@ export default function DiseaseGuide() {
   };
   return (
     <View style={[styles.safe, dynamicStyles.safe]}>
-      <AppHeader title="Disease Guide" />
+      <AppHeader title="Disease Guide" showBack />
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

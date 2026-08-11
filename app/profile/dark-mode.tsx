@@ -27,11 +27,7 @@ export default function DarkModeScreen() {
         },
       ]}
     >
-      <AppHeader
-        title="Appearance"
-        subtitle="Customize the look and feel of AquaGuide AI"
-        showBack
-      />
+      <AppHeader title="Theme Settings" showBack />
 
       <ScrollView
         style={[
@@ -146,9 +142,24 @@ export default function DarkModeScreen() {
               />
 
               <View style={styles.textContainer}>
-                <Text style={styles.rowTitle}>Follow System Theme</Text>
-
-                <Text style={styles.rowSubtitle}>
+                <Text
+                  style={[
+                    styles.rowTitle,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Follow System Theme
+                </Text>
+                <Text
+                  style={[
+                    styles.rowSubtitle,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
                   Automatically match your device appearance.
                 </Text>
               </View>
@@ -178,7 +189,14 @@ export default function DarkModeScreen() {
           <Text style={styles.previewText}>Preview Theme</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footer}>
+        <Text
+          style={[
+            styles.footer,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
           Theme synchronization with your AquaGuide AI account will be available
           in a future update.
         </Text>

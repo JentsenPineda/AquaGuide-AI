@@ -167,11 +167,7 @@ export default function LibraryScreen() {
         },
       ]}
     >
-      <AppHeader
-        title="Species Library"
-        subtitle="Explore ornamental fish species with AI-powered care information."
-        showBack={false}
-      />
+      <AppHeader title="Species Library" showBack={false} />
 
       <View
         style={[

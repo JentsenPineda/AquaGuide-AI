@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -22,13 +23,22 @@ export default function ReminderScheduleSelector({
   onWeekDayChange,
   onMonthDayChange,
 }: Props) {
+  const colors = useAppColors();
+
   if (repeat === "Daily") {
     return null;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
+      <Text
+        style={[
+          styles.title,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
         {repeat === "Weekly" ? "Select Day" : "Day of Month"}
       </Text>
 
@@ -43,14 +53,19 @@ export default function ReminderScheduleSelector({
                 onPress={() => onWeekDayChange(day)}
                 style={[
                   styles.weekChip,
-                  selected && {
-                    backgroundColor: accentColor,
-                    borderColor: accentColor,
+                  {
+                    backgroundColor: selected ? accentColor : colors.card,
+                    borderColor: selected ? accentColor : colors.border,
                   },
                 ]}
               >
                 <Text
-                  style={[styles.weekText, selected && styles.weekTextSelected]}
+                  style={[
+                    styles.weekText,
+                    {
+                      color: selected ? "#FFFFFF" : colors.textSecondary,
+                    },
+                  ]}
                 >
                   {day}
                 </Text>
@@ -73,16 +88,18 @@ export default function ReminderScheduleSelector({
                 onPress={() => onMonthDayChange(day)}
                 style={[
                   styles.monthChip,
-                  selected && {
-                    backgroundColor: accentColor,
-                    borderColor: accentColor,
+                  {
+                    backgroundColor: selected ? accentColor : colors.card,
+                    borderColor: selected ? accentColor : colors.border,
                   },
                 ]}
               >
                 <Text
                   style={[
                     styles.monthText,
-                    selected && styles.monthTextSelected,
+                    {
+                      color: selected ? "#FFFFFF" : colors.textSecondary,
+                    },
                   ]}
                 >
                   {day}
@@ -104,7 +121,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: "700",
-    color: "#0F172A",
     marginBottom: 14,
   },
 
@@ -120,8 +136,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: "#CBD5E1",
-    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -129,12 +143,6 @@ const styles = StyleSheet.create({
   weekText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#475569",
-  },
-
-  weekTextSelected: {
-    color: "#FFFFFF",
-    fontWeight: "700",
   },
 
   monthContainer: {
@@ -146,8 +154,6 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: "#CBD5E1",
-    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
@@ -156,11 +162,5 @@ const styles = StyleSheet.create({
   monthText: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#475569",
-  },
-
-  monthTextSelected: {
-    color: "#FFFFFF",
-    fontWeight: "700",
   },
 });

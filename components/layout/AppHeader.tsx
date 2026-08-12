@@ -2,13 +2,21 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type AppHeaderProps = {
   title: string;
   subtitle?: string;
   showBack?: boolean;
+  showLogo?: boolean;
   variant?: "dark" | "light";
 };
 
@@ -16,6 +24,7 @@ export default function AppHeader({
   title,
   subtitle,
   showBack = false,
+  showLogo = false,
   variant,
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
@@ -42,6 +51,7 @@ export default function AppHeader({
           },
         ]}
       >
+        {/* LEFT */}
         <View style={styles.left}>
           {showBack ? (
             <Pressable
@@ -57,11 +67,20 @@ export default function AppHeader({
             >
               <Ionicons name="chevron-back" size={26} color={colors.primary} />
             </Pressable>
+          ) : showLogo ? (
+            <View style={styles.logoWrapper}>
+              <Image
+                source={require("../../Icon/iconnn.png")}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
           ) : (
             <View style={styles.placeholder} />
           )}
         </View>
 
+        {/* TITLE */}
         <View style={styles.titleContainer}>
           <Text
             numberOfLines={1}
@@ -90,6 +109,7 @@ export default function AppHeader({
           ) : null}
         </View>
 
+        {/* RIGHT */}
         <View style={styles.right} />
       </View>
     </View>
@@ -138,9 +158,25 @@ const styles = StyleSheet.create({
 
   placeholder: {
     width: 26,
+    height: 26,
   },
 
   backButton: {
     padding: 4,
+  },
+
+  logoWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+
+  logo: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
   },
 });

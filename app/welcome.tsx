@@ -1,10 +1,10 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import {
   Image,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -68,7 +68,7 @@ export default function WelcomeScreen() {
   const colors = useAppColors();
 
   return (
-    <SafeAreaView
+    <View
       style={[
         styles.container,
         {
@@ -76,6 +76,7 @@ export default function WelcomeScreen() {
         },
       ]}
     >
+      <AppHeader title=" " showBack={false} />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -207,7 +208,7 @@ export default function WelcomeScreen() {
           AquaGuide AI • Version 1.0
         </Text>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

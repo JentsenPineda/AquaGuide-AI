@@ -1,3 +1,4 @@
+import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
@@ -7,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CustomTabBar({ state }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const colors = useAppColors();
 
   const routes = [
     {
@@ -40,15 +42,37 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
         },
       ]}
     >
-      <View style={styles.tabBar}>
+      <View
+        style={[
+          styles.tabBar,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
+      >
         {routes.slice(0, 2).map((item) => (
           <Pressable
             key={item.label}
             style={styles.tab}
             onPress={() => router.push(item.route as any)}
           >
-            <Ionicons name={item.icon as any} size={24} color="#00BCD4" />
-            <Text style={styles.label}>{item.label}</Text>
+            <Ionicons
+              name={item.icon as any}
+              size={24}
+              color={colors.primary}
+            />
+
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              {item.label}
+            </Text>
           </Pressable>
         ))}
 
@@ -60,8 +84,22 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
             style={styles.tab}
             onPress={() => router.push(item.route as any)}
           >
-            <Ionicons name={item.icon as any} size={24} color="#00BCD4" />
-            <Text style={styles.label}>{item.label}</Text>
+            <Ionicons
+              name={item.icon as any}
+              size={24}
+              color={colors.primary}
+            />
+
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              {item.label}
+            </Text>
           </Pressable>
         ))}
       </View>
@@ -71,6 +109,8 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
           styles.scanButton,
           {
             bottom: Math.max(insets.bottom, 12) + 30,
+            backgroundColor: colors.primary,
+            borderColor: colors.card,
           },
         ]}
         onPress={() => router.push("/scan")}
@@ -92,8 +132,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
 
-    backgroundColor: "#FFFFFF",
-
     marginHorizontal: 12,
 
     borderRadius: 28,
@@ -103,6 +141,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
 
     elevation: 12,
+
+    borderWidth: StyleSheet.hairlineWidth,
   },
 
   tab: {
@@ -115,7 +155,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 11,
     fontWeight: "600",
-    color: "#003B57",
   },
 
   scanButton: {
@@ -127,13 +166,10 @@ const styles = StyleSheet.create({
 
     borderRadius: 36,
 
-    backgroundColor: "#00BCD4",
-
     justifyContent: "center",
     alignItems: "center",
 
     borderWidth: 5,
-    borderColor: "#FFFFFF",
 
     elevation: 15,
   },

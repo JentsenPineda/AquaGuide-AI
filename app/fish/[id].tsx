@@ -162,6 +162,140 @@ export default function FishDetailsScreen() {
             />
           </View>
         </View>
+        {/* Quick Guides */}
+        <View style={styles.section}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Quick Guides
+          </Text>
+
+          <Pressable
+            style={[
+              styles.guideButton,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() =>
+              router.push({
+                pathname: "/breeding-result",
+                params: { fish: fish.id },
+              })
+            }
+          >
+            <View
+              style={[
+                styles.guideIcon,
+                { backgroundColor: colors.primary + "18" },
+              ]}
+            >
+              <Ionicons name="fish-outline" size={22} color={colors.primary} />
+            </View>
+            <View style={styles.guideContent}>
+              <Text style={[styles.guideTitle, { color: colors.textPrimary }]}>
+                Breeding Guide
+              </Text>
+              <Text
+                style={[styles.guideSubtitle, { color: colors.textSecondary }]}
+              >
+                Learn how to breed {fish.commonName}
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.guideButton,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() =>
+              router.push({
+                pathname: "/plant-result",
+                params: { fish: fish.id },
+              })
+            }
+          >
+            <View
+              style={[
+                styles.guideIcon,
+                { backgroundColor: colors.primary + "18" },
+              ]}
+            >
+              <Ionicons name="leaf-outline" size={22} color={colors.primary} />
+            </View>
+            <View style={styles.guideContent}>
+              <Text style={[styles.guideTitle, { color: colors.textPrimary }]}>
+                Plant Compatibility
+              </Text>
+              <Text
+                style={[styles.guideSubtitle, { color: colors.textSecondary }]}
+              >
+                Explore plants compatible with {fish.commonName}
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.guideButton,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() =>
+              router.push({
+                pathname: "/tank-care",
+                params: { fish: fish.id },
+              })
+            }
+          >
+            <View
+              style={[
+                styles.guideIcon,
+                { backgroundColor: colors.primary + "18" },
+              ]}
+            >
+              <Ionicons name="water-outline" size={22} color={colors.primary} />
+            </View>
+            <View style={styles.guideContent}>
+              <Text style={[styles.guideTitle, { color: colors.textPrimary }]}>
+                Tank & Care Recommendation
+              </Text>
+              <Text
+                style={[styles.guideSubtitle, { color: colors.textSecondary }]}
+              >
+                Plan the ideal setup for {fish.commonName}
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+        </View>
+
         {/* Variants */}
         <View style={styles.section}>
           <Text
@@ -176,12 +310,7 @@ export default function FishDetailsScreen() {
           </Text>
 
           <Pressable
-            style={[
-              styles.variantButton,
-              {
-                backgroundColor: colors.primary,
-              },
-            ]}
+            style={styles.variantButton}
             onPress={() =>
               router.push({
                 pathname: "/variants/[species]",
@@ -211,27 +340,8 @@ export default function FishDetailsScreen() {
 
           <View style={styles.chipsContainer}>
             {profile?.diseases?.map((disease) => (
-              <View
-                key={disease}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    borderWidth: 1,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    {
-                      color: colors.textPrimary,
-                    },
-                  ]}
-                >
-                  {disease}
-                </Text>
+              <View key={disease} style={styles.chip}>
+                <Text style={styles.chipText}>{disease}</Text>
               </View>
             ))}
           </View>
@@ -250,33 +360,10 @@ export default function FishDetailsScreen() {
           </Text>
 
           {profile?.equipment?.map((item) => (
-            <View
-              key={item}
-              style={[
-                styles.card,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                  borderWidth: 1,
-                },
-              ]}
-            >
-              <Ionicons
-                name="checkmark-circle"
-                size={18}
-                color={colors.primary}
-              />
+            <View key={item} style={styles.card}>
+              <Ionicons name="checkmark-circle" size={18} color="#00BCD4" />
 
-              <Text
-                style={[
-                  styles.cardText,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {item}
-              </Text>
+              <Text style={styles.cardText}>{item}</Text>
             </View>
           ))}
         </View>
@@ -293,26 +380,8 @@ export default function FishDetailsScreen() {
             Breeding Guide
           </Text>
 
-          <View
-            style={[
-              styles.infoCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderWidth: 1,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.infoText,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              {profile?.breedingGuide}
-            </Text>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoText}>{profile?.breedingGuide}</Text>
           </View>
         </View>
         {/* AI Recommendation */}
@@ -338,16 +407,7 @@ export default function FishDetailsScreen() {
           >
             <Ionicons name="sparkles" size={24} color="#FFFFFF" />
 
-            <Text
-              style={[
-                styles.aiText,
-                {
-                  color: colors.white,
-                },
-              ]}
-            >
-              {profile?.aiRecommendation}
-            </Text>
+            <Text style={styles.aiText}>{profile?.aiRecommendation}</Text>
           </View>
         </View>
         <View style={{ height: 40 }} />
@@ -499,6 +559,40 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
     marginTop: 4,
+  },
+
+  guideButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 10,
+  },
+
+  guideIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  guideContent: {
+    flex: 1,
+    marginLeft: 12,
+    marginRight: 8,
+  },
+
+  guideTitle: {
+    fontSize: 15,
+    fontWeight: "800",
+  },
+
+  guideSubtitle: {
+    fontSize: 12,
+    marginTop: 3,
+    lineHeight: 17,
   },
 
   variantButton: {

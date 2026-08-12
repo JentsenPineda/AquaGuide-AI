@@ -6,11 +6,14 @@ import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Animated,
   Image,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
@@ -24,15 +27,68 @@ import { fishProfiles } from "../data/fishProfiles";
 
 export default function TankCareScreen() {
   const colors = useAppColors();
+  const { fish: fishParam } = useLocalSearchParams<{
+    fish?: string | string[];
+  }>();
+  const passedFishId = Array.isArray(fishParam) ? fishParam[0] : fishParam;
+
   const [setupType, setSetupType] = useState<"Aquarium" | "Pond">("Aquarium");
 
-  const [selectedFishId, setSelectedFishId] = useState("");
+  const [selectedFishId, setSelectedFishId] = useState(passedFishId ?? "");
   const [showFishDropdown, setShowFishDropdown] = useState(false);
 
   const [fishCount, setFishCount] = useState("");
   const [userTankSize, setUserTankSize] = useState("");
 
   const [showAssessment, setShowAssessment] = useState(false);
+  const assessmentTranslateY = useRef(new Animated.Value(0)).current;
+
+  const closeAssessment = () => {
+    Animated.timing(assessmentTranslateY, {
+      toValue: 700,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => {
+      setShowAssessment(false);
+      assessmentTranslateY.setValue(0);
+    });
+  };
+
+  const assessmentPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return gestureState.dy > 5;
+      },
+
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dy > 0) {
+          assessmentTranslateY.setValue(gestureState.dy);
+        }
+      },
+
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 120 || gestureState.vy > 1.2) {
+          closeAssessment();
+        } else {
+          Animated.spring(assessmentTranslateY, {
+            toValue: 0,
+            useNativeDriver: true,
+            tension: 70,
+            friction: 10,
+          }).start();
+        }
+      },
+
+      onPanResponderTerminate: () => {
+        Animated.spring(assessmentTranslateY, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      },
+    }),
+  ).current;
   const selectedFish = useMemo(
     () => allFish.find((fish) => fish.id === selectedFishId),
     [selectedFishId],
@@ -44,6 +100,19 @@ export default function TankCareScreen() {
 
     return allFish;
   }, [setupType]);
+
+  useEffect(() => {
+    if (!selectedFishId) return;
+
+    const currentFish = allFish.find((fish) => fish.id === selectedFishId);
+
+    if (setupType === "Pond" && currentFish && !currentFish.pondCompatible) {
+      setSelectedFishId("");
+      setFishCount("");
+      setUserTankSize("");
+      setShowAssessment(false);
+    }
+  }, [setupType, selectedFishId]);
   const profile = fishProfiles[selectedFishId as keyof typeof fishProfiles];
 
   const careData =
@@ -165,7 +234,7 @@ export default function TankCareScreen() {
       );
       return;
     }
-
+    assessmentTranslateY.setValue(0);
     setShowAssessment(true);
   };
 
@@ -220,7 +289,6 @@ export default function TankCareScreen() {
               onPress={() => {
                 setSetupType("Aquarium");
 
-                setSelectedFishId("");
                 setFishCount("");
                 setUserTankSize("");
                 setShowAssessment(false);
@@ -252,7 +320,6 @@ export default function TankCareScreen() {
               onPress={() => {
                 setSetupType("Pond");
 
-                setSelectedFishId("");
                 setFishCount("");
                 setUserTankSize("");
                 setShowAssessment(false);
@@ -387,21 +454,47 @@ export default function TankCareScreen() {
           <Modal
             visible={showAssessment}
             transparent
-            animationType="slide"
-            onRequestClose={() => setShowAssessment(false)}
+            animationType="none"
+            onRequestClose={closeAssessment}
           >
             <View style={styles.modalOverlay}>
-              <View
+              {/* BACKGROUND / CREVICE — TAP TO CLOSE */}
+              <Pressable
+                style={styles.modalBackdrop}
+                onPress={closeAssessment}
+              />
+
+              {/* ASSESSMENT SHEET */}
+              <Animated.View
                 style={[
                   styles.assessmentContainer,
-                  { backgroundColor: colors.card },
+                  {
+                    backgroundColor: colors.card,
+                    transform: [
+                      {
+                        translateY: assessmentTranslateY,
+                      },
+                    ],
+                  },
                 ]}
               >
-                <View style={styles.assessmentHandle} />
+                {/* DRAG HANDLE / CLOSE AREA */}
 
-                <ThemeText variant="title" style={styles.assessmentTitle}>
-                  Tank Assessment
-                </ThemeText>
+                <View
+                  {...assessmentPanResponder.panHandlers}
+                  style={styles.assessmentDragArea}
+                >
+                  <View style={styles.assessmentHandle} />
+
+                  <Pressable onPress={closeAssessment}>
+                    <ThemeText variant="title" style={styles.assessmentTitle}>
+                      Tank Assessment
+                    </ThemeText>
+                  </Pressable>
+                </View>
+
+                {/* ASSESSMENT CONTENT */}
+
                 <ScrollView
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{ paddingBottom: 20 }}
@@ -410,12 +503,13 @@ export default function TankCareScreen() {
                     <>
                       <ThemeText variant="title">
                         {setupType === "Pond"
-                          ? `🐟 ${selectedFish.commonName} Pond Recommendation`
-                          : `🐠 ${selectedFish.commonName}`}
+                          ? `${selectedFish.commonName} Pond Recommendation`
+                          : selectedFish.commonName}
                       </ThemeText>
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Category</ThemeText>
+
                         <ThemeText variant="body">
                           {selectedFish.category}
                         </ThemeText>
@@ -425,6 +519,7 @@ export default function TankCareScreen() {
                         <ThemeText variant="subtitle">
                           Recommended Size
                         </ThemeText>
+
                         <ThemeText variant="body">
                           {recommendedVolume.toLocaleString()} Gallons
                         </ThemeText>
@@ -434,6 +529,7 @@ export default function TankCareScreen() {
                         <ThemeText variant="subtitle">
                           Your Setup Size
                         </ThemeText>
+
                         <ThemeText variant="body">
                           {actualVolume} Gallons
                         </ThemeText>
@@ -463,13 +559,14 @@ export default function TankCareScreen() {
                           }}
                         >
                           {stockingStatus === "Suitable"
-                            ? "✓ Suitable Setup"
-                            : "⚠ Needs Adjustment"}
+                            ? "Suitable Setup"
+                            : "Needs Adjustment"}
                         </ThemeText>
                       </View>
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Temperature</ThemeText>
+
                         <ThemeText variant="body">
                           {careData.idealTemperature ??
                             selectedFish.temperature}
@@ -478,6 +575,7 @@ export default function TankCareScreen() {
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">pH</ThemeText>
+
                         <ThemeText variant="body">
                           {careData.idealPH ?? selectedFish.pH}
                         </ThemeText>
@@ -485,6 +583,7 @@ export default function TankCareScreen() {
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Diet</ThemeText>
+
                         <ThemeText variant="body">
                           {selectedFish.diet}
                         </ThemeText>
@@ -492,6 +591,7 @@ export default function TankCareScreen() {
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Difficulty</ThemeText>
+
                         <ThemeText variant="body">
                           {careData.difficulty}
                         </ThemeText>
@@ -501,6 +601,7 @@ export default function TankCareScreen() {
                         <ThemeText variant="subtitle">
                           Maintenance Level
                         </ThemeText>
+
                         <ThemeText variant="body">
                           {careData.maintenanceLevel ?? "Moderate"}
                         </ThemeText>
@@ -510,6 +611,7 @@ export default function TankCareScreen() {
                         <ThemeText variant="subtitle">
                           Feeding Schedule
                         </ThemeText>
+
                         <ThemeText variant="body">
                           {careData.feedingFrequency}
                         </ThemeText>
@@ -517,6 +619,7 @@ export default function TankCareScreen() {
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Water Change</ThemeText>
+
                         <ThemeText variant="body">
                           {careData.waterChange}
                         </ThemeText>
@@ -524,6 +627,7 @@ export default function TankCareScreen() {
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Filtration</ThemeText>
+
                         <ThemeText variant="body">
                           {careData.filtration}
                         </ThemeText>
@@ -531,6 +635,7 @@ export default function TankCareScreen() {
 
                       <View style={styles.resultSection}>
                         <ThemeText variant="subtitle">Compatibility</ThemeText>
+
                         <ThemeText variant="body">
                           {careData.compatibility}
                         </ThemeText>
@@ -561,7 +666,7 @@ export default function TankCareScreen() {
 
                         {profile?.equipment?.map((item) => (
                           <ThemeText key={item} variant="body">
-                            ✓ {item}
+                            {item}
                           </ThemeText>
                         ))}
                       </View>
@@ -583,13 +688,13 @@ export default function TankCareScreen() {
 
                       <ThemeButton
                         title="Close Assessment"
-                        onPress={() => setShowAssessment(false)}
+                        onPress={closeAssessment}
                         style={{ marginTop: 24 }}
                       />
                     </>
                   )}
                 </ScrollView>
-              </View>
+              </Animated.View>
             </View>
           </Modal>
           <Modal
@@ -903,6 +1008,10 @@ const styles = StyleSheet.create({
     maxHeight: "75%",
   },
 
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
   modalTitle: {
     fontSize: 22,
     fontWeight: "700",
@@ -934,6 +1043,10 @@ const styles = StyleSheet.create({
     maxHeight: "88%",
   },
 
+  assessmentDragArea: {
+    alignItems: "center",
+  },
+
   assessmentHandle: {
     width: 55,
     height: 5,
@@ -942,7 +1055,9 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 18,
   },
-
+  assessmentCloseArea: {
+    alignItems: "center",
+  },
   assessmentTitle: {
     textAlign: "center",
     fontSize: 24,

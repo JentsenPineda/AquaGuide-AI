@@ -1,3 +1,4 @@
+import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { subscribeToLogs } from "@/services/logbookService";
@@ -11,15 +12,7 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Image,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 type LogItem = {
   id: string;
@@ -225,7 +218,7 @@ export default function HomeScreen() {
   const activeFishCareCount = activePrograms.length;
 
   return (
-    <SafeAreaView
+    <View
       style={[
         styles.safe,
         {
@@ -233,6 +226,7 @@ export default function HomeScreen() {
         },
       ]}
     >
+      <AppHeader title="AquaGuide AI" showBack={false} showLogo />
       <ScrollView
         contentContainerStyle={[
           styles.container,
@@ -245,37 +239,6 @@ export default function HomeScreen() {
         {/* =====================================================
             HEADER
         ===================================================== */}
-
-        <View style={styles.header}>
-          <View style={styles.appTitleRow}>
-            <Image
-              source={require("@/assets/images/image-library-UI/aquaguide-icon.png")}
-              style={styles.appIcon}
-            />
-
-            <Text
-              style={[
-                styles.appName,
-                {
-                  color: colors.textPrimary,
-                },
-              ]}
-            >
-              AquaGuide AI
-            </Text>
-          </View>
-
-          <Text
-            style={[
-              styles.tagline,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Ornamental Fish Management Assistant
-          </Text>
-        </View>
 
         {/* =====================================================
             WELCOME BANNER
@@ -617,7 +580,7 @@ export default function HomeScreen() {
 
         <View style={{ height: 30 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

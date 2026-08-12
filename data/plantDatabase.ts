@@ -53,6 +53,16 @@ export const plantDatabase: Record<string, PlantData> = {
     placement: "Foreground",
   },
 
+  marimo_moss_ball: {
+    name: "Moss Ball",
+    image: require("../assets/images/aquatic-plants/marimo_moss_ball.png"),
+    difficulty: "Beginner",
+    lighting: "Low",
+    growthRate: "Medium",
+    co2: "Not Required",
+    placement: "Foreground",
+  },
+
   hornwort: {
     name: "Hornwort",
     image: require("../assets/images/aquatic-plants/hornwort.png"),
@@ -193,6 +203,16 @@ export const plantDatabase: Record<string, PlantData> = {
     placement: "Floating",
   },
 
+  red_root_floater: {
+    name: "Red Root Floater",
+    image: require("../assets/images/aquatic-plants/red_root_floater.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Floating",
+  },
+
   bucephalandra: {
     name: "Bucephalandra",
     image: require("../assets/images/aquatic-plants/bucephalandra.png"),
@@ -206,6 +226,146 @@ export const plantDatabase: Record<string, PlantData> = {
   amazon_frogbit: {
     name: "Amazon Frogbit",
     image: require("../assets/images/aquatic-plants/amazon_frogbit.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Floating",
+  },
+
+  water_iris: {
+    name: "Water Iris",
+    image: require("../assets/images/aquatic-plants/water_iris.png"),
+    difficulty: "Intermediate",
+    lighting: "Medium",
+    growthRate: "Medium",
+    co2: "Optional",
+    placement: "Background",
+  },
+
+  pickerel_rush: {
+    name: "Pickerel Rush",
+    image: require("../assets/images/aquatic-plants/pickerel_rush.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Medium",
+    co2: "Not Required",
+    placement: "Background",
+  },
+
+  sweet_flag: {
+    name: "Sweet Flag",
+    image: require("../assets/images/aquatic-plants/sweet_flag.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Medium",
+    co2: "Not Required",
+    placement: "Background",
+  },
+
+  horsetail_reed: {
+    name: "Horsetail Reed",
+    image: require("../assets/images/aquatic-plants/horsetail_reed.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Background",
+  },
+
+  water_lettuce: {
+    name: "Water Lettuce",
+    image: require("../assets/images/aquatic-plants/water_lettuce.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Floating",
+  },
+
+  water_hyacinth: {
+    name: "Water Hyacinth",
+    image: require("../assets/images/aquatic-plants/water_hyacinth.png"),
+    difficulty: "Beginner",
+    lighting: "High",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Floating",
+  },
+
+  frogbit: {
+    name: "Frogbit",
+    image: require("../assets/images/aquatic-plants/frogbit.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Floating",
+  },
+
+  duckweed: {
+    name: "Duckweed",
+    image: require("../assets/images/aquatic-plants/duckweed.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Not Required",
+    placement: "Floating",
+  },
+
+  water_lily: {
+    name: "Water Lily",
+    image: require("../assets/images/aquatic-plants/water_lily.png"),
+    difficulty: "Beginner",
+    lighting: "Medium to High",
+    growthRate: "Medium",
+    co2: "Not Required",
+    placement: "Background",
+  },
+
+  lotus: {
+    name: "Lotus",
+    image: require("../assets/images/aquatic-plants/lotus.png"),
+    difficulty: "Intermediate",
+    lighting: "High",
+    growthRate: "Medium",
+    co2: "Optional",
+    placement: "Background",
+  },
+
+  cabomba: {
+    name: "Cabomba",
+    image: require("../assets/images/aquatic-plants/cabomba.png"),
+    difficulty: "Intermediate",
+    lighting: "Medium to High",
+    growthRate: "Fast",
+    co2: "Recommended",
+    placement: "Background",
+  },
+
+  crinum_calamistratum: {
+    name: "Crinum Calamistratum",
+    image: require("../assets/images/aquatic-plants/crinum_calamistratum.png"),
+    difficulty: "Intermediate",
+    lighting: "Low to Medium",
+    growthRate: "Slow",
+    co2: "Optional",
+    placement: "Background",
+  },
+
+  giant_hygrophila: {
+    name: "Giant Hygrophila",
+    image: require("../assets/images/aquatic-plants/giant_hygrophila.png"),
+    difficulty: "Beginner",
+    lighting: "Medium",
+    growthRate: "Fast",
+    co2: "Optional",
+    placement: "Background",
+  },
+
+  salvinia: {
+    name: "Salvinia",
+    image: require("../assets/images/aquatic-plants/salvinia.png"),
     difficulty: "Beginner",
     lighting: "Medium",
     growthRate: "Fast",

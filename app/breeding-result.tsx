@@ -167,29 +167,44 @@ export default function BreedingResult() {
             },
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.primary,
-              },
-            ]}
-          >
-            ⚠ Common Mistakes
-          </Text>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons
+              name="alert-circle-outline"
+              size={22}
+              color={colors.primary}
+            />
+
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              Common Mistakes
+            </Text>
+          </View>
 
           {guide.mistakes?.map((mistake: string) => (
-            <Text
-              key={mistake}
-              style={[
-                styles.listItem,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              ✗ {mistake}
-            </Text>
+            <View key={mistake} style={styles.listItemRow}>
+              <MaterialCommunityIcons
+                name="close-circle-outline"
+                size={18}
+                color={colors.primary}
+              />
+
+              <Text
+                style={[
+                  styles.listItem,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                {mistake}
+              </Text>
+            </View>
           ))}
         </View>
 
@@ -203,29 +218,44 @@ export default function BreedingResult() {
             },
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.primary,
-              },
-            ]}
-          >
-            🐣 Fry Care
-          </Text>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons
+              name="fish"
+              size={22}
+              color={colors.primary}
+            />
+
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              Fry Care
+            </Text>
+          </View>
 
           {guide.fryCare?.map((tip: string) => (
-            <Text
-              key={tip}
-              style={[
-                styles.listItem,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              ✓ {tip}
-            </Text>
+            <View key={tip} style={styles.listItemRow}>
+              <MaterialCommunityIcons
+                name="check-circle-outline"
+                size={18}
+                color={colors.primary}
+              />
+
+              <Text
+                style={[
+                  styles.listItem,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                {tip}
+              </Text>
+            </View>
           ))}
         </View>
 
@@ -239,16 +269,24 @@ export default function BreedingResult() {
             },
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.primary,
-              },
-            ]}
-          >
-            💡 Pro Tip
-          </Text>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons
+              name="lightbulb-outline"
+              size={22}
+              color={colors.primary}
+            />
+
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              Pro Tip
+            </Text>
+          </View>
 
           <Text
             style={[
@@ -374,5 +412,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.12,
     shadowRadius: 6,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  listItemRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
   },
 });

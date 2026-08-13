@@ -415,9 +415,9 @@ export default function ProfileScreen() {
           />
 
           <SettingItem
-            icon="moon-outline"
-            title="Dark Mode"
-            onPress={() => router.push("/profile/dark-mode")}
+            icon="key"
+            title="Change Password"
+            onPress={() => router.push("/profile/change-password")}
           />
         </View>
 

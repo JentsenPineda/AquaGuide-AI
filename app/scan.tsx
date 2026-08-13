@@ -9,15 +9,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Animated,
-    Easing,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 type ScanState =
@@ -43,6 +43,8 @@ export default function ScanScreen() {
     label: string;
     confidence: number;
     note: string;
+    variant: string | null;
+    scientificName: string | null;
   } | null>(null);
 
   // Animations
@@ -195,21 +197,81 @@ export default function ScanScreen() {
 
       const aiTask = askVisionAI(
         photo.base64,
-        `You are an ornamental fish identification expert.
+        `You are AquaGuide AI, an expert ornamental fish identification assistant.
 
-Identify the fish in this image.
+Carefully analyze the fish in the provided image.
 
-Reply ONLY in this JSON format:
+Identify the fish as accurately as possible.
+
+Return the following information:
+
+1. species
+2. variant or color/morph type, ONLY if it can be reasonably determined
+3. scientific name, ONLY if it can be reliably determined
+4. confidence from 0 to 1
+5. a short introduction about the identified fish
+
+IMPORTANT IDENTIFICATION RULES:
+
+- Identify ornamental fish broadly, including species outside the AquaGuide database.
+- Do not automatically classify an unfamiliar fish as a common species.
+- Carefully analyze body shape, head shape, mouth, fins, tail shape, body proportions, scales, markings, coloration, and overall morphology.
+- Carefully distinguish visually similar species.
+- Channa/Snakehead must NOT automatically be classified as Betta, Gourami, Paradise Fish, or another visually similar species.
+- Do not identify a fish based only on its color, body color, or general appearance.
+- Use multiple physical characteristics before deciding the species.
+- If the image appears to show a snakehead/Channa-type fish, specifically check for its elongated body, snake-like head, mouth shape, dorsal and anal fin structure, and overall body proportions before considering Betta or Gourami.
+- When the fish has an elongated body and vivid coloration, do NOT assume it is a Betta.
+- Before identifying a colorful fish as Betta, compare it against Channa/Snakehead and Gourami.
+- A Betta should only be selected when the visible morphology supports Betta identification, including its characteristic body proportions, head shape, mouth, fin structure, and tail structure.
+- Color alone is never sufficient evidence for Betta identification.
+- If the fish has a snakehead-like elongated body, broad head, large mouth, or characteristic dorsal/anal fin proportions, strongly consider Channa/Snakehead even when the fish is brightly colored.
+- Before producing the final answer, internally compare at least the three most plausible species for the fish based on visible morphology. In particular, when the fish is colorful and elongated, compare Channa/Snakehead, Betta Fish, and Gourami before selecting the final species.
+- Do not select Betta Fish merely because the fish has long or colorful fins. Evaluate the entire body shape, head, mouth, dorsal fin, anal fin, caudal fin, and body proportions.
+- If the visible evidence is insufficient to distinguish between Channa/Snakehead and Betta Fish, return a lower confidence score rather than making a high-confidence guess.
+- If the fish clearly belongs to one of the following AquaGuide-supported species, use the EXACT canonical species name:
+
+AquaGuide supported species:
+1. Goldfish
+2. Betta Fish
+3. Guppy
+4. Platy
+5. Zebra Danio
+6. Angelfish
+7. Gourami
+8. Molly
+9. Swordtail
+10. Tiger Barb
+11. Discus
+12. Arowana
+13. Flowerhorn
+14. Oscar
+15. Koi
+
+- Use "Betta Fish" instead of "Fighting Fish" or "Siamese Fighting Fish" when identifying Betta.
+- Use "Zebra Danio" instead of "Zebra Fish" when identifying Zebra Danio.
+- If the fish is NOT one of these 15 species, identify its actual species rather than forcing it into the supported list.
+- If the exact variant cannot be determined, return null for variant.
+- If the scientific name cannot be reliably determined, return null for scientificName.
+- Never invent a variant or scientific name.
+- If the image is unclear, give a lower confidence score instead of guessing.
+- Confidence must be between 0 and 1.
+- Keep the introduction short, around 1–2 sentences.
+
+Return ONLY valid JSON.
+Do not include markdown.
+Do not include code fences.
+Do not include explanations outside the JSON.
+
+Use exactly this structure:
 
 {
-  "label": "Fish Name",
+  "species": "Fish Name",
+  "variant": "Variant Name or null",
+  "scientificName": "Scientific Name or null",
   "confidence": 0.95,
-  "note": "Short description"
-}
-
-Do not include markdown.
-Do not include explanations.
-Return valid JSON only.`,
+  "introduction": "Short introduction about the fish."
+}`,
       );
 
       const [response] = await Promise.all([aiTask, waitForProgress()]);
@@ -218,19 +280,84 @@ Return valid JSON only.`,
         throw new Error(response.error ?? "AI request failed.");
       }
 
-      const aiResult = JSON.parse(response.message);
+      let aiResult: {
+        species: string;
+        variant: string | null;
+        scientificName: string | null;
+        confidence: number;
+        introduction: string;
+      };
 
+      try {
+        let cleanedResponse = response.message.trim();
+
+        // Remove markdown code fences if the model included them.
+        cleanedResponse = cleanedResponse
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
+
+        // Try to isolate the JSON object if the model added extra text.
+        const firstBrace = cleanedResponse.indexOf("{");
+        const lastBrace = cleanedResponse.lastIndexOf("}");
+
+        if (firstBrace !== -1 && lastBrace !== -1) {
+          cleanedResponse = cleanedResponse.slice(firstBrace, lastBrace + 1);
+        }
+
+        aiResult = JSON.parse(cleanedResponse);
+
+        // Basic validation.
+        if (
+          !aiResult ||
+          typeof aiResult.species !== "string" ||
+          typeof aiResult.confidence !== "number"
+        ) {
+          throw new Error("Invalid fish identification response.");
+        }
+
+        // Normalize optional fields.
+        aiResult.variant =
+          typeof aiResult.variant === "string" && aiResult.variant.trim()
+            ? aiResult.variant.trim()
+            : null;
+
+        aiResult.scientificName =
+          typeof aiResult.scientificName === "string" &&
+          aiResult.scientificName.trim()
+            ? aiResult.scientificName.trim()
+            : null;
+
+        aiResult.introduction =
+          typeof aiResult.introduction === "string" &&
+          aiResult.introduction.trim()
+            ? aiResult.introduction.trim()
+            : "The fish could not be confidently identified from this image.";
+
+        // Keep confidence between 0 and 1.
+        aiResult.confidence = Math.max(0, Math.min(1, aiResult.confidence));
+      } catch (parseError) {
+        console.error("Invalid AI JSON response:", response.message);
+        console.error("JSON parsing error:", parseError);
+
+        throw new Error(
+          "The AI could not provide a valid identification. Please try a clearer photo.",
+        );
+      }
       setResult({
-        label: aiResult.label,
+        label: aiResult.species,
         confidence: aiResult.confidence,
-        note: aiResult.note,
+        note: aiResult.introduction,
+        variant: aiResult.variant ?? null,
+        scientificName: aiResult.scientificName ?? null,
       });
 
       if (user) {
         await addScan(user.uid, {
-          label: aiResult.label,
+          label: aiResult.species,
           confidence: aiResult.confidence,
-          note: aiResult.note,
+          note: aiResult.introduction,
         });
       }
 
@@ -277,7 +404,77 @@ Return valid JSON only.`,
 
     const normalizedLabel = normalize(result.label);
 
-    // First: exact normalized match
+    // Canonical aliases for supported AquaGuide fish.
+    // Different AI models may use different common names
+    // for the same fish.
+    const fishAliases: Record<string, string[]> = {
+      betta: [
+        "betta",
+        "betta fish",
+        "fighting fish",
+        "siamese fighting fish",
+        "siamese fighter",
+      ],
+
+      goldfish: ["goldfish", "gold fish", "carassius auratus"],
+
+      guppy: ["guppy", "guppy fish", "millionfish", "million fish"],
+
+      platy: ["platy", "platy fish", "platyfish", "southern platyfish"],
+
+      danio: ["danio", "zebra danio", "zebra fish", "zebrafish"],
+
+      angelfish: ["angelfish", "freshwater angelfish", "freshwater angel"],
+
+      gourami: [
+        "gourami",
+        "gourami fish",
+        "three spot gourami",
+        "three spot gourami fish",
+        "labyrinth fish",
+      ],
+
+      molly: ["molly", "molly fish", "mollies"],
+
+      swordtail: ["swordtail", "swordtail fish", "swordtail livebearer"],
+
+      tigerbarb: [
+        "tiger barb",
+        "tiger barbs",
+        "tiger barb fish",
+        "sumatran barb",
+        "sumatra barb",
+      ],
+
+      discus: ["discus", "discus fish", "discus cichlid"],
+
+      arowana: ["arowana", "arowana fish", "dragon fish", "dragonfish"],
+
+      flowerhorn: ["flowerhorn", "flowerhorn cichlid", "flower horn"],
+
+      oscar: ["oscar", "oscar fish", "oscar cichlid", "tiger oscar"],
+
+      koi: ["koi", "koi fish", "koi carp", "ornamental carp"],
+    };
+
+    // First: convert an AI alias into the canonical AquaGuide ID.
+    const aliasEntry = Object.entries(fishAliases).find(([, aliases]) =>
+      aliases.some((alias) => normalize(alias) === normalizedLabel),
+    );
+
+    if (aliasEntry) {
+      const [canonicalId] = aliasEntry;
+
+      const aliasMatch = allFish.find(
+        (fish) => normalize(fish.id) === normalize(canonicalId),
+      );
+
+      if (aliasMatch) {
+        return aliasMatch;
+      }
+    }
+
+    // Second: exact normalized match against the existing database.
     const exactMatch = allFish.find((fish) => {
       const commonName = normalize(fish.commonName);
       const id = normalize(fish.id);
@@ -289,7 +486,7 @@ Return valid JSON only.`,
       return exactMatch;
     }
 
-    // Second: partial match
+    // Third: partial match against the existing database.
     const partialMatch = allFish.find((fish) => {
       const commonName = normalize(fish.commonName);
       const id = normalize(fish.id);
@@ -560,6 +757,45 @@ Return valid JSON only.`,
               >
                 {result.label.toUpperCase()}
               </Text>
+              {result.scientificName && (
+                <Text
+                  style={{
+                    color: colors.textSecondary,
+                    fontSize: 14,
+                    fontStyle: "italic",
+                    marginTop: -8,
+                    marginBottom: 16,
+                  }}
+                >
+                  {result.scientificName}
+                </Text>
+              )}
+
+              {result.variant && (
+                <View
+                  style={{
+                    alignSelf: "flex-start",
+                    backgroundColor: colors.primary + "18",
+                    borderColor: colors.primary + "55",
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    marginTop: -8,
+                    marginBottom: 16,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 12,
+                      fontWeight: "700",
+                    }}
+                  >
+                    Variant: {result.variant}
+                  </Text>
+                </View>
+              )}
 
               {/* Confidence */}
               <View style={styles.confidenceSection}>
@@ -968,16 +1204,29 @@ Return valid JSON only.`,
                       color={colors.primary}
                     />
 
-                    <Text
-                      style={[
-                        styles.resultDescription,
-                        {
-                          color: colors.textSecondary,
-                        },
-                      ]}
-                    >
-                      {result.note}
-                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          color: colors.textPrimary,
+                          fontSize: 15,
+                          fontWeight: "800",
+                          marginBottom: 6,
+                        }}
+                      >
+                        About This Fish
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.resultDescription,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        {result.note}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               )}
@@ -999,16 +1248,29 @@ Return valid JSON only.`,
                     color={colors.primary}
                   />
 
-                  <Text
-                    style={[
-                      styles.resultDescription,
-                      {
-                        color: colors.textSecondary,
-                      },
-                    ]}
-                  >
-                    {result.note}
-                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        color: colors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: "800",
+                        marginBottom: 6,
+                      }}
+                    >
+                      About This Fish
+                    </Text>
+
+                    <Text
+                      style={[
+                        styles.resultDescription,
+                        {
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {result.note}
+                    </Text>
+                  </View>
                 </View>
               )}
             </View>

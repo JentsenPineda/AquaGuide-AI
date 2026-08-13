@@ -20,6 +20,14 @@ export interface AIResponse {
   error?: string;
 }
 
+export interface FishScanAIResult {
+  species: string;
+  variant: string | null;
+  scientificName: string | null;
+  confidence: number;
+  introduction: string;
+}
+
 async function sendRequest(body: object): Promise<AIResponse> {
   try {
     const response = await fetch(`${BASE_URL}/chat/completions`, {

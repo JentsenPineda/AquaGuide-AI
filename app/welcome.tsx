@@ -1,16 +1,10 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useAuth } from "@/contexts/AuthContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 function FeatureCard({
   icon,
@@ -34,38 +28,57 @@ function FeatureCard({
       ]}
     >
       <View style={styles.featureIcon}>
-        <Ionicons name={icon} size={26} color="#00BCD4" />
+        <Ionicons name={icon} size={22} color="#00BCD4" />
       </View>
 
-      <View style={{ flex: 1 }}>
-        <Text
-          style={[
-            styles.featureTitle,
-            {
-              color: colors.textPrimary,
-            },
-          ]}
-        >
-          {title}
-        </Text>
+      <Text
+        style={[
+          styles.featureTitle,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        {title}
+      </Text>
 
-        <Text
-          style={[
-            styles.featureSubtitle,
-            {
-              color: colors.textSecondary,
-            },
-          ]}
-        >
-          {subtitle}
-        </Text>
-      </View>
+      <Text
+        style={[
+          styles.featureSubtitle,
+          {
+            color: colors.textSecondary,
+          },
+        ]}
+        numberOfLines={2}
+      >
+        {subtitle}
+      </Text>
     </View>
   );
 }
 
 export default function WelcomeScreen() {
   const colors = useAppColors();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/(tabs)");
+    }
+  }, [loading, user]);
+
+  if (loading || user) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      />
+    );
+  }
 
   return (
     <View
@@ -77,12 +90,9 @@ export default function WelcomeScreen() {
       ]}
     >
       <AppHeader title=" " showBack={false} />
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Hero */}
 
+      <View style={styles.content}>
+        {/* LOGO */}
         <View style={styles.hero}>
           <View style={styles.logoWrapper}>
             <Image source={require("../Icon/iconnn.png")} style={styles.logo} />
@@ -107,95 +117,107 @@ export default function WelcomeScreen() {
               },
             ]}
           >
-            Intelligent Aquarium Assistant
-          </Text>
-
-          <Text
-            style={[
-              styles.description,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Helping you identify ornamental fish, manage aquarium care, and
-            receive AI-powered recommendations.
+            Intelligent Fish Care Assistant
           </Text>
         </View>
 
+        {/* FEATURES */}
         <View style={styles.features}>
           <FeatureCard
             icon="scan-outline"
-            title="AI Fish Identification"
-            subtitle="Recognize ornamental fish instantly using AI."
+            title="AI Identification"
+            subtitle="Identify fish with AI"
           />
 
           <FeatureCard
             icon="water-outline"
-            title="Tank & Care Guide"
-            subtitle="Receive tank size, care tips, and water recommendations."
+            title="Tank & Care"
+            subtitle="Tank and water guidance"
           />
 
           <FeatureCard
-            icon="notifications-outline"
-            title="Smart Reminders"
-            subtitle="Never miss feeding, maintenance, or water changes."
+            icon="library-outline"
+            title="Species Library"
+            subtitle="Explore ornamental fish"
+          />
+
+          <FeatureCard
+            icon="medkit-outline"
+            title="Disease Guide"
+            subtitle="Learn common fish diseases"
           />
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.loginButton,
-            {
-              shadowColor: "#00BCD4",
-            },
-          ]}
-          activeOpacity={0.9}
-          onPress={() => router.push("/auth/login")}
-        >
-          <Ionicons name="log-in-outline" size={22} color="#FFFFFF" />
-
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.registerButton,
-            {
-              borderColor: "#00BCD4",
-              backgroundColor: colors.card,
-            },
-          ]}
-          activeOpacity={0.9}
-          onPress={() => router.push("/auth/register")}
-        >
-          <Ionicons name="person-add-outline" size={22} color="#00BCD4" />
-
-          <Text style={styles.registerText}>Create Account</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.guestButton}
-          onPress={() => router.replace("/(tabs)")}
-        >
-          <Text
+        {/* ACTION BUTTONS */}
+        <View style={styles.actions}>
+          <TouchableOpacity
             style={[
-              styles.guestText,
+              styles.loginButton,
               {
-                color: colors.textSecondary,
+                backgroundColor: colors.primary,
               },
             ]}
+            activeOpacity={0.9}
+            onPress={() => router.push("/auth/login")}
           >
-            Continue as Guest
-          </Text>
+            <Ionicons name="log-in-outline" size={21} color="#FFFFFF" />
 
-          <Ionicons
-            name="arrow-forward"
-            size={16}
-            color={colors.textSecondary}
-            style={{ marginLeft: 6 }}
-          />
-        </TouchableOpacity>
+            <Text style={styles.loginText}>Login</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.registerButton,
+              {
+                borderColor: colors.primary,
+                backgroundColor: colors.card,
+              },
+            ]}
+            activeOpacity={0.9}
+            onPress={() => router.push("/auth/register")}
+          >
+            <Ionicons
+              name="person-add-outline"
+              size={21}
+              color={colors.primary}
+            />
+
+            <Text
+              style={[
+                styles.registerText,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              Create Account
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.guestButton}
+            activeOpacity={0.7}
+            onPress={() => router.replace("/(tabs)")}
+          >
+            <Text
+              style={[
+                styles.guestText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Continue as Guest
+            </Text>
+
+            <Ionicons
+              name="arrow-forward"
+              size={16}
+              color={colors.textSecondary}
+              style={{ marginLeft: 5 }}
+            />
+          </TouchableOpacity>
+        </View>
 
         <Text
           style={[
@@ -207,7 +229,7 @@ export default function WelcomeScreen() {
         >
           AquaGuide AI • Version 1.0
         </Text>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -218,20 +240,20 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
   },
 
   hero: {
     alignItems: "center",
-    marginTop: 25,
-    marginBottom: 40,
+    marginTop: 8,
   },
 
   logoWrapper: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 105,
+    height: 105,
+    borderRadius: 52.5,
 
     backgroundColor: "#E8FAFD",
 
@@ -242,133 +264,125 @@ const styles = StyleSheet.create({
 
     shadowColor: "#000",
     shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-  },
-
-  logo: {
-    width: 110,
-    height: 110,
-    borderRadius: 30,
-  },
-
-  title: {
-    marginTop: 24,
-    fontSize: 36,
-    fontWeight: "900",
-  },
-
-  subtitle: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: "700",
-  },
-
-  description: {
-    marginTop: 18,
-    textAlign: "center",
-    lineHeight: 28,
-    fontSize: 16,
-    paddingHorizontal: 20,
-  },
-
-  features: {
-    marginTop: 35,
-    gap: 14,
-  },
-
-  featureCard: {
-    flexDirection: "row",
-    alignItems: "center",
-
-    padding: 18,
-
-    borderRadius: 22,
-
-    borderWidth: 1,
-
-    marginBottom: 16,
-
-    elevation: 3,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-
+    shadowRadius: 10,
     shadowOffset: {
       width: 0,
       height: 4,
     },
   },
 
-  featureIcon: {
-    width: 56,
-    height: 56,
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 22,
+  },
 
-    borderRadius: 28,
+  title: {
+    marginTop: 12,
+    fontSize: 30,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 15,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+
+  description: {
+    marginTop: 8,
+    textAlign: "center",
+    fontSize: 13,
+    lineHeight: 19,
+    paddingHorizontal: 18,
+  },
+
+  features: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 25,
+    gap: 10,
+  },
+
+  featureCard: {
+    flex: 1,
+    minHeight: 150,
+
+    borderRadius: 18,
+    borderWidth: 1,
+
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  featureIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
 
     backgroundColor: "#E8FAFD",
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginRight: 16,
+    marginBottom: 7,
   },
 
   featureTitle: {
-    fontSize: 17,
+    fontSize: 13,
     fontWeight: "800",
+    textAlign: "center",
   },
 
   featureSubtitle: {
-    marginTop: 5,
-    fontSize: 14,
-    lineHeight: 21,
+    marginTop: 3,
+    fontSize: 10,
+    lineHeight: 14,
+    textAlign: "center",
+  },
+
+  actions: {
+    marginTop: 20,
+    paddingTop: 0,
   },
 
   loginButton: {
-    marginTop: 34,
-
-    height: 60,
-
-    borderRadius: 20,
-
-    backgroundColor: "#00BCD4",
+    height: 52,
+    borderRadius: 17,
 
     justifyContent: "center",
     alignItems: "center",
 
     flexDirection: "row",
 
-    elevation: 6,
+    elevation: 4,
 
-    shadowOpacity: 0.25,
-
-    shadowRadius: 10,
-
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 3,
     },
   },
 
   loginText: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "800",
-
-    marginLeft: 8,
+    marginLeft: 7,
   },
 
   registerButton: {
-    marginTop: 18,
+    height: 52,
+    borderRadius: 17,
 
-    height: 60,
-
-    borderRadius: 20,
+    marginTop: 10,
 
     borderWidth: 2,
 
@@ -379,35 +393,29 @@ const styles = StyleSheet.create({
   },
 
   registerText: {
-    color: "#00BCD4",
-
-    fontSize: 18,
-
+    fontSize: 17,
     fontWeight: "800",
-
-    marginLeft: 8,
+    marginLeft: 7,
   },
 
   guestButton: {
-    marginTop: 24,
+    height: 42,
+
+    marginTop: 5,
 
     flexDirection: "row",
-
     justifyContent: "center",
-
     alignItems: "center",
   },
 
   guestText: {
-    fontSize: 15,
-
+    fontSize: 14,
     fontWeight: "700",
   },
 
   version: {
     textAlign: "center",
-    marginTop: 28,
-    marginBottom: 15,
-    fontSize: 13,
+    fontSize: 11,
+    marginTop: 3,
   },
 });

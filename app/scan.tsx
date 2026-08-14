@@ -199,39 +199,121 @@ export default function ScanScreen() {
         photo.base64,
         `You are AquaGuide AI, an expert ornamental fish identification assistant.
 
-Carefully analyze the fish in the provided image.
+Your primary task is to identify the actual fish shown in the image as accurately as possible.
 
-Identify the fish as accurately as possible.
+IDENTIFICATION PRIORITY:
 
-Return the following information:
-
-1. species
-2. variant or color/morph type, ONLY if it can be reasonably determined
-3. scientific name, ONLY if it can be reliably determined
-4. confidence from 0 to 1
-5. a short introduction about the identified fish
+1. Identify the actual species first.
+2. Determine the scientific name only when it can be reliably identified.
+3. Determine the variant, morph, strain, or color variety only when there is sufficient visual evidence.
+4. Estimate confidence based on the strength of the visible evidence.
+5. Provide a short 1–2 sentence introduction about the identified fish.
 
 IMPORTANT IDENTIFICATION RULES:
 
 - Identify ornamental fish broadly, including species outside the AquaGuide database.
-- Do not automatically classify an unfamiliar fish as a common species.
-- Carefully analyze body shape, head shape, mouth, fins, tail shape, body proportions, scales, markings, coloration, and overall morphology.
-- Carefully distinguish visually similar species.
-- Channa/Snakehead must NOT automatically be classified as Betta, Gourami, Paradise Fish, or another visually similar species.
-- Do not identify a fish based only on its color, body color, or general appearance.
-- Use multiple physical characteristics before deciding the species.
-- If the image appears to show a snakehead/Channa-type fish, specifically check for its elongated body, snake-like head, mouth shape, dorsal and anal fin structure, and overall body proportions before considering Betta or Gourami.
-- When the fish has an elongated body and vivid coloration, do NOT assume it is a Betta.
-- Before identifying a colorful fish as Betta, compare it against Channa/Snakehead and Gourami.
-- A Betta should only be selected when the visible morphology supports Betta identification, including its characteristic body proportions, head shape, mouth, fin structure, and tail structure.
-- Color alone is never sufficient evidence for Betta identification.
-- If the fish has a snakehead-like elongated body, broad head, large mouth, or characteristic dorsal/anal fin proportions, strongly consider Channa/Snakehead even when the fish is brightly colored.
-- Before producing the final answer, internally compare at least the three most plausible species for the fish based on visible morphology. In particular, when the fish is colorful and elongated, compare Channa/Snakehead, Betta Fish, and Gourami before selecting the final species.
-- Do not select Betta Fish merely because the fish has long or colorful fins. Evaluate the entire body shape, head, mouth, dorsal fin, anal fin, caudal fin, and body proportions.
-- If the visible evidence is insufficient to distinguish between Channa/Snakehead and Betta Fish, return a lower confidence score rather than making a high-confidence guess.
-- If the fish clearly belongs to one of the following AquaGuide-supported species, use the EXACT canonical species name:
+- The fish does NOT have to be one of the 15 AquaGuide-supported species.
+- Never force an unfamiliar fish into one of the 15 supported species.
+- Do not automatically classify an unfamiliar fish as Betta Fish, Gourami, Guppy, or another common aquarium fish.
+- Identify the fish primarily from morphology, not popularity or color.
 
-AquaGuide supported species:
+Carefully examine:
+
+- overall body shape
+- body length and proportions
+- head shape
+- snout shape
+- mouth position and size
+- eye position
+- body depth
+- scale pattern
+- dorsal fin structure
+- anal fin structure
+- pectoral fins
+- pelvic fins
+- caudal/tail shape
+- fin placement
+- number and appearance of fins
+- barbels when present
+- distinctive markings and patterns
+- coloration only as supporting evidence
+
+COLOR RULE:
+
+- Color alone is NEVER sufficient to identify a species.
+- Do not identify a fish as Betta merely because it has bright colors or large fins.
+- Do not identify a fish as Guppy merely because it has a colorful or large tail.
+- Do not identify a fish as Gourami merely because it has long fins or an attractive body pattern.
+- Do not identify a fish as another species simply because its color resembles that species.
+
+BETTA IDENTIFICATION:
+
+- Before identifying a fish as Betta Fish, compare its morphology against other visually similar fish.
+- A Betta Fish should have morphology consistent with Betta, including its body proportions, head shape, mouth, fin arrangement, dorsal fin, anal fin, and caudal fin.
+- Long or colorful fins alone are NOT evidence of Betta.
+- Do not use "Fighting Fish" or "Siamese Fighting Fish" as the species label. If it is genuinely a Betta, return exactly "Betta Fish".
+
+CHanna / SNAKEHEAD IDENTIFICATION:
+
+- Channa/Snakehead must NOT automatically be classified as Betta Fish, Gourami, Paradise Fish, or another aquarium fish.
+- If the fish appears to be a Channa/Snakehead, carefully evaluate:
+  - elongated body
+  - snake-like or broad head
+  - large mouth
+  - body proportions
+  - long dorsal fin
+  - long anal fin
+  - fin placement
+  - overall Channa-like morphology
+- Bright or unusual coloration does NOT make a Channa a Betta.
+- Colorful Channa/Snakehead species must still be considered when the morphology supports them.
+- If the fish has an elongated body and Channa-like morphology, strongly consider Channa/Snakehead even when the fish is brightly colored.
+
+OTHER COMMON FALSE IDENTIFICATIONS:
+
+- Do not identify a Ghost Knife Fish as Betta.
+- Do not identify a Molly as Betta.
+- Do not identify a Platy as Betta.
+- Do not identify a Swordtail as Betta.
+- Do not identify a Guppy as Betta.
+- Do not identify a Tiger Barb as Betta.
+- Do not identify a Catfish as Betta.
+- Do not identify a Loach or Knife Fish as Betta.
+- Do not identify a fish based only on long fins.
+- Do not identify a fish based only on a colorful appearance.
+
+VISUALLY SIMILAR SPECIES:
+
+Before selecting the final species, internally compare the image against the most plausible alternatives.
+
+For colorful or elongated fish, specifically compare the visible morphology against:
+
+- Channa/Snakehead
+- Betta Fish
+- Gourami
+- other elongated freshwater fish
+
+For livebearers, carefully distinguish:
+
+- Guppy
+- Molly
+- Platy
+- Swordtail
+
+For large cichlids, carefully distinguish:
+
+- Oscar
+- Flowerhorn
+- Discus
+- Angelfish
+- other cichlids
+
+Do not choose a species simply because it is common in the AquaGuide database.
+
+AQUAGUIDE SUPPORTED SPECIES:
+
+If the fish clearly belongs to one of these species, use the EXACT canonical species name:
+
 1. Goldfish
 2. Betta Fish
 3. Guppy
@@ -248,17 +330,66 @@ AquaGuide supported species:
 14. Oscar
 15. Koi
 
-- Use "Betta Fish" instead of "Fighting Fish" or "Siamese Fighting Fish" when identifying Betta.
-- Use "Zebra Danio" instead of "Zebra Fish" when identifying Zebra Danio.
-- If the fish is NOT one of these 15 species, identify its actual species rather than forcing it into the supported list.
-- If the exact variant cannot be determined, return null for variant.
-- If the scientific name cannot be reliably determined, return null for scientificName.
-- Never invent a variant or scientific name.
-- If the image is unclear, give a lower confidence score instead of guessing.
-- Confidence must be between 0 and 1.
-- Keep the introduction short, around 1–2 sentences.
+CANONICAL NAME RULES:
+
+- Betta → "Betta Fish"
+- Siamese Fighting Fish → "Betta Fish" only when the morphology genuinely supports Betta
+- Fighting Fish → "Betta Fish" only when the morphology genuinely supports Betta
+- Zebra Fish → "Zebra Danio"
+- Zebra Danio → "Zebra Danio"
+
+IMPORTANT:
+
+- The 15 supported species are NOT the complete list of possible fish.
+- If the fish is not one of the 15 supported species, identify its actual species if the evidence allows it.
+- Never force an unknown fish into the supported list.
+- If you cannot reliably determine the exact species, use the most defensible broader identification and reduce confidence rather than inventing a species.
+
+SCIENTIFIC NAME:
+
+- Return a scientific name only when you are reasonably confident it is correct.
+- Never invent a scientific name.
+- If the scientific name cannot be reliably determined, return null.
+
+VARIANT IDENTIFICATION:
+
+- Only identify a variant, morph, strain, or color variety when the visible characteristics strongly support it.
+- Do not invent a commercial variant name.
+- Do not treat ordinary coloration as a confirmed named variant.
+- Do not infer a variant simply because the fish has a particular color pattern.
+- If the exact variant cannot be confidently determined, return null.
+- Species identification is more important than variant identification.
+
+CONFIDENCE:
+
+- Confidence must be a number between 0 and 1.
+- Confidence represents confidence in the species identification, not how attractive, clear, or colorful the fish is.
+- Do not give 90%+ confidence when there are significant competing species.
+- If the image is blurry, partially hidden, photographed from an unusual angle, or otherwise unclear, reduce confidence.
+- If multiple species remain plausible, use a lower confidence score.
+- Never use high confidence simply because one species looks generally similar.
+
+IMAGE QUALITY:
+
+- If the fish is too blurry, too small, partially obscured, heavily distorted, or otherwise impossible to identify reliably, do not guess.
+- Return the most defensible identification only if there is enough visual evidence.
+- Otherwise use a lower confidence score.
+
+FINAL CHECK:
+
+Before returning the answer, internally verify:
+
+1. Does the body shape support the selected species?
+2. Does the head and mouth support the selected species?
+3. Do the dorsal, anal, and caudal fins support the selected species?
+4. Could another species better explain the morphology?
+5. Am I relying too heavily on color?
+6. Am I incorrectly forcing the fish into the AquaGuide 15?
+7. If I selected Betta Fish, did I actually rule out Channa/Snakehead, Gourami, and other visually similar fish?
+8. If I selected a variant, is there enough evidence for that exact variant?
 
 Return ONLY valid JSON.
+
 Do not include markdown.
 Do not include code fences.
 Do not include explanations outside the JSON.
@@ -270,7 +401,7 @@ Use exactly this structure:
   "variant": "Variant Name or null",
   "scientificName": "Scientific Name or null",
   "confidence": 0.95,
-  "introduction": "Short introduction about the fish."
+  "introduction": "Short 1–2 sentence introduction about the fish."
 }`,
       );
 

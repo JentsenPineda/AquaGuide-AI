@@ -1,8 +1,10 @@
 import AppHeader from "@/components/layout/AppHeader";
+import AvatarPicker from "@/components/profile/AvatarPicker";
+import { AvatarId, getAvatarSource } from "@/constants/avatar";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -76,13 +78,33 @@ export default function ProfileScreen() {
   const [logCount, setLogCount] = useState(0);
   const [displayName, setDisplayName] = useState("");
   const [editing, setEditing] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>("avatar1");
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadAvatar = async () => {
+      try {
+        const savedAvatar = await AsyncStorage.getItem(
+          `aquaguide_avatar_${user.uid}`,
+        );
+
+        if (savedAvatar) {
+          setSelectedAvatar(savedAvatar as AvatarId);
+        }
+      } catch (error) {
+        console.log("Failed to load avatar:", error);
+      }
+    };
+
+    loadAvatar();
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
 
     setDisplayName(user.displayName || "");
-    setSelectedImage(user.photoURL || null);
   }, [user]);
 
   useEffect(() => {
@@ -122,66 +144,6 @@ export default function ProfileScreen() {
       setEditing(false);
     } catch (error) {
       console.log(error);
-    }
-  };
-  const pickImage = async () => {
-    Alert.alert("Profile Photo", "Choose a photo source", [
-      {
-        text: "Camera",
-        onPress: openCamera,
-      },
-      {
-        text: "Gallery",
-        onPress: openGallery,
-      },
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-    ]);
-  };
-  const openGallery = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-      Alert.alert(
-        "Permission Required",
-        "Please allow gallery access to change your profile picture.",
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-    }
-  };
-
-  const openCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (!permission.granted) {
-      Alert.alert(
-        "Permission Required",
-        "Please allow camera access to take a profile picture.",
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
     }
   };
 
@@ -226,16 +188,16 @@ export default function ProfileScreen() {
         >
           <View style={styles.avatarContainer}>
             <Image
-              source={{
-                uri:
-                  selectedImage ||
-                  "https://ui-avatars.com/api/?name=User&background=E5E7EB&color=374151",
-              }}
+              source={getAvatarSource(selectedAvatar)}
               style={styles.avatar}
+              resizeMode="cover"
             />
 
-            <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
-              <Ionicons name="camera" size={20} color="#FFFFFF" />
+            <TouchableOpacity
+              style={styles.cameraButton}
+              onPress={() => setShowAvatarPicker(true)}
+            >
+              <Ionicons name="pencil" size={19} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
           <Text
@@ -434,6 +396,26 @@ export default function ProfileScreen() {
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <AvatarPicker
+        visible={showAvatarPicker}
+        selectedAvatar={selectedAvatar}
+        onSelect={async (avatarId) => {
+          try {
+            await AsyncStorage.setItem(
+              `aquaguide_avatar_${user?.uid}`,
+              avatarId,
+            );
+
+            setSelectedAvatar(avatarId);
+            setShowAvatarPicker(false);
+          } catch (error) {
+            console.log("Failed to save avatar:", error);
+          }
+        }}
+        onClose={() => setShowAvatarPicker(false)}
+        colors={colors}
+      />
     </View>
   );
 }
@@ -628,6 +610,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "#00BCD4",
     backgroundColor: "#E5E7EB",
+    transform: [{ scale: 1.18 }],
   },
 
   logoutButton: {
@@ -658,5 +641,80 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#FFFFFF",
     elevation: 5,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+
+  avatarModal: {
+    borderRadius: 24,
+    padding: 20,
+    maxHeight: "80%",
+  },
+
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+  },
+
+  modalSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+  },
+
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  avatarGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    rowGap: 14,
+  },
+
+  avatarOption: {
+    width: "23%",
+    aspectRatio: 1,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+
+  avatarOptionImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 50,
+  },
+
+  selectedCheck: {
+    position: "absolute",
+    right: -2,
+    bottom: -2,
+    width: 23,
+    height: 23,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
 });

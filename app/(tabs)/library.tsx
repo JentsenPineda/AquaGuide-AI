@@ -4,7 +4,7 @@ import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Image,
@@ -28,6 +28,7 @@ export default function LibraryScreen() {
   const colors = useAppColors();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
+  const listRef = useRef<FlatList>(null);
 
   const fishData = useMemo(() => {
     switch (selectedCategory) {
@@ -205,7 +206,16 @@ export default function LibraryScreen() {
                 borderColor: colors.border,
               },
             ]}
-            onPress={() => setSelectedCategory(item)}
+            onPress={() => {
+              setSelectedCategory(item);
+
+              requestAnimationFrame(() => {
+                listRef.current?.scrollToOffset({
+                  offset: 0,
+                  animated: true,
+                });
+              });
+            }}
           >
             <Text
               style={[
@@ -224,6 +234,7 @@ export default function LibraryScreen() {
         ))}
       </View>
       <FlatList
+        ref={listRef}
         data={filteredFish}
         keyExtractor={(item) => item.id}
         renderItem={renderFishCard}

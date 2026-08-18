@@ -20,6 +20,7 @@ import { registerUser } from "../../services/authService";
 
 export default function RegisterScreen() {
   const colors = useAppColors();
+
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -32,20 +33,69 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!fullName || !username || !email || !password || !confirmPassword) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedUsername = username.trim();
+    const normalizedFullName = fullName.trim();
+
+    // Check required fields
+    if (
+      !normalizedFullName ||
+      !normalizedUsername ||
+      !normalizedEmail ||
+      !password ||
+      !confirmPassword
+    ) {
       Alert.alert("Missing Information", "Please complete all fields.");
       return;
     }
 
+    // Check password confirmation
     if (password !== confirmPassword) {
       Alert.alert("Password Error", "Passwords do not match.");
       return;
     }
 
-    if (password.length < 6) {
+    // Minimum password length
+    if (password.length < 8) {
       Alert.alert(
         "Weak Password",
-        "Password must contain at least 6 characters.",
+        "Password must contain at least 8 characters.",
+      );
+      return;
+    }
+
+    // Uppercase requirement
+    if (!/[A-Z]/.test(password)) {
+      Alert.alert(
+        "Weak Password",
+        "Password must contain at least one uppercase letter.",
+      );
+      return;
+    }
+
+    // Lowercase requirement
+    if (!/[a-z]/.test(password)) {
+      Alert.alert(
+        "Weak Password",
+        "Password must contain at least one lowercase letter.",
+      );
+      return;
+    }
+
+    // Number requirement
+    if (!/[0-9]/.test(password)) {
+      Alert.alert(
+        "Weak Password",
+        "Password must contain at least one number.",
+      );
+      return;
+    }
+
+    // Special character requirement
+    if (!/[!@#$%^&*(),.?":{}|<>_\-+=\\[\]/;'`~]/.test(password)) {
+      Alert.alert(
+        "Weak Password",
+        "Password must contain at least one special character.",
       );
       return;
     }
@@ -53,13 +103,38 @@ export default function RegisterScreen() {
     try {
       setLoading(true);
 
-      await registerUser(fullName, username, email, password);
+      await registerUser(
+        normalizedFullName,
+        normalizedUsername,
+        normalizedEmail,
+        password,
+      );
 
       Alert.alert("Success", "Account created successfully.");
 
       router.replace("/auth/login");
     } catch (error: any) {
-      Alert.alert("Registration Failed", error.message);
+      let message = "Unable to create your account.";
+
+      switch (error?.code) {
+        case "auth/email-already-in-use":
+          message = "An account with this email already exists.";
+          break;
+
+        case "auth/invalid-email":
+          message = "Please enter a valid email address.";
+          break;
+
+        case "auth/weak-password":
+          message =
+            "The password does not meet Firebase security requirements.";
+          break;
+
+        default:
+          message = error?.message ?? message;
+      }
+
+      Alert.alert("Registration Failed", message);
     } finally {
       setLoading(false);
     }
@@ -75,6 +150,7 @@ export default function RegisterScreen() {
       ]}
     >
       <AppHeader title="Create Account" showBack />
+
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -113,6 +189,7 @@ export default function RegisterScreen() {
             Join AquaGuide AI and manage your aquarium smarter.
           </Text>
 
+          {/* FULL NAME */}
           <TextInput
             style={[
               styles.input,
@@ -126,8 +203,11 @@ export default function RegisterScreen() {
             placeholder="Full Name"
             value={fullName}
             onChangeText={setFullName}
+            autoCapitalize="words"
+            autoCorrect={false}
           />
 
+          {/* USERNAME */}
           <TextInput
             style={[
               styles.input,
@@ -141,8 +221,11 @@ export default function RegisterScreen() {
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
           />
 
+          {/* EMAIL */}
           <TextInput
             style={[
               styles.input,
@@ -156,10 +239,14 @@ export default function RegisterScreen() {
             placeholder="Email Address"
             keyboardType="email-address"
             autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="email"
+            textContentType="emailAddress"
             value={email}
             onChangeText={setEmail}
           />
 
+          {/* PASSWORD */}
           <View
             style={[
               styles.passwordContainer,
@@ -179,6 +266,10 @@ export default function RegisterScreen() {
               placeholderTextColor={colors.textSecondary}
               placeholder="Password"
               secureTextEntry={secure1}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="new-password"
+              textContentType="newPassword"
               value={password}
               onChangeText={setPassword}
             />
@@ -192,6 +283,7 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* CONFIRM PASSWORD */}
           <View
             style={[
               styles.passwordContainer,
@@ -205,6 +297,10 @@ export default function RegisterScreen() {
               placeholder="Confirm Password"
               placeholderTextColor={colors.textSecondary}
               secureTextEntry={secure2}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="new-password"
+              textContentType="newPassword"
               style={[
                 styles.passwordInput,
                 {
@@ -224,6 +320,7 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* CREATE ACCOUNT */}
           <TouchableOpacity
             style={styles.button}
             disabled={loading}
@@ -236,6 +333,7 @@ export default function RegisterScreen() {
             )}
           </TouchableOpacity>
 
+          {/* LOGIN */}
           <TouchableOpacity onPress={() => router.push("/auth/login")}>
             <Text style={styles.login}>Already have an account? Sign In</Text>
           </TouchableOpacity>

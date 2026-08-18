@@ -1,10 +1,10 @@
 import {
-    createUserWithEmailAndPassword,
-    sendEmailVerification,
-    sendPasswordResetEmail,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
 } from "firebase/auth";
 
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
@@ -17,9 +17,11 @@ export const registerUser = async (
   email: string,
   password: string,
 ) => {
+  const normalizedEmail = email.trim();
+
   const credential = await createUserWithEmailAndPassword(
     auth,
-    email,
+    normalizedEmail,
     password,
   );
 
@@ -35,7 +37,7 @@ export const registerUser = async (
     uid: user.uid,
     fullName,
     username,
-    email,
+    email: normalizedEmail,
     createdAt: serverTimestamp(),
   });
 

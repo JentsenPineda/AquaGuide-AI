@@ -208,7 +208,7 @@ export default function PlantResult() {
                       <Image
                         source={plant.image}
                         style={styles.image}
-                        resizeMode="contain"
+                        resizeMode="cover"
                       />
 
                       <View

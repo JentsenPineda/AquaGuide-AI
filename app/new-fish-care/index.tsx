@@ -20,6 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 export default function NewFishCareScreen() {
   const colors = useAppColors();
   const { user } = useAuth();
@@ -29,6 +30,7 @@ export default function NewFishCareScreen() {
   const [showAcclimationModal, setShowAcclimationModal] = useState(false);
   const [showActivePrograms, setShowActivePrograms] = useState(true);
   const [showCompletedPrograms, setShowCompletedPrograms] = useState(false);
+
   const activePrograms = programs.filter(
     (program) => program.status === "active",
   );
@@ -38,10 +40,14 @@ export default function NewFishCareScreen() {
   );
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setPrograms([]);
+      return;
+    }
 
     return subscribeToPrograms(user.uid, setPrograms);
   }, [user]);
+
   const dynamicStyles = {
     container: {
       backgroundColor: colors.background,
@@ -65,14 +71,222 @@ export default function NewFishCareScreen() {
       borderColor: colors.border,
     },
   };
+
+  /*
+   * Guest authentication gate.
+   *
+   * New Fish Care is personalized because programs and progress
+   * are connected to the user's account.
+   */
+  if (!user) {
+    return (
+      <View style={[styles.container, dynamicStyles.container]}>
+        <AppHeader title="New Fish Care" showBack />
+
+        <ScrollView
+          contentContainerStyle={styles.authContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View
+            style={[
+              styles.authIconContainer,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Ionicons name="fish-outline" size={58} color={colors.primary} />
+          </View>
+
+          <ThemeText
+            variant="title"
+            style={[
+              styles.authTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Personalized Fish Care
+          </ThemeText>
+
+          <ThemeText
+            variant="body"
+            style={[
+              styles.authDescription,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Sign in to create and save a personalized care plan for your new
+            fish. Your progress, care programs, and recommendations can be
+            available whenever you return.
+          </ThemeText>
+
+          <ThemeCard
+            style={[
+              styles.authInfoCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <View style={styles.authInfoItem}>
+              <View
+                style={[
+                  styles.authInfoIcon,
+                  {
+                    backgroundColor: colors.background,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="bookmark-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+              </View>
+
+              <View style={styles.authInfoText}>
+                <ThemeText variant="subtitle">Save Your Progress</ThemeText>
+
+                <ThemeText variant="body">
+                  Continue your fish care program whenever you return.
+                </ThemeText>
+              </View>
+            </View>
+
+            <View style={styles.authInfoItem}>
+              <View
+                style={[
+                  styles.authInfoIcon,
+                  {
+                    backgroundColor: colors.background,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="calendar-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+              </View>
+
+              <View style={styles.authInfoText}>
+                <ThemeText variant="subtitle">Track Your Care</ThemeText>
+
+                <ThemeText variant="body">
+                  Keep track of your 7-day fish care progress.
+                </ThemeText>
+              </View>
+            </View>
+
+            <View style={styles.authInfoItem}>
+              <View
+                style={[
+                  styles.authInfoIcon,
+                  {
+                    backgroundColor: colors.background,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="person-outline"
+                  size={22}
+                  color={colors.primary}
+                />
+              </View>
+
+              <View style={styles.authInfoText}>
+                <ThemeText variant="subtitle">
+                  Personalized Experience
+                </ThemeText>
+
+                <ThemeText variant="body">
+                  Your fish care programs are connected to your account.
+                </ThemeText>
+              </View>
+            </View>
+          </ThemeCard>
+
+          <TouchableOpacity
+            style={[
+              styles.authPrimaryButton,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push({
+                pathname: "/auth/login",
+                params: {
+                  redirect: "newFishCare",
+                },
+              })
+            }
+          >
+            <Ionicons name="log-in-outline" size={22} color="#FFFFFF" />
+
+            <ThemeText style={styles.authPrimaryButtonText}>Sign In</ThemeText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.authSecondaryButton,
+              {
+                borderColor: colors.border,
+                backgroundColor: colors.card,
+              },
+            ]}
+            activeOpacity={0.85}
+            onPress={() => router.push("/auth/register")}
+          >
+            <Ionicons
+              name="person-add-outline"
+              size={22}
+              color={colors.primary}
+            />
+
+            <ThemeText
+              style={[
+                styles.authSecondaryButtonText,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Create Account
+            </ThemeText>
+          </TouchableOpacity>
+
+          <ThemeText
+            variant="body"
+            style={[
+              styles.authFooter,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            You can continue using the other AquaGuide AI features as a guest.
+          </ThemeText>
+        </ScrollView>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, dynamicStyles.container]}>
       <AppHeader title="New Fish Care" showBack />
+
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero */}
         {/* Dashboard Header */}
         <View style={styles.dashboardHeader}>
           <View style={styles.dashboardTitleRow}>
@@ -131,8 +345,10 @@ export default function NewFishCareScreen() {
             <View style={styles.educationContent}>
               <View style={styles.educationItem}>
                 <Ionicons name="heart" size={22} color="#E53935" />
+
                 <View style={styles.educationText}>
                   <ThemeText variant="subtitle">Reduce Stress</ThemeText>
+
                   <ThemeText variant="body">
                     Fish experience stress during transportation. Proper
                     acclimation helps them recover safely.
@@ -142,8 +358,10 @@ export default function NewFishCareScreen() {
 
               <View style={styles.educationItem}>
                 <Ionicons name="water" size={22} color="#2196F3" />
+
                 <View style={styles.educationText}>
                   <ThemeText variant="subtitle">Prevent Water Shock</ThemeText>
+
                   <ThemeText variant="body">
                     Sudden changes in water temperature or chemistry can
                     seriously harm your fish.
@@ -153,8 +371,10 @@ export default function NewFishCareScreen() {
 
               <View style={styles.educationItem}>
                 <Ionicons name="shield-checkmark" size={22} color="#4CAF50" />
+
                 <View style={styles.educationText}>
                   <ThemeText variant="subtitle">Prevent Diseases</ThemeText>
+
                   <ThemeText variant="body">
                     A proper acclimation process strengthens the immune system
                     and lowers disease risk.
@@ -164,8 +384,10 @@ export default function NewFishCareScreen() {
 
               <View style={styles.educationItem}>
                 <Ionicons name="time-outline" size={22} color="#FF9800" />
+
                 <View style={styles.educationText}>
                   <ThemeText variant="subtitle">Estimated Duration</ThemeText>
+
                   <ThemeText variant="body">
                     Approximately 30–45 minutes.
                   </ThemeText>
@@ -175,7 +397,6 @@ export default function NewFishCareScreen() {
           )}
         </ThemeCard>
 
-        {/* Buttons */}
         {/* My Fish Care Programs */}
         {user && (
           <>
@@ -185,6 +406,7 @@ export default function NewFishCareScreen() {
             >
               My Fish Care Programs
             </ThemeText>
+
             <>
               {activePrograms.length > 0 && (
                 <>
@@ -308,6 +530,7 @@ export default function NewFishCareScreen() {
             </>
           </>
         )}
+
         <ThemeButton
           title={
             activePrograms.length > 0
@@ -332,6 +555,7 @@ export default function NewFishCareScreen() {
             Why Is Acclimation Important?
           </ThemeText>
         </TouchableOpacity>
+
         <Modal
           visible={showAcclimationModal}
           transparent
@@ -417,6 +641,102 @@ const styles = StyleSheet.create({
     paddingBottom: TAB_BAR_HEIGHT,
   },
 
+  authContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    padding: 24,
+    paddingBottom: TAB_BAR_HEIGHT + 30,
+  },
+
+  authIconContainer: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    marginBottom: 24,
+  },
+
+  authTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    textAlign: "center",
+  },
+
+  authDescription: {
+    marginTop: 12,
+    fontSize: 15,
+    lineHeight: 23,
+    textAlign: "center",
+  },
+
+  authInfoCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 18,
+    marginTop: 28,
+    marginBottom: 24,
+  },
+
+  authInfoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+
+  authInfoIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
+  },
+
+  authInfoText: {
+    flex: 1,
+  },
+
+  authPrimaryButton: {
+    height: 56,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
+  },
+
+  authPrimaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  authSecondaryButton: {
+    height: 56,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    borderWidth: 1,
+  },
+
+  authSecondaryButtonText: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  authFooter: {
+    textAlign: "center",
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 20,
+  },
+
   hero: {
     alignItems: "center",
     padding: 24,
@@ -483,11 +803,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 15,
   },
+
   educationCard: {
     borderRadius: 18,
     padding: 18,
     marginBottom: 20,
   },
+
   cardText: {
     lineHeight: 22,
     fontSize: 15,
@@ -526,6 +848,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
   },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -567,6 +890,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
+
   chevronContainer: {
     width: 36,
     height: 36,

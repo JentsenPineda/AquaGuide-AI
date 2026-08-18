@@ -2,7 +2,8 @@ import AppHeader from "@/components/layout/AppHeader";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import { User } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -16,33 +17,39 @@ import {
   View,
 } from "react-native";
 
-import { useEffect } from "react";
 import { loginUser } from "../../services/authService";
+
+type LoginRedirect =
+  | "reminder"
+  | "logbook"
+  | "profile"
+  | "scan"
+  | "sevenDays"
+  | "menu"
+  | "newFishCare";
 
 export default function LoginScreen() {
   const colors = useAppColors();
-  useEffect(() => {
-    console.log("LOGIN SCREEN MOUNTED");
-  }, []);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [secure, setSecure] = useState(true);
-
   const [loading, setLoading] = useState(false);
-
-  type LoginRedirect = "reminder" | "logbook" | "profile";
 
   const { redirect } = useLocalSearchParams<{
     redirect?: LoginRedirect;
   }>();
 
   useEffect(() => {
+    console.log("LOGIN SCREEN MOUNTED");
     console.log("LOGIN REDIRECT PARAM:", redirect);
   }, [redirect]);
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password) {
       Alert.alert(
         "Missing Information",
         "Please enter your email and password.",
@@ -50,33 +57,19 @@ export default function LoginScreen() {
       return;
     }
 
+    let user: User;
+
     try {
       setLoading(true);
 
-      const user = await loginUser(email, password);
+      user = await loginUser(normalizedEmail, password);
 
-      // Email verification is temporarily disabled.
-
-      Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`);
-
-      switch (redirect) {
-        case "reminder":
-          router.replace("/reminder");
-          break;
-
-        case "logbook":
-          router.replace("/logbook");
-          break;
-
-        case "profile":
-          router.replace("/profile");
-          break;
-
-        default:
-          router.replace("/(tabs)");
-          break;
-      }
+      console.log("LOGIN FIREBASE SUCCESS:", user.uid);
     } catch (error: any) {
+      console.log("LOGIN ERROR:", error);
+      console.log("LOGIN ERROR CODE:", error?.code);
+      console.log("LOGIN ERROR MESSAGE:", error?.message);
+
       let message = "Unable to login.";
 
       switch (error.code) {
@@ -97,13 +90,94 @@ export default function LoginScreen() {
           break;
 
         default:
-          message = error.message;
+          message = error.message || "Unable to login.";
       }
 
       Alert.alert("Login Failed", message);
+      return;
     } finally {
       setLoading(false);
     }
+
+    console.log("LOGIN SUCCESSFUL");
+    console.log("LOGIN REDIRECT:", redirect);
+
+    /*
+     * MENU
+     *
+     * Menu → Login → Successful Login → Welcome → Proceed → Menu
+     */
+    if (redirect === "menu") {
+      Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`, [
+        {
+          text: "Proceed",
+          onPress: () => {
+            router.replace("/(tabs)/menu");
+          },
+        },
+      ]);
+
+      return;
+    }
+
+    /*
+     * NEW FISH CARE
+     *
+     * Fish Care → New Fish Care → Login
+     * → Successful Login → Welcome → Proceed
+     * → New Fish Care
+     *
+     * IMPORTANT:
+     * This must NOT go to /(tabs).
+     */
+    if (redirect === "newFishCare") {
+      Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`, [
+        {
+          text: "Proceed",
+          onPress: () => {
+            router.replace("/new-fish-care");
+          },
+        },
+      ]);
+
+      return;
+    }
+
+    /*
+     * OTHER LOGIN DESTINATIONS
+     */
+    Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`, [
+      {
+        text: "Proceed",
+        onPress: () => {
+          switch (redirect) {
+            case "reminder":
+              router.replace("/reminder");
+              break;
+
+            case "logbook":
+              router.replace("/logbook");
+              break;
+
+            case "profile":
+              router.replace("/profile");
+              break;
+
+            case "scan":
+              router.replace("/scan");
+              break;
+
+            case "sevenDays":
+              router.replace("/new-fish-care/sevenDays");
+              break;
+
+            default:
+              router.replace("/(tabs)");
+              break;
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -172,6 +246,9 @@ export default function LoginScreen() {
             ]}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="email"
+            textContentType="emailAddress"
             value={email}
             onChangeText={setEmail}
           />
@@ -189,6 +266,10 @@ export default function LoginScreen() {
               placeholder="Password"
               placeholderTextColor={colors.textSecondary}
               secureTextEntry={secure}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="password"
+              textContentType="password"
               style={[
                 styles.passwordInput,
                 {

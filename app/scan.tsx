@@ -1,15 +1,20 @@
 import AppHeader from "@/components/layout/AppHeader";
+import ScanControls from "@/components/scan/ScanControls";
+import ScanLimitBanner from "@/components/scan/ScanLimitBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { allFish } from "@/data/allFish";
 import { fishCareDatabase } from "@/data/fishCareDatabase";
+import useDailyScanLimit from "@/hooks/useDailyScanLimit";
 import { askVisionAI } from "@/services/aiService";
 import { addScan } from "@/services/scanService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { router } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Easing,
   Image,
@@ -32,6 +37,7 @@ export default function ScanScreen() {
   const colors = useAppColors();
   const cameraRef = useRef<CameraView>(null);
   const { user } = useAuth();
+  const { remainingScans, reserveScan, releaseScan } = useDailyScanLimit();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<"back" | "front">("back");
 
@@ -176,8 +182,36 @@ export default function ScanScreen() {
       }, 30);
     });
   const onScan = async () => {
+    let scanReserved = false;
+
     try {
       if (!cameraRef.current) return;
+      if (!user) {
+        Alert.alert(
+          "Login Required",
+          "Please sign in to use AI Fish Identification.",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Login",
+              onPress: () => router.push("/auth/login?redirect=scan"),
+            },
+          ],
+        );
+
+        return;
+      }
+
+      const scanReservation = await reserveScan();
+
+      if (!scanReservation.allowed) {
+        return;
+      }
+
+      scanReserved = true;
 
       setScanState("capturing");
       setResult(null);
@@ -495,6 +529,11 @@ Use exactly this structure:
       setScanState("done");
     } catch (error) {
       console.error(error);
+
+      if (scanReserved) {
+        await releaseScan();
+      }
+
       setScanState("error");
     }
   };
@@ -657,7 +696,16 @@ Use exactly this structure:
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Camera / Preview */}
+        {/* Daily Scan Limit */}
+        <ScanLimitBanner
+          remainingScans={remainingScans}
+          limit={5}
+          primaryColor={colors.primary}
+          textPrimary={colors.textPrimary}
+          textSecondary={colors.textSecondary}
+          cardColor={colors.card}
+          borderColor={colors.border}
+        />
 
         {/* Camera / Preview */}
         <View
@@ -1443,111 +1491,21 @@ Use exactly this structure:
           )}
         </View>
         {/* Controls */}
-        {permission?.granted && (
-          <View style={styles.controls}>
-            {scanState === "processing" ? (
-              <View style={styles.disabledBtn}>
-                <Text
-                  style={[
-                    styles.primaryBtnText,
-                    {
-                      color: colors.textPrimary,
-                    },
-                  ]}
-                >
-                  Processing…
-                </Text>
-              </View>
-            ) : scanState === "done" ? (
-              <>
-                <Pressable
-                  onPress={onReset}
-                  style={({ pressed }) => [
-                    styles.secondaryBtn,
-                    {
-                      backgroundColor: colors.surface,
-                      borderColor: colors.border,
-                    },
-                    pressed && styles.btnPressed,
-                  ]}
-                >
-                  <Ionicons
-                    name="refresh"
-                    size={18}
-                    color={colors.textPrimary}
-                  />
-                  <Text
-                    style={[
-                      styles.secondaryBtnText,
-                      {
-                        color: colors.textPrimary,
-                      },
-                    ]}
-                  >
-                    Scan Again
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={onScan}
-                  style={({ pressed }) => [
-                    styles.primaryBtn,
-                    {
-                      backgroundColor: colors.primary,
-                    },
-                    pressed && styles.btnPressed,
-                  ]}
-                >
-                  <Ionicons name="camera" size={18} color="#FFFFFF" />
-                  <Text style={styles.primaryBtnText}>Capture</Text>
-                </Pressable>
-              </>
-            ) : (
-              <>
-                <Pressable
-                  onPress={onReset}
-                  style={({ pressed }) => [
-                    styles.secondaryBtn,
-                    {
-                      backgroundColor: colors.surface,
-                      borderColor: colors.border,
-                    },
-                    pressed && styles.btnPressed,
-                  ]}
-                >
-                  <Ionicons name="close" size={18} color={colors.textPrimary} />
-                  <Text
-                    style={[
-                      styles.secondaryBtnText,
-                      {
-                        color: colors.textPrimary,
-                      },
-                    ]}
-                  >
-                    Clear
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={onScan}
-                  style={({ pressed }) => [
-                    styles.primaryBtn,
-                    {
-                      backgroundColor: colors.primary,
-                    },
-                    pressed && styles.btnPressed,
-                  ]}
-                >
-                  <Ionicons name="camera" size={18} color="#FFFFFF" />
-                  <Text style={styles.primaryBtnText}>Scan</Text>
-                </Pressable>
-              </>
-            )}
-          </View>
-        )}
+        <ScanControls
+          permissionGranted={permission?.granted ?? false}
+          scanState={scanState}
+          canScan={!user || remainingScans > 0}
+          onReset={onReset}
+          onScan={onScan}
+          primaryColor={colors.primary}
+          textPrimary={colors.textPrimary}
+          surfaceColor={colors.surface}
+          borderColor={colors.border}
+        />
       </ScrollView>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#0B0F14" },
   container: { flex: 1, padding: 16, gap: 12 },

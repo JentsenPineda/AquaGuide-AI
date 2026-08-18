@@ -3,7 +3,7 @@ import AppHeader from "@/components/layout/AppHeader";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { router } from "expo-router";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 export default function MenuScreen() {
   const { user, logout } = useAuth();
@@ -24,7 +24,6 @@ export default function MenuScreen() {
             try {
               await logout();
 
-              router.dismissAll();
               router.replace("/(tabs)/menu");
             } catch {
               Alert.alert("Error", "Unable to logout.");
@@ -39,7 +38,12 @@ export default function MenuScreen() {
     <View style={styles.container}>
       <AppHeader title="Menu" />
 
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ROW 1 */}
         <View style={styles.row}>
           <View style={styles.cardWrapper}>
             <ModuleCard
@@ -133,7 +137,14 @@ export default function MenuScreen() {
                 title="Login"
                 subtitle="Sign in"
                 icon="log-in-outline"
-                route="/auth/login"
+                onPress={() =>
+                  router.push({
+                    pathname: "/auth/login",
+                    params: {
+                      redirect: "menu",
+                    },
+                  })
+                }
                 iconColor="#00BCD4"
                 iconBackground="#E8FAFD"
               />
@@ -151,7 +162,9 @@ export default function MenuScreen() {
             </View>
           </View>
         )}
-      </View>
+
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
     </View>
   );
 }
@@ -161,11 +174,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  content: {
+  scrollView: {
     flex: 1,
+  },
+
+  content: {
     paddingHorizontal: 14,
     paddingTop: 16,
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
 
   row: {
@@ -181,5 +197,9 @@ const styles = StyleSheet.create({
   fullWidthCard: {
     width: "100%",
     marginTop: 2,
+  },
+
+  bottomSpacing: {
+    height: 30,
   },
 });

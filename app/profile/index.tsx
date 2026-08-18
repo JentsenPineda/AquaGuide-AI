@@ -60,9 +60,11 @@ function SettingItem({
   );
 }
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user && !isLoggingOut) {
       router.replace({
         pathname: "/auth/login",
         params: {
@@ -70,7 +72,7 @@ export default function ProfileScreen() {
         },
       });
     }
-  }, [user]);
+  }, [loading, user, isLoggingOut]);
 
   const colors = useAppColors();
 
@@ -149,9 +151,14 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
+
       await logout();
+
+      router.replace("/(tabs)/menu");
     } catch (error) {
-      console.log(error);
+      setIsLoggingOut(false);
+      console.log("Logout Error:", error);
     }
   };
 

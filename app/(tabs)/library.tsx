@@ -1,4 +1,3 @@
-// app/(tabs)/library.tsx
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
@@ -24,20 +23,81 @@ type Category = "All" | "Beginner" | "Intermediate" | "Expert";
 
 const categories: Category[] = ["All", "Beginner", "Intermediate", "Expert"];
 
+const getCategoryColors = (category: string) => {
+  switch (category) {
+    case "Beginner":
+      return {
+        background: "#E8F5E9",
+        text: "#2E7D32",
+      };
+
+    case "Intermediate":
+      return {
+        background: "#FFF3E0",
+        text: "#EF6C00",
+      };
+
+    case "Expert":
+      return {
+        background: "#FCE4EC",
+        text: "#C2185B",
+      };
+
+    default:
+      return {
+        background: "#E8FAFD",
+        text: "#008AA3",
+      };
+  }
+};
+
+const getFilterColors = (category: Category) => {
+  switch (category) {
+    case "Beginner":
+      return {
+        active: "#4CAF50",
+        light: "#E8F5E9",
+      };
+
+    case "Intermediate":
+      return {
+        active: "#FF9800",
+        light: "#FFF3E0",
+      };
+
+    case "Expert":
+      return {
+        active: "#E91E63",
+        light: "#FCE4EC",
+      };
+
+    default:
+      return {
+        active: "#00BCD4",
+        light: "#E8FAFD",
+      };
+  }
+};
+
 export default function LibraryScreen() {
   const colors = useAppColors();
+
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
+
   const listRef = useRef<FlatList>(null);
 
   const fishData = useMemo(() => {
     switch (selectedCategory) {
       case "Beginner":
         return beginnerFish;
+
       case "Intermediate":
         return intermediateFish;
+
       case "Expert":
         return expertFish;
+
       default:
         return allFish;
     }
@@ -45,7 +105,7 @@ export default function LibraryScreen() {
 
   const filteredFish = useMemo(() => {
     return fishData.filter((fish) => {
-      const keyword = search.toLowerCase();
+      const keyword = search.toLowerCase().trim();
 
       return (
         fish.commonName.toLowerCase().includes(keyword) ||
@@ -54,110 +114,185 @@ export default function LibraryScreen() {
     });
   }, [fishData, search]);
 
-  const renderFishCard = ({ item }: any) => (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      style={[
-        styles.card,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-          borderWidth: 1,
-        },
-      ]}
-      onPress={() =>
-        router.push({
-          pathname: "/fish/[id]",
-          params: {
-            id: item.id,
+  const renderFishCard = ({ item }: any) => {
+    const categoryColors = getCategoryColors(item.category);
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={[
+          styles.card,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
           },
-        })
-      }
-    >
-      <Image source={item.image} style={styles.image} resizeMode="cover" />
-
-      <View style={styles.overlay} />
-
-      <View style={styles.cardContent}>
-        <View
-          style={[
-            styles.badge,
-            {
-              backgroundColor: colors.primaryLight,
+        ]}
+        onPress={() =>
+          router.push({
+            pathname: "/fish/[id]",
+            params: {
+              id: item.id,
             },
-          ]}
-        >
-          <Text
+          })
+        }
+      >
+        {/* IMAGE */}
+        <View style={styles.imageContainer}>
+          <Image source={item.image} style={styles.image} resizeMode="cover" />
+
+          <View style={styles.overlay} />
+
+          {/* CATEGORY BADGE ON IMAGE */}
+          <View
             style={[
-              styles.badgeText,
+              styles.imageBadge,
               {
-                color: colors.primary,
+                backgroundColor: categoryColors.background,
               },
             ]}
           >
-            {item.category}
-          </Text>
-        </View>
+            <View
+              style={[
+                styles.categoryDot,
+                {
+                  backgroundColor: categoryColors.text,
+                },
+              ]}
+            />
 
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.name,
-            {
-              color: colors.textPrimary,
-            },
-          ]}
-        >
-          {item.commonName}
-        </Text>
-
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.scientific,
-            {
-              color: colors.textSecondary,
-            },
-          ]}
-        >
-          {item.scientificName}
-        </Text>
-
-        <View style={styles.infoRow}>
-          <View style={styles.infoItem}>
-            <Ionicons name="water" size={14} color="#00E5FF" />
-            <Text style={styles.infoText}>{item.pH}</Text>
-          </View>
-
-          <View style={styles.infoItem}>
-            <Ionicons name="thermometer" size={14} color="#FFB300" />
-            <Text style={styles.infoText}>{item.temperature}</Text>
-          </View>
-
-          <View style={styles.infoItem}>
-            <Ionicons name="resize" size={14} color="#8BC34A" />
-            <Text style={styles.infoText}>{item.tankSize}</Text>
+            <Text
+              style={[
+                styles.imageBadgeText,
+                {
+                  color: categoryColors.text,
+                },
+              ]}
+            >
+              {item.category}
+            </Text>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            router.push({
-              pathname: "/fish/[id]",
-              params: {
-                id: item.id,
+        {/* CARD CONTENT */}
+        <View style={styles.cardContent}>
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.name,
+              {
+                color: colors.textPrimary,
               },
-            })
-          }
-        >
-          <Text style={styles.buttonText}>View Details</Text>
+            ]}
+          >
+            {item.commonName}
+          </Text>
 
-          <Ionicons name="arrow-forward" color="#fff" size={18} />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.scientific,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            {item.scientificName}
+          </Text>
+
+          {/* INFO */}
+          <View style={styles.infoRow}>
+            <View
+              style={[
+                styles.infoItem,
+                {
+                  backgroundColor: colors.surface,
+                },
+              ]}
+            >
+              <Ionicons name="water" size={14} color="#00BCD4" />
+
+              <Text
+                style={[
+                  styles.infoText,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {item.pH}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.infoItem,
+                {
+                  backgroundColor: colors.surface,
+                },
+              ]}
+            >
+              <Ionicons name="thermometer" size={14} color="#FFB300" />
+
+              <Text
+                style={[
+                  styles.infoText,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {item.temperature}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.infoItem,
+                {
+                  backgroundColor: colors.surface,
+                },
+              ]}
+            >
+              <Ionicons name="resize" size={14} color="#8BC34A" />
+
+              <Text
+                style={[
+                  styles.infoText,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {item.tankSize}
+              </Text>
+            </View>
+          </View>
+
+          {/* VIEW DETAILS */}
+          <TouchableOpacity
+            style={[
+              styles.button,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+            onPress={() =>
+              router.push({
+                pathname: "/fish/[id]",
+                params: {
+                  id: item.id,
+                },
+              })
+            }
+          >
+            <Text style={styles.buttonText}>View Details</Text>
+
+            <Ionicons name="arrow-forward" color="#FFFFFF" size={18} />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View
@@ -170,6 +305,7 @@ export default function LibraryScreen() {
     >
       <AppHeader title="Species Library" showBack={false} />
 
+      {/* SEARCH */}
       <View
         style={[
           styles.searchContainer,
@@ -180,6 +316,7 @@ export default function LibraryScreen() {
         ]}
       >
         <Ionicons name="search" size={20} color={colors.textSecondary} />
+
         <TextInput
           placeholder="Search fish..."
           placeholderTextColor={colors.textMuted}
@@ -194,45 +331,53 @@ export default function LibraryScreen() {
         />
       </View>
 
+      {/* CATEGORY FILTERS */}
       <View style={styles.categoryContainer}>
-        {categories.map((item) => (
-          <TouchableOpacity
-            key={item}
-            style={[
-              styles.categoryButton,
-              {
-                backgroundColor:
-                  selectedCategory === item ? colors.primary : colors.surface,
-                borderColor: colors.border,
-              },
-            ]}
-            onPress={() => {
-              setSelectedCategory(item);
+        {categories.map((item) => {
+          const filterColors = getFilterColors(item);
+          const isSelected = selectedCategory === item;
 
-              requestAnimationFrame(() => {
-                listRef.current?.scrollToOffset({
-                  offset: 0,
-                  animated: true,
-                });
-              });
-            }}
-          >
-            <Text
+          return (
+            <TouchableOpacity
+              key={item}
               style={[
-                styles.categoryText,
+                styles.categoryButton,
+                item === "Intermediate" && styles.intermediateButton,
                 {
-                  color:
-                    selectedCategory === item
-                      ? colors.white
-                      : colors.textPrimary,
+                  backgroundColor: isSelected
+                    ? filterColors.active
+                    : colors.surface,
+                  borderColor: isSelected ? filterColors.active : colors.border,
                 },
               ]}
+              onPress={() => {
+                setSelectedCategory(item);
+
+                requestAnimationFrame(() => {
+                  listRef.current?.scrollToOffset({
+                    offset: 0,
+                    animated: true,
+                  });
+                });
+              }}
+              activeOpacity={0.8}
             >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.categoryText,
+                  {
+                    color: isSelected ? "#FFFFFF" : colors.textPrimary,
+                  },
+                ]}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
+
+      {/* FISH LIST */}
       <FlatList
         ref={listRef}
         data={filteredFish}
@@ -242,17 +387,18 @@ export default function LibraryScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.statsContainer}>
+            {/* TOTAL */}
             <View
               style={[
                 styles.statCard,
                 {
                   backgroundColor: colors.card,
                   borderColor: colors.border,
-                  borderWidth: 1,
                 },
               ]}
             >
               <Ionicons name="fish" size={24} color="#00BCD4" />
+
               <Text
                 style={[
                   styles.statNumber,
@@ -263,6 +409,7 @@ export default function LibraryScreen() {
               >
                 {filteredFish.length}
               </Text>
+
               <Text
                 style={[
                   styles.statLabel,
@@ -275,17 +422,18 @@ export default function LibraryScreen() {
               </Text>
             </View>
 
+            {/* BEGINNER */}
             <View
               style={[
                 styles.statCard,
                 {
                   backgroundColor: colors.card,
                   borderColor: colors.border,
-                  borderWidth: 1,
                 },
               ]}
             >
               <Ionicons name="leaf" size={24} color="#4CAF50" />
+
               <Text
                 style={[
                   styles.statNumber,
@@ -296,6 +444,7 @@ export default function LibraryScreen() {
               >
                 {beginnerFish.length}
               </Text>
+
               <Text
                 style={[
                   styles.statLabel,
@@ -308,17 +457,18 @@ export default function LibraryScreen() {
               </Text>
             </View>
 
+            {/* INTERMEDIATE */}
             <View
               style={[
                 styles.statCard,
                 {
                   backgroundColor: colors.card,
                   borderColor: colors.border,
-                  borderWidth: 1,
                 },
               ]}
             >
               <Ionicons name="flask" size={24} color="#FF9800" />
+
               <Text
                 style={[
                   styles.statNumber,
@@ -329,6 +479,7 @@ export default function LibraryScreen() {
               >
                 {intermediateFish.length}
               </Text>
+
               <Text
                 style={[
                   styles.statLabel,
@@ -341,17 +492,18 @@ export default function LibraryScreen() {
               </Text>
             </View>
 
+            {/* EXPERT */}
             <View
               style={[
                 styles.statCard,
                 {
                   backgroundColor: colors.card,
                   borderColor: colors.border,
-                  borderWidth: 1,
                 },
               ]}
             >
               <Ionicons name="diamond" size={24} color="#E91E63" />
+
               <Text
                 style={[
                   styles.statNumber,
@@ -362,6 +514,7 @@ export default function LibraryScreen() {
               >
                 {expertFish.length}
               </Text>
+
               <Text
                 style={[
                   styles.statLabel,
@@ -378,6 +531,7 @@ export default function LibraryScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="search" size={70} color={colors.textMuted} />
+
             <Text
               style={[
                 styles.emptyTitle,
@@ -409,38 +563,23 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3FAFC",
-  },
-
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 10,
-  },
-
-  title: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: "#003B57",
-  },
-
-  subtitle: {
-    marginTop: 5,
-    color: "#607D8B",
-    fontSize: 15,
-    lineHeight: 21,
   },
 
   searchContainer: {
     marginHorizontal: 20,
     marginTop: 12,
-    marginBottom: 20,
-    backgroundColor: "#fff",
+    marginBottom: 16,
+
     borderRadius: 16,
+    borderWidth: 1,
+
     paddingHorizontal: 16,
+
     height: 55,
+
     flexDirection: "row",
     alignItems: "center",
+
     elevation: 2,
   },
 
@@ -448,56 +587,90 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     fontSize: 16,
-    color: "#222",
   },
 
   categoryContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  categoryButton: {
-    minWidth: 10,
-    paddingHorizontal: 8,
-    height: 44,
-    marginHorizontal: 1,
-    borderRadius: 22,
-    backgroundColor: "#E8F7FA",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 10,
+    marginBottom: 14,
+    gap: 6,
   },
-  activeCategory: {
-    backgroundColor: "#00BCD4",
+
+  categoryButton: {
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 12,
   },
 
   categoryText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "700",
-    color: "#008AA3",
     textAlign: "center",
-  },
-
-  activeCategoryText: {
-    color: "#fff",
+    includeFontPadding: false,
   },
 
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginTop: 10,
-    marginBottom: 22,
+
+    paddingHorizontal: 0,
+
+    marginTop: 8,
+    marginBottom: 18,
   },
 
   statCard: {
     width: "23%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
+
+    borderRadius: 17,
+    borderWidth: 1,
+
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
+
+    paddingVertical: 13,
+
+    elevation: 3,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+  },
+
+  statNumber: {
+    fontSize: 19,
+    fontWeight: "800",
+    marginTop: 5,
+  },
+
+  statLabel: {
+    fontSize: 10,
+    marginTop: 2,
+  },
+
+  listContent: {
+    paddingHorizontal: 20,
+    paddingTop: 2,
+    paddingBottom: TAB_BAR_HEIGHT,
+  },
+
+  card: {
+    borderRadius: 20,
+    borderWidth: 1,
+
+    overflow: "hidden",
+
+    marginBottom: 18,
+
     elevation: 4,
 
     shadowColor: "#000",
@@ -509,111 +682,116 @@ const styles = StyleSheet.create({
     },
   },
 
-  statNumber: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#003B57",
-    marginTop: 6,
-  },
+  imageContainer: {
+    width: "100%",
+    height: 150,
 
-  statLabel: {
-    fontSize: 11,
-    color: "#78909C",
-    marginTop: 2,
-  },
-
-  listContent: {
-    paddingHorizontal: 20,
-    paddingTop: 4,
-    paddingBottom: TAB_BAR_HEIGHT,
-  },
-
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    overflow: "hidden",
-    marginBottom: 22,
-    elevation: 4,
+    position: "relative",
   },
 
   image: {
     width: "100%",
-    height: 210,
+    height: "100%",
   },
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.12)",
+    backgroundColor: "rgba(0,0,0,0.08)",
+  },
+
+  imageBadge: {
+    position: "absolute",
+
+    top: 12,
+    left: 12,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    borderRadius: 20,
+
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+
+    elevation: 3,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+
+  categoryDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+
+    marginRight: 6,
+  },
+
+  imageBadgeText: {
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   cardContent: {
-    padding: 18,
-  },
-
-  badge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#E0F7FA",
-    borderRadius: 30,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginBottom: 10,
-  },
-
-  badgeText: {
-    color: "#0097A7",
-    fontWeight: "700",
-    fontSize: 12,
+    padding: 15,
   },
 
   name: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: "800",
-    color: "#003B57",
   },
 
   scientific: {
-    marginTop: 4,
-    fontSize: 15,
-    color: "#78909C",
+    marginTop: 3,
+    fontSize: 14,
     fontStyle: "italic",
   },
 
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 18,
-    marginBottom: 18,
+
+    marginTop: 14,
+    marginBottom: 14,
   },
 
   infoItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F4FBFD",
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
+
+    borderRadius: 12,
+
+    paddingHorizontal: 9,
+    paddingVertical: 8,
   },
 
   infoText: {
-    marginLeft: 6,
-    color: "#455A64",
+    marginLeft: 5,
+
     fontWeight: "600",
-    fontSize: 13,
+    fontSize: 12,
   },
 
   button: {
-    backgroundColor: "#00BCD4",
-    borderRadius: 14,
-    height: 50,
+    borderRadius: 13,
+
+    height: 46,
+
     justifyContent: "center",
     alignItems: "center",
+
     flexDirection: "row",
   },
 
   buttonText: {
     color: "#FFFFFF",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 15,
     marginRight: 8,
   },
 
@@ -627,15 +805,17 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 22,
     fontWeight: "700",
-    color: "#37474F",
   },
 
   emptySubtitle: {
     marginTop: 8,
     fontSize: 15,
-    color: "#90A4AE",
     textAlign: "center",
     paddingHorizontal: 40,
     lineHeight: 22,
+  },
+
+  intermediateButton: {
+    minWidth: 105,
   },
 });

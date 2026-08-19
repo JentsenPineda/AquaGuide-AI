@@ -10,7 +10,6 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-
 import {
   Alert,
   Modal,
@@ -41,19 +40,21 @@ const SPECIES = [
   "Gourami",
 ];
 
+const OTHER_SPECIES = "Other / Not Listed";
+
 export default function CreateFishCareProgramScreen() {
   const colors = useAppColors();
   const { user } = useAuth();
 
   const [fishName, setFishName] = useState("");
   const [species, setSpecies] = useState("");
+  const [customSpecies, setCustomSpecies] = useState("");
   const [quantity, setQuantity] = useState("1");
 
   const [showSpecies, setShowSpecies] = useState(false);
   const [purchaseDate, setPurchaseDate] = useState(new Date());
 
   const [showDatePicker, setShowDatePicker] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
   const dynamicStyles = {
@@ -75,22 +76,110 @@ export default function CreateFishCareProgramScreen() {
     modal: {
       backgroundColor: colors.card,
     },
+
+    speciesItem: {
+      borderBottomColor: colors.border,
+    },
   };
+
+  const isOtherSpecies = species === OTHER_SPECIES;
+
+  const finalSpecies = isOtherSpecies ? customSpecies.trim() : species;
+
+  const handleStartProgram = async () => {
+    if (!user) {
+      Alert.alert(
+        "Login Required",
+        "Please sign in to create and save a 7-Day Fish Care Program.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Login",
+            onPress: () =>
+              router.push({
+                pathname: "/auth/login",
+                params: {
+                  redirect: "newFishCare",
+                },
+              }),
+          },
+        ],
+      );
+
+      return;
+    }
+
+    if (!fishName.trim()) {
+      Alert.alert("Validation", "Please enter a fish name.");
+      return;
+    }
+
+    if (!species) {
+      Alert.alert("Validation", "Please select a species.");
+      return;
+    }
+
+    if (isOtherSpecies && !customSpecies.trim()) {
+      Alert.alert(
+        "Species Required",
+        "Please enter the name of the fish species.",
+      );
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const id = await createProgram(
+        user.uid,
+        fishName.trim(),
+        finalSpecies,
+        purchaseDate.toISOString(),
+      );
+
+      router.replace({
+        pathname: "/new-fish-care/sevenDays",
+        params: {
+          programId: id,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+
+      Alert.alert("Error", "Failed to create program.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={[styles.screen, dynamicStyles.screen]}>
       <AppHeader
         title="New Fish Care"
         subtitle="Start a 7-Day Care Program"
         showBack
-        variant="light"
       />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
+        {/* ============================================================ */}
+        {/* HERO                                                          */}
+        {/* ============================================================ */}
+
         <ThemeCard style={[styles.heroCard, dynamicStyles.card]}>
-          <View style={styles.heroIcon}>
+          <View
+            style={[
+              styles.heroIcon,
+              {
+                backgroundColor: colors.primary + "14",
+              },
+            ]}
+          >
             <Ionicons name="fish" size={54} color={colors.primary} />
           </View>
 
@@ -104,10 +193,16 @@ export default function CreateFishCareProgramScreen() {
           </ThemeText>
         </ThemeCard>
 
+        {/* ============================================================ */}
+        {/* FISH INFORMATION                                              */}
+        {/* ============================================================ */}
+
         <ThemeCard style={[styles.formCard, dynamicStyles.card]}>
           <ThemeText variant="subtitle" style={styles.sectionTitle}>
             Fish Information
           </ThemeText>
+
+          {/* Fish Name */}
 
           <ThemeText variant="body" style={styles.label}>
             Fish Name
@@ -117,9 +212,11 @@ export default function CreateFishCareProgramScreen() {
             value={fishName}
             onChangeText={setFishName}
             placeholder="Example: Sunny"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textSecondary}
             style={[styles.input, dynamicStyles.input]}
           />
+
+          {/* Species */}
 
           <ThemeText variant="body" style={styles.label}>
             Species
@@ -148,6 +245,56 @@ export default function CreateFishCareProgramScreen() {
             />
           </TouchableOpacity>
 
+          {/* Other / Not Listed Input */}
+
+          {isOtherSpecies && (
+            <View style={styles.customSpeciesContainer}>
+              <ThemeText variant="body" style={styles.label}>
+                Species Name
+              </ThemeText>
+
+              <TextInput
+                value={customSpecies}
+                onChangeText={setCustomSpecies}
+                placeholder="Enter fish species"
+                placeholderTextColor={colors.textSecondary}
+                autoCapitalize="words"
+                style={[styles.input, dynamicStyles.input]}
+              />
+
+              <View
+                style={[
+                  styles.customSpeciesNotice,
+                  {
+                    backgroundColor: colors.primary + "10",
+                    borderColor: colors.primary + "25",
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="information-circle-outline"
+                  size={19}
+                  color={colors.primary}
+                />
+
+                <Text
+                  style={[
+                    styles.customSpeciesNoticeText,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  This species is not currently included in AquaGuide AI's
+                  supported species library. The 7-Day Care Program will provide
+                  general acclimation and observation guidance.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Number of Fish */}
+
           <ThemeText variant="body" style={styles.label}>
             Number of Fish
           </ThemeText>
@@ -158,6 +305,9 @@ export default function CreateFishCareProgramScreen() {
             keyboardType="number-pad"
             style={[styles.input, dynamicStyles.input]}
           />
+
+          {/* Purchase Date */}
+
           <ThemeText variant="body" style={styles.label}>
             Purchase Date
           </ThemeText>
@@ -186,6 +336,10 @@ export default function CreateFishCareProgramScreen() {
           </TouchableOpacity>
         </ThemeCard>
 
+        {/* ============================================================ */}
+        {/* INFORMATION                                                   */}
+        {/* ============================================================ */}
+
         <ThemeCard style={[styles.infoCard, dynamicStyles.card]}>
           <View style={styles.infoRow}>
             <Ionicons
@@ -193,6 +347,7 @@ export default function CreateFishCareProgramScreen() {
               size={22}
               color={colors.primary}
             />
+
             <ThemeText variant="body" style={styles.infoText}>
               Progress is automatically saved.
             </ThemeText>
@@ -200,6 +355,7 @@ export default function CreateFishCareProgramScreen() {
 
           <View style={styles.infoRow}>
             <Ionicons name="time-outline" size={22} color={colors.primary} />
+
             <ThemeText variant="body" style={styles.infoText}>
               Continue your 7-Day Care anytime.
             </ThemeText>
@@ -207,67 +363,27 @@ export default function CreateFishCareProgramScreen() {
 
           <View style={styles.infoRow}>
             <Ionicons name="fish-outline" size={22} color={colors.primary} />
+
             <ThemeText variant="body" style={styles.infoText}>
               Manage multiple fish care programs.
             </ThemeText>
           </View>
         </ThemeCard>
 
+        {/* ============================================================ */}
+        {/* START PROGRAM                                                 */}
+        {/* ============================================================ */}
+
         <ThemeButton
           title={loading ? "Creating Program..." : "Start 7-Day Care Program"}
           loading={loading}
-          onPress={async () => {
-            if (!user) {
-              Alert.alert(
-                "Login Required",
-                "Please sign in to create and save a 7-Day Fish Care Program.",
-                [
-                  {
-                    text: "Cancel",
-                    style: "cancel",
-                  },
-                  {
-                    text: "Login",
-                    onPress: () => router.push("/auth/login"),
-                  },
-                ],
-              );
-              return;
-            }
-            if (!fishName.trim()) {
-              Alert.alert("Validation", "Please enter a fish name.");
-              return;
-            }
-
-            if (!species) {
-              Alert.alert("Validation", "Please select a species.");
-              return;
-            }
-
-            try {
-              setLoading(true);
-
-              const id = await createProgram(
-                user.uid,
-                fishName.trim(),
-                species,
-                purchaseDate.toISOString(),
-              );
-
-              router.replace({
-                pathname: "/new-fish-care/sevenDays",
-                params: {
-                  programId: id,
-                },
-              });
-            } catch (error) {
-              console.error(error);
-              Alert.alert("Error", "Failed to create program.");
-            } finally {
-              setLoading(false);
-            }
-          }}
+          onPress={handleStartProgram}
         />
+
+        {/* ============================================================ */}
+        {/* SPECIES MODAL                                                  */}
+        {/* ============================================================ */}
+
         <Modal
           visible={showSpecies}
           transparent
@@ -279,7 +395,14 @@ export default function CreateFishCareProgramScreen() {
             onPress={() => setShowSpecies(false)}
           >
             <Pressable style={[styles.bottomSheet, dynamicStyles.modal]}>
-              <View style={styles.handle} />
+              <View
+                style={[
+                  styles.handle,
+                  {
+                    backgroundColor: colors.border,
+                  },
+                ]}
+              />
 
               <Text
                 style={[
@@ -296,10 +419,11 @@ export default function CreateFishCareProgramScreen() {
                 {SPECIES.map((item) => (
                   <TouchableOpacity
                     key={item}
-                    style={styles.speciesItem}
+                    style={[styles.speciesItem, dynamicStyles.speciesItem]}
                     activeOpacity={0.85}
                     onPress={() => {
                       setSpecies(item);
+                      setCustomSpecies("");
                       setShowSpecies(false);
                     }}
                   >
@@ -319,6 +443,7 @@ export default function CreateFishCareProgramScreen() {
                     >
                       {item}
                     </Text>
+
                     {species === item && (
                       <Ionicons
                         name="checkmark-circle"
@@ -328,10 +453,77 @@ export default function CreateFishCareProgramScreen() {
                     )}
                   </TouchableOpacity>
                 ))}
+
+                {/* OTHER / NOT LISTED */}
+
+                <TouchableOpacity
+                  style={[
+                    styles.speciesItem,
+                    dynamicStyles.speciesItem,
+                    styles.otherSpeciesItem,
+                  ]}
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    setSpecies(OTHER_SPECIES);
+                    setShowSpecies(false);
+                  }}
+                >
+                  <View
+                    style={[
+                      styles.otherIcon,
+                      {
+                        backgroundColor: colors.primary + "14",
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name="create-outline"
+                      size={21}
+                      color={colors.primary}
+                    />
+                  </View>
+
+                  <View style={styles.otherSpeciesContent}>
+                    <Text
+                      style={[
+                        styles.speciesText,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      {OTHER_SPECIES}
+                    </Text>
+
+                    <Text
+                      style={[
+                        styles.otherSpeciesSubtitle,
+                        {
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      Enter the species manually
+                    </Text>
+                  </View>
+
+                  {species === OTHER_SPECIES && (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={22}
+                      color={colors.primary}
+                    />
+                  )}
+                </TouchableOpacity>
               </ScrollView>
             </Pressable>
           </Pressable>
         </Modal>
+
+        {/* ============================================================ */}
+        {/* DATE PICKER                                                    */}
+        {/* ============================================================ */}
+
         <ReminderDatePickerModal
           visible={showDatePicker}
           date={purchaseDate}
@@ -346,6 +538,10 @@ export default function CreateFishCareProgramScreen() {
   );
 }
 
+/* ========================================================================== */
+/* STYLES                                                                     */
+/* ========================================================================== */
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -356,6 +552,8 @@ const styles = StyleSheet.create({
     paddingBottom: TAB_BAR_HEIGHT + 40,
     gap: 18,
   },
+
+  /* Hero */
 
   heroCard: {
     borderRadius: 24,
@@ -370,7 +568,6 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EFF6FF",
     marginBottom: 18,
   },
 
@@ -384,6 +581,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     opacity: 0.8,
   },
+
+  /* Form */
 
   formCard: {
     borderRadius: 24,
@@ -425,6 +624,30 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 
+  /* Custom Species */
+
+  customSpeciesContainer: {
+    marginTop: 2,
+  },
+
+  customSpeciesNotice: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 13,
+    marginTop: 10,
+  },
+
+  customSpeciesNoticeText: {
+    flex: 1,
+    marginLeft: 9,
+    fontSize: 12.5,
+    lineHeight: 19,
+  },
+
+  /* Info */
+
   infoCard: {
     borderRadius: 20,
     padding: 18,
@@ -442,6 +665,8 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 21,
   },
+
+  /* Modal */
 
   modalOverlay: {
     flex: 1,
@@ -462,7 +687,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#CBD5E1",
     alignSelf: "center",
     marginBottom: 18,
   },
@@ -479,7 +703,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E2E8F0",
   },
 
   speciesText: {
@@ -487,5 +710,28 @@ const styles = StyleSheet.create({
     marginLeft: 14,
     fontSize: 16,
     fontWeight: "500",
+  },
+
+  otherSpeciesItem: {
+    paddingVertical: 14,
+  },
+
+  otherIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  otherSpeciesContent: {
+    flex: 1,
+    marginLeft: 2,
+  },
+
+  otherSpeciesSubtitle: {
+    marginLeft: 14,
+    marginTop: 3,
+    fontSize: 12,
   },
 });

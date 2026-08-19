@@ -22,14 +22,23 @@ export default function RootNavigation() {
           headerTintColor: "#00BCD4",
         }}
       >
-        {/* Authentication */}
+        {/* ============================================================ */}
+        {/* Authentication                                                */}
+        {/* ============================================================ */}
+
         <Stack.Screen name="auth/login" />
         <Stack.Screen name="auth/register" />
 
-        {/* Main Tabs */}
+        {/* ============================================================ */}
+        {/* Main Tabs                                                     */}
+        {/* ============================================================ */}
+
         <Stack.Screen name="(tabs)" />
 
-        {/* AI Fish Scanner */}
+        {/* ============================================================ */}
+        {/* AI Fish Scanner                                               */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="scan"
           options={{
@@ -37,7 +46,10 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* Library */}
+        {/* ============================================================ */}
+        {/* Library                                                        */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="library/common"
           options={{
@@ -46,7 +58,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Tank & Care */}
+
+        {/* ============================================================ */}
+        {/* Tank & Care                                                    */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="tank-care"
           options={{
@@ -56,7 +72,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Disease Guide */}
+
+        {/* ============================================================ */}
+        {/* Disease Guide                                                  */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="disease-guide"
           options={{
@@ -66,7 +86,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Breeding Guide */}
+
+        {/* ============================================================ */}
+        {/* Breeding Guide                                                 */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="breeding-guide"
           options={{
@@ -86,7 +110,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Aqua Plants */}
+
+        {/* ============================================================ */}
+        {/* Aqua Plants                                                    */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="aqua-plant"
           options={{
@@ -96,7 +124,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Plant Result */}
+
+        {/* ============================================================ */}
+        {/* Plant Result                                                   */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="plant-result"
           options={{
@@ -106,7 +138,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Equipment */}
+
+        {/* ============================================================ */}
+        {/* Equipment                                                      */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="equipment/equipment"
           options={{
@@ -116,7 +152,7 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Equipment Category */}
+
         <Stack.Screen
           name="equipment/equipment-category"
           options={{
@@ -126,7 +162,7 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Equipment Detail */}
+
         <Stack.Screen
           name="equipment/equipment-detail"
           options={{
@@ -136,7 +172,7 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Equipment Guide */}
+
         <Stack.Screen
           name="equipment/equipment-guide"
           options={{
@@ -146,7 +182,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* New Fish Care */}
+
+        {/* ============================================================ */}
+        {/* New Fish Care                                                  */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="new-fish-care/index"
           options={{
@@ -157,20 +197,40 @@ export default function RootNavigation() {
           }}
         />
 
+        {/* New Fish Care Terms & Conditions */}
+        <Stack.Screen
+          name="new-fish-care/terms"
+          options={{
+            headerShown: false,
+            title: "New Fish Care Notice",
+            headerTintColor: "#00BCD4",
+            headerBackButtonDisplayMode: "minimal",
+          }}
+        />
+
+        {/* New Fish Care Preparation */}
         <Stack.Screen
           name="new-fish-care/preparation"
           options={{
+            headerShown: false,
             title: "Preparation",
+            headerTintColor: "#00BCD4",
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
 
+        {/* New Fish Care Acclimation */}
         <Stack.Screen
           name="new-fish-care/acclimation"
           options={{
+            headerShown: false,
             title: "Acclimation",
+            headerTintColor: "#00BCD4",
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
 
+        {/* New Fish Care Inspection */}
         <Stack.Screen
           name="new-fish-care/inspection"
           options={{
@@ -181,27 +241,43 @@ export default function RootNavigation() {
           }}
         />
 
+        {/* First 24 Hours */}
         <Stack.Screen
           name="new-fish-care/first24hours"
           options={{
+            headerShown: false,
             title: "First 24 Hours",
+            headerTintColor: "#00BCD4",
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
 
+        {/* First 7 Days */}
         <Stack.Screen
           name="new-fish-care/sevenDays"
           options={{
+            headerShown: false,
             title: "First 7 Days",
+            headerTintColor: "#00BCD4",
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
 
+        {/* Success Tips */}
         <Stack.Screen
           name="new-fish-care/success"
           options={{
+            headerShown: false,
             title: "Success Tips",
+            headerTintColor: "#00BCD4",
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Compatibility Checker */}
+
+        {/* ============================================================ */}
+        {/* Compatibility Checker                                          */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="compatibility-checker"
           options={{
@@ -211,7 +287,11 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Fish Details */}
+
+        {/* ============================================================ */}
+        {/* Fish Details                                                   */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="fish/[id]"
           options={{
@@ -222,7 +302,10 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* Fish Variants */}
+        {/* ============================================================ */}
+        {/* Fish Variants                                                  */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="variants/[species]"
           options={{
@@ -232,14 +315,22 @@ export default function RootNavigation() {
             headerBackButtonDisplayMode: "minimal",
           }}
         />
-        {/* Profile */}
+
+        {/* ============================================================ */}
+        {/* Profile                                                         */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="profile"
           options={{
             headerShown: false,
           }}
         />
-        {/* Modal */}
+
+        {/* ============================================================ */}
+        {/* Modal                                                           */}
+        {/* ============================================================ */}
+
         <Stack.Screen
           name="modal"
           options={{

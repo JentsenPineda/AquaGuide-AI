@@ -1,21 +1,53 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { equipmentData } from "../../data/equipmentDatabase";
+
 export default function EquipmentDetail() {
   const colors = useAppColors();
   const { category, equipment } = useLocalSearchParams();
 
-  const selected = equipmentData[category as keyof typeof equipmentData]?.find(
-    (item) => item.id === equipment,
-  );
+  const selected = equipmentData[
+    String(category) as keyof typeof equipmentData
+  ]?.find((item) => item.id === String(equipment));
 
   if (!selected) {
-    return null;
+    return (
+      <View
+        style={[
+          styles.safe,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        <AppHeader title="Equipment Details" showBack />
+
+        <View style={styles.empty}>
+          <MaterialCommunityIcons
+            name="alert-circle-outline"
+            size={42}
+            color={colors.textSecondary}
+          />
+
+          <Text
+            style={[
+              styles.emptyText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Equipment information could not be found.
+          </Text>
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -28,42 +60,90 @@ export default function EquipmentDetail() {
       ]}
     >
       <AppHeader title="Equipment Details" showBack />
+
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Image source={selected.image} style={styles.image} />
-
-        <Text
+        {/* IMAGE */}
+        <View
           style={[
-            styles.title,
+            styles.imageCard,
             {
-              color: colors.textPrimary,
+              backgroundColor: colors.card,
+              borderColor: colors.border,
             },
           ]}
         >
-          {selected.name}
-        </Text>
+          <Image
+            source={selected.image}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* TITLE */}
+        <View style={styles.titleSection}>
+          <Text
+            style={[
+              styles.eyebrow,
+              {
+                color: colors.primary,
+              },
+            ]}
+          >
+            EQUIPMENT
+          </Text>
+
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {selected.name}
+          </Text>
+        </View>
+
+        {/* DESCRIPTION */}
         <View
           style={[
             styles.card,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.primary,
-              },
-            ]}
-          >
-            Description
-          </Text>
+          <View style={styles.sectionHeader}>
+            <View
+              style={[
+                styles.sectionIcon,
+                {
+                  backgroundColor: colors.primary + "15",
+                },
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={20}
+                color={colors.primary}
+              />
+            </View>
+
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Description
+            </Text>
+          </View>
 
           <Text
             style={[
@@ -77,41 +157,78 @@ export default function EquipmentDetail() {
           </Text>
         </View>
 
+        {/* USES */}
         <View
           style={[
             styles.card,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.primary,
-              },
-            ]}
-          >
-            Uses
-          </Text>
-
-          {selected.uses.map((use) => (
-            <Text
-              key={use}
+          <View style={styles.sectionHeader}>
+            <View
               style={[
-                styles.list,
+                styles.sectionIcon,
                 {
-                  color: colors.textSecondary,
+                  backgroundColor: colors.primary + "15",
                 },
               ]}
             >
-              ✓ {use}
+              <MaterialCommunityIcons
+                name="check-decagram-outline"
+                size={20}
+                color={colors.primary}
+              />
+            </View>
+
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Uses
             </Text>
-          ))}
+          </View>
+
+          <View style={styles.usesList}>
+            {selected.uses.map((use, index) => (
+              <View key={`${use}-${index}`} style={styles.useRow}>
+                <View
+                  style={[
+                    styles.checkCircle,
+                    {
+                      backgroundColor: colors.primary + "15",
+                    },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={15}
+                    color={colors.primary}
+                  />
+                </View>
+
+                <Text
+                  style={[
+                    styles.list,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {use}
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
+
+        <View style={styles.bottomSpace} />
       </ScrollView>
     </View>
   );
@@ -120,50 +237,118 @@ export default function EquipmentDetail() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
   },
 
   container: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: TAB_BAR_HEIGHT + 25,
+  },
+
+  imageCard: {
+    height: 205,
+    borderRadius: 22,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
   },
 
   image: {
-    width: "100%",
-    height: 250,
-    borderRadius: 20,
-    resizeMode: "contain",
+    width: "90%",
+    height: "90%",
+  },
+
+  titleSection: {
+    marginTop: 20,
+    marginBottom: 18,
+  },
+
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.4,
+    marginBottom: 5,
   },
 
   title: {
-    color: "#fff",
     fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 15,
-    marginBottom: 15,
+    fontWeight: "900",
+    lineHeight: 34,
   },
 
   card: {
-    backgroundColor: "#102331",
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 15,
+    borderWidth: 1,
+    padding: 17,
+    marginBottom: 14,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  sectionIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 11,
   },
 
   sectionTitle: {
-    color: "#00D4FF",
-    fontWeight: "700",
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 17,
+    fontWeight: "800",
   },
 
   text: {
-    color: "#CFD8DC",
-    lineHeight: 22,
+    fontSize: 13.5,
+    lineHeight: 21,
+  },
+
+  usesList: {
+    gap: 10,
+  },
+
+  useRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  checkCircle: {
+    width: 27,
+    height: 27,
+    borderRadius: 13.5,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+    marginTop: 1,
   },
 
   list: {
-    color: "#CFD8DC",
-    marginBottom: 8,
+    flex: 1,
+    fontSize: 13.5,
+    lineHeight: 20,
+  },
+
+  empty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 30,
+  },
+
+  emptyText: {
+    fontSize: 15,
+    textAlign: "center",
+    marginTop: 12,
+    lineHeight: 21,
+  },
+
+  bottomSpace: {
+    height: 10,
   },
 });

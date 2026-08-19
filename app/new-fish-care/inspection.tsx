@@ -8,7 +8,7 @@ import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const symptoms = [
@@ -75,116 +75,288 @@ const symptoms = [
 
 export default function InspectionScreen() {
   const colors = useAppColors();
-  const [selected, setSelected] = useState<any>(null);
 
-  const recommendation = useMemo(() => {
-    return selected;
-  }, [selected]);
-  const dynamicStyles = {
-    container: {
-      backgroundColor: colors.background,
-    },
+  const scrollRef = useRef<ScrollView>(null);
 
-    header: {
-      backgroundColor: colors.card,
-    },
+  const [selected, setSelected] = useState<(typeof symptoms)[number] | null>(
+    null,
+  );
 
-    card: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
+  const recommendation = useMemo(() => selected, [selected]);
 
-    resultCard: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
+  const selectCondition = (item: (typeof symptoms)[number]) => {
+    setSelected(item);
+
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({
+        animated: true,
+      });
+    }, 100);
   };
+
+  const continueToFirstDay = () => {
+    scrollRef.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
+
+    setTimeout(() => {
+      router.push("/new-fish-care/first24hours");
+    }, 150);
+  };
+
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="New Fish Care" showBack />
+
       <ScrollView
-        contentContainerStyle={styles.content}
+        ref={scrollRef}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingBottom: TAB_BAR_HEIGHT + 30,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemeCard style={[styles.header, dynamicStyles.header]}>
-          <Ionicons name="search-circle" size={75} color={colors.primary} />
-          <ThemeText variant="title" style={styles.title}>
-            Health Inspection
-          </ThemeText>
-          <ThemeText variant="body" style={styles.subtitle}>
-            Observe your fish after acclimation. Choose the condition that best
-            matches its behavior.
-          </ThemeText>
-        </ThemeCard>
-        {symptoms.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            activeOpacity={0.8}
+        {/* HEADER */}
+
+        <ThemeCard style={styles.header}>
+          <View
             style={[
-              styles.card,
-              dynamicStyles.card,
-              selected?.id === item.id && {
-                borderColor: item.color,
-                borderWidth: 2,
+              styles.heroIcon,
+              {
+                backgroundColor: colors.primary + "14",
               },
             ]}
-            onPress={() => setSelected(item)}
           >
-            <View
+            <Ionicons
+              name="search-circle-outline"
+              size={52}
+              color={colors.primary}
+            />
+          </View>
+
+          <View
+            style={[
+              styles.stepBadge,
+              {
+                backgroundColor: colors.primary + "12",
+              },
+            ]}
+          >
+            <ThemeText
+              variant="subtitle"
               style={[
-                styles.iconContainer,
+                styles.stepText,
                 {
-                  backgroundColor: item.color,
+                  color: colors.primary,
                 },
               ]}
             >
-              <Ionicons name={item.icon as any} size={28} color="#FFFFFF" />
-            </View>
+              STEP 3 OF 5
+            </ThemeText>
+          </View>
 
-            <View style={{ flex: 1 }}>
-              <ThemeText variant="subtitle" style={styles.cardTitle}>
-                {item.title}
-              </ThemeText>
-              <ThemeText
-                variant="body"
-                style={[styles.status, { color: item.color }]}
+          <ThemeText variant="title" style={styles.title}>
+            Health Inspection
+          </ThemeText>
+
+          <ThemeText
+            variant="body"
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Observe your fish after acclimation. Choose the condition that best
+            matches its current behavior.
+          </ThemeText>
+        </ThemeCard>
+
+        {/* SECTION */}
+
+        <View style={styles.sectionHeader}>
+          <ThemeText variant="subtitle" style={styles.sectionTitle}>
+            What Do You Observe?
+          </ThemeText>
+
+          <ThemeText
+            variant="body"
+            style={[
+              styles.sectionHint,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Select one condition
+          </ThemeText>
+        </View>
+
+        {/* CONDITIONS */}
+
+        {symptoms.map((item) => {
+          const isSelected = selected?.id === item.id;
+
+          return (
+            <TouchableOpacity
+              key={item.id}
+              activeOpacity={0.85}
+              onPress={() => selectCondition(item)}
+              style={[
+                styles.conditionCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: isSelected ? item.color : colors.border,
+                },
+                isSelected && {
+                  borderWidth: 2,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.conditionIcon,
+                  {
+                    backgroundColor: item.color + "18",
+                  },
+                ]}
               >
-                {item.status}
-              </ThemeText>
-            </View>
+                <Ionicons
+                  name={item.icon as any}
+                  size={26}
+                  color={item.color}
+                />
+              </View>
 
-            <Ionicons name="chevron-forward" size={24} color="#90A4AE" />
-          </TouchableOpacity>
-        ))}
+              <View style={styles.conditionContent}>
+                <ThemeText variant="subtitle" style={styles.conditionTitle}>
+                  {item.title}
+                </ThemeText>
+
+                <ThemeText
+                  variant="body"
+                  style={[
+                    styles.conditionStatus,
+                    {
+                      color: item.color,
+                    },
+                  ]}
+                >
+                  {item.status}
+                </ThemeText>
+              </View>
+
+              <Ionicons
+                name={isSelected ? "checkmark-circle" : "chevron-forward"}
+                size={25}
+                color={isSelected ? item.color : colors.textSecondary}
+              />
+            </TouchableOpacity>
+          );
+        })}
+
+        {/* RECOMMENDATION */}
 
         {recommendation && (
-          <ThemeCard style={[styles.resultCard, dynamicStyles.resultCard]}>
-            <ThemeText variant="subtitle" style={styles.resultTitle}>
-              AquaGuide AI Recommendation
-            </ThemeText>
-            <ThemeText variant="body" style={styles.resultText}>
-              {recommendation.advice}
-            </ThemeText>
-          </ThemeCard>
+          <View
+            style={[
+              styles.recommendation,
+              {
+                backgroundColor: colors.primary + "0D",
+                borderColor: colors.primary + "25",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.recommendationIcon,
+                {
+                  backgroundColor: colors.primary + "16",
+                },
+              ]}
+            >
+              <Ionicons
+                name="sparkles-outline"
+                size={22}
+                color={colors.primary}
+              />
+            </View>
+
+            <View style={styles.recommendationContent}>
+              <ThemeText variant="subtitle" style={styles.recommendationTitle}>
+                AquaGuide AI Recommendation
+              </ThemeText>
+
+              <ThemeText
+                variant="body"
+                style={[
+                  styles.recommendationText,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                {recommendation.advice}
+              </ThemeText>
+            </View>
+          </View>
         )}
 
-        <ThemeCard style={styles.warning}>
-          <Ionicons name="medical" size={28} color="#F44336" />
+        {/* WARNING */}
 
-          <View style={{ flex: 1, marginLeft: 15 }}>
+        <View
+          style={[
+            styles.warning,
+            {
+              backgroundColor: "#F443360D",
+              borderColor: "#F4433628",
+            },
+          ]}
+        >
+          <View style={styles.warningIcon}>
+            <Ionicons name="medical-outline" size={23} color="#F44336" />
+          </View>
+
+          <View style={styles.warningContent}>
             <ThemeText variant="subtitle" style={styles.warningTitle}>
               Important Reminder
             </ThemeText>
-            <ThemeText variant="body" style={styles.warningText}>
+
+            <ThemeText
+              variant="body"
+              style={[
+                styles.warningText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
               If your fish shows severe breathing difficulty, continuous
               rolling, heavy bleeding, or cannot swim properly, isolate the fish
               immediately and check the Disease Guide for treatment options.
             </ThemeText>
           </View>
-        </ThemeCard>
+        </View>
+
+        {/* CONTINUE */}
+
         <ThemeButton
-          title="Continue"
-          onPress={() => router.push("/new-fish-care/first24hours")}
+          title={
+            selected ? "Continue to First 24 Hours" : "Select a Condition First"
+          }
+          onPress={continueToFirstDay}
+          disabled={!selected}
           style={styles.button}
         />
       </ScrollView>
@@ -195,109 +367,171 @@ export default function InspectionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3FBFD",
   },
 
   content: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    padding: 18,
   },
 
   header: {
     alignItems: "center",
-    padding: 24,
+    padding: 22,
     borderRadius: 24,
-    marginBottom: 25,
+    marginBottom: 22,
+  },
+
+  heroIcon: {
+    width: 78,
+    height: 78,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 13,
+  },
+
+  stepBadge: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    marginBottom: 12,
+  },
+
+  stepText: {
+    fontSize: 11,
+    fontWeight: "900",
+    letterSpacing: 0.7,
   },
 
   title: {
-    marginTop: 10,
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 26,
+    fontWeight: "900",
     textAlign: "center",
   },
 
   subtitle: {
-    marginTop: 10,
+    marginTop: 9,
     textAlign: "center",
-    lineHeight: 24,
-    fontSize: 15,
-    opacity: 0.85,
+    fontSize: 14,
+    lineHeight: 22,
   },
 
-  card: {
+  sectionHeader: {
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+  },
+
+  sectionHint: {
+    fontSize: 12,
+    marginTop: 3,
+  },
+
+  conditionCard: {
+    minHeight: 72,
     borderRadius: 18,
-    padding: 18,
-    marginBottom: 15,
+    borderWidth: 1,
+    padding: 13,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
-    elevation: 2,
   },
 
-  iconContainer: {
-    width: 55,
-    height: 55,
-    borderRadius: 28,
+  conditionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
   },
 
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: "700",
+  conditionContent: {
+    flex: 1,
+    marginLeft: 12,
   },
 
-  status: {
-    marginTop: 4,
-    fontWeight: "700",
-    fontSize: 14,
-  },
-
-  resultCard: {
-    borderRadius: 18,
-    padding: 20,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-
-  resultTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 10,
-  },
-
-  resultText: {
-    lineHeight: 24,
+  conditionTitle: {
     fontSize: 15,
-    opacity: 0.9,
+    fontWeight: "800",
+  },
+
+  conditionStatus: {
+    fontSize: 12,
+    fontWeight: "700",
+    marginTop: 3,
+  },
+
+  recommendation: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 16,
+    flexDirection: "row",
+    marginTop: 8,
+    marginBottom: 12,
+  },
+
+  recommendationIcon: {
+    width: 43,
+    height: 43,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  recommendationContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  recommendationTitle: {
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 5,
+  },
+
+  recommendationText: {
+    fontSize: 13.5,
+    lineHeight: 21,
   },
 
   warning: {
     borderRadius: 18,
-    padding: 18,
+    borderWidth: 1,
+    padding: 16,
     flexDirection: "row",
-    marginBottom: 30,
+    marginTop: 8,
+    marginBottom: 24,
+  },
+
+  warningIcon: {
+    width: 43,
+    height: 43,
+    borderRadius: 14,
+    backgroundColor: "#F4433615",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  warningContent: {
+    flex: 1,
+    marginLeft: 12,
   },
 
   warningTitle: {
-    fontWeight: "700",
-    fontSize: 17,
-    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 5,
   },
 
   warningText: {
-    lineHeight: 22,
-    fontSize: 14,
-    opacity: 0.9,
+    fontSize: 13.5,
+    lineHeight: 21,
   },
 
   button: {
-    height: 58,
-    backgroundColor: "#00BCD4",
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    height: 56,
+    borderRadius: 17,
   },
 });

@@ -40,6 +40,7 @@ export default function ScanScreen() {
   const { remainingScans, reserveScan, releaseScan } = useDailyScanLimit();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<"back" | "front">("back");
+  const [cameraReady, setCameraReady] = useState(false);
 
   const [scanState, setScanState] = useState<ScanState>("idle");
   const [progress, setProgress] = useState<number>(0);
@@ -64,7 +65,9 @@ export default function ScanScreen() {
       case "idle":
         return "Camera permission required";
       case "ready":
-        return "Align the ornamental fish inside the frame";
+        return cameraReady
+          ? "Align the ornamental fish inside the frame"
+          : "Preparing camera…";
       case "capturing":
         return "Capturing image…";
       case "processing":
@@ -76,7 +79,7 @@ export default function ScanScreen() {
       default:
         return "";
     }
-  }, [scanState, progress]);
+  }, [scanState, progress, cameraReady]);
 
   // Start/stop the scanner animation depending on state
 
@@ -144,13 +147,34 @@ export default function ScanScreen() {
   // Permission flow
   useEffect(() => {
     if (!permission) return;
+
+    setCameraReady(false);
+
     if (permission.granted) setScanState("ready");
     else setScanState("idle");
   }, [permission]);
 
+  useEffect(() => {
+    if (!permission?.granted || capturedUri || scanState === "processing") {
+      stopScanAnimations();
+      return;
+    }
+
+    if (cameraReady && scanState === "ready") {
+      startScanAnimations();
+    } else {
+      stopScanAnimations();
+    }
+
+    return () => stopScanAnimations();
+  }, [cameraReady, permission?.granted, capturedUri, scanState]);
+
   const onRequestPermission = async () => {
     const res = await requestPermission();
-    if (res.granted) setScanState("ready");
+    if (res.granted) {
+      setCameraReady(false);
+      setScanState("ready");
+    }
   };
 
   const onFlip = () =>
@@ -158,6 +182,7 @@ export default function ScanScreen() {
 
   const onReset = () => {
     setCapturedUri(null);
+    setCameraReady(false);
     setResult(null);
     setProgress(0);
     setScanState(permission?.granted ? "ready" : "idle");
@@ -182,6 +207,14 @@ export default function ScanScreen() {
       }, 30);
     });
   const onScan = async () => {
+    if (!cameraReady || !cameraRef.current) {
+      Alert.alert(
+        "Camera Not Ready",
+        "Please wait a moment for the camera to initialize, then try again.",
+      );
+      return;
+    }
+
     let scanReserved = false;
 
     try {
@@ -215,6 +248,12 @@ export default function ScanScreen() {
 
       setScanState("capturing");
       setResult(null);
+
+      if (!cameraRef.current) {
+        throw new Error(
+          "Camera is not ready. Please wait a moment and try again.",
+        );
+      }
 
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.7,
@@ -725,6 +764,10 @@ Use exactly this structure:
                 ref={cameraRef}
                 style={styles.preview}
                 facing={facing}
+                onCameraReady={() => {
+                  setCameraReady(true);
+                  setScanState("ready");
+                }}
               />
             )
           ) : (
@@ -772,6 +815,36 @@ Use exactly this structure:
                   Grant Permission
                 </Text>
               </Pressable>
+            </View>
+          )}
+
+          {/* Camera status */}
+          {permission?.granted && !capturedUri && (
+            <View
+              pointerEvents="none"
+              style={[
+                styles.cameraStatus,
+                {
+                  backgroundColor: cameraReady
+                    ? "rgba(10, 18, 24, 0.72)"
+                    : "rgba(10, 18, 24, 0.82)",
+                  borderColor: cameraReady
+                    ? colors.primary + "66"
+                    : "rgba(255,255,255,0.12)",
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.cameraStatusDot,
+                  {
+                    backgroundColor: cameraReady ? "#4ADE80" : "#FACC15",
+                  },
+                ]}
+              />
+              <Text style={styles.cameraStatusText}>
+                {cameraReady ? "Camera ready" : "Starting camera…"}
+              </Text>
             </View>
           )}
 
@@ -1494,7 +1567,9 @@ Use exactly this structure:
         <ScanControls
           permissionGranted={permission?.granted ?? false}
           scanState={scanState}
-          canScan={!user || remainingScans > 0}
+          canScan={Boolean(
+            user && cameraReady && remainingScans > 0 && scanState === "ready",
+          )}
           onReset={onReset}
           onScan={onScan}
           primaryColor={colors.primary}
@@ -1507,8 +1582,8 @@ Use exactly this structure:
   );
 }
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#0B0F14" },
-  container: { flex: 1, padding: 16, gap: 12 },
+  safe: { flex: 1 },
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 10, gap: 14 },
 
   header: {
     flexDirection: "row",
@@ -1529,14 +1604,46 @@ const styles = StyleSheet.create({
   },
 
   previewWrap: {
-    borderRadius: 24,
+    borderRadius: 28,
     overflow: "hidden",
     borderWidth: 1,
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
 
   preview: {
     width: "100%",
     height: 430,
+    backgroundColor: "#071116",
+  },
+
+  cameraStatus: {
+    position: "absolute",
+    top: 14,
+    left: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    zIndex: 10,
+  },
+
+  cameraStatusDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    marginRight: 7,
+  },
+
+  cameraStatusText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.2,
   },
 
   permissionBox: {
@@ -1562,10 +1669,10 @@ const styles = StyleSheet.create({
   scannerFrame: {
     width: "86%",
     height: 320,
-    borderRadius: 18,
-    borderWidth: 1,
+    borderRadius: 24,
+    borderWidth: 1.5,
     borderColor: "rgba(255,255,255,0.22)",
-    backgroundColor: "rgba(0,0,0,0.10)",
+    backgroundColor: "rgba(0,0,0,0.08)",
   },
 
   scanLine: {
@@ -1619,17 +1726,18 @@ const styles = StyleSheet.create({
   },
 
   panel: {
-    padding: 14,
-    borderRadius: 18,
+    padding: 16,
+    borderRadius: 22,
     borderWidth: 1,
-    gap: 10,
+    gap: 12,
   },
 
   statusRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 11,
     paddingHorizontal: 2,
+    minHeight: 28,
   },
 
   resultBox: {
@@ -1669,8 +1777,8 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: "row",
     gap: 12,
-    marginTop: 4,
-    marginBottom: 8,
+    marginTop: 0,
+    marginBottom: 10,
   },
 
   primaryBtn: {
@@ -1710,10 +1818,10 @@ const styles = StyleSheet.create({
   btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
 
   resultCard: {
-    padding: 16,
-    borderRadius: 18,
+    padding: 18,
+    borderRadius: 22,
     borderWidth: 1,
-    gap: 14,
+    gap: 16,
   },
 
   resultHeader: {

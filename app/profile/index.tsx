@@ -7,45 +7,60 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { updateProfile } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TextInput,
   View,
 } from "react-native";
+
 import { useAuth } from "../../contexts/AuthContext";
 import { subscribeToLogs } from "../../services/logbookService";
 import { subscribeToReminders } from "../../services/reminderService";
 
-function SettingItem({
-  icon,
-  title,
-  onPress,
-}: {
+type SettingItemProps = {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
+  subtitle: string;
   onPress?: () => void;
-}) {
+};
+
+function SettingItem({ icon, title, subtitle, onPress }: SettingItemProps) {
   const colors = useAppColors();
+
   return (
-    <TouchableOpacity
-      style={[
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={({ pressed }) => [
         styles.settingItem,
         {
           borderBottomColor: colors.border,
+          opacity: pressed && onPress ? 0.75 : 1,
         },
       ]}
-      onPress={onPress}
     >
-      <View style={styles.settingLeft}>
-        <Ionicons name={icon} size={22} color={colors.primary} />
+      <View
+        style={[
+          styles.settingIcon,
+          {
+            backgroundColor: colors.primary + "12",
+          },
+        ]}
+      >
+        <Ionicons name={icon} size={21} color={colors.primary} />
+      </View>
+
+      <View style={styles.settingContent}>
         <Text
           style={[
-            styles.settingText,
+            styles.settingTitle,
             {
               color: colors.textPrimary,
             },
@@ -53,15 +68,108 @@ function SettingItem({
         >
           {title}
         </Text>
+
+        <Text
+          style={[
+            styles.settingSubtitle,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
+          {subtitle}
+        </Text>
       </View>
 
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-    </TouchableOpacity>
+      {onPress && (
+        <Ionicons
+          name="chevron-forward"
+          size={19}
+          color={colors.textSecondary}
+        />
+      )}
+    </Pressable>
   );
 }
+
+function StatCard({
+  icon,
+  value,
+  label,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  value: number;
+  label: string;
+}) {
+  const colors = useAppColors();
+
+  return (
+    <View
+      style={[
+        styles.statCard,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.statIcon,
+          {
+            backgroundColor: colors.primary + "12",
+          },
+        ]}
+      >
+        <Ionicons name={icon} size={22} color={colors.primary} />
+      </View>
+
+      <Text
+        style={[
+          styles.statNumber,
+          {
+            color: colors.textPrimary,
+          },
+        ]}
+      >
+        {value}
+      </Text>
+
+      <Text
+        style={[
+          styles.statLabel,
+          {
+            color: colors.textSecondary,
+          },
+        ]}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 export default function ProfileScreen() {
+  const colors = useAppColors();
+
   const { user, loading, logout } = useAuth();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const [reminderCount, setReminderCount] = useState(0);
+  const [logCount, setLogCount] = useState(0);
+
+  const [displayName, setDisplayName] = useState("");
+
+  const [editing, setEditing] = useState(false);
+  const [savingName, setSavingName] = useState(false);
+
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>("avatar1");
+
+  const [hasSavedAvatar, setHasSavedAvatar] = useState(false);
+
+  // FIX: Avatar picker state
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   useEffect(() => {
     if (!loading && !user && !isLoggingOut) {
@@ -74,15 +182,6 @@ export default function ProfileScreen() {
     }
   }, [loading, user, isLoggingOut]);
 
-  const colors = useAppColors();
-
-  const [reminderCount, setReminderCount] = useState(0);
-  const [logCount, setLogCount] = useState(0);
-  const [displayName, setDisplayName] = useState("");
-  const [editing, setEditing] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState<AvatarId>("avatar1");
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
-
   useEffect(() => {
     if (!user) return;
 
@@ -94,9 +193,16 @@ export default function ProfileScreen() {
 
         if (savedAvatar) {
           setSelectedAvatar(savedAvatar as AvatarId);
+          setHasSavedAvatar(true);
+        } else {
+          setSelectedAvatar("avatar1");
+          setHasSavedAvatar(false);
         }
       } catch (error) {
         console.log("Failed to load avatar:", error);
+
+        setSelectedAvatar("avatar1");
+        setHasSavedAvatar(false);
       }
     };
 
@@ -113,12 +219,10 @@ export default function ProfileScreen() {
     if (!user) return;
 
     const unsubscribeReminders = subscribeToReminders(user.uid, (reminders) => {
-      console.log("Profile reminders:", reminders.length);
       setReminderCount(reminders.length);
     });
 
     const unsubscribeLogs = subscribeToLogs(user.uid, (logs) => {
-      console.log("Profile logs:", logs.length);
       setLogCount(logs.length);
     });
 
@@ -127,14 +231,42 @@ export default function ProfileScreen() {
       unsubscribeLogs();
     };
   }, [user]);
-  if (!user) {
-    return null;
+
+  const greetingName = useMemo(() => {
+    if (!displayName.trim()) {
+      return "AquaGuide User";
+    }
+
+    return displayName.trim().split(" ")[0];
+  }, [displayName]);
+
+  if (loading || !user) {
+    return (
+      <View
+        style={[
+          styles.loadingScreen,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
   }
+
   const saveDisplayName = async () => {
     if (!user) return;
 
+    const newName = displayName.trim();
+
+    if (!newName) {
+      Alert.alert("Name Required", "Please enter a name before saving.");
+      return;
+    }
+
     try {
-      const newName = displayName.trim();
+      setSavingName(true);
 
       await updateProfile(user, {
         displayName: newName,
@@ -145,11 +277,25 @@ export default function ProfileScreen() {
       setDisplayName(newName);
       setEditing(false);
     } catch (error) {
-      console.log(error);
+      console.log("Failed to update profile:", error);
+
+      Alert.alert(
+        "Unable to Update Profile",
+        "We couldn't save your name. Please try again.",
+      );
+    } finally {
+      setSavingName(false);
     }
   };
 
+  const cancelEditing = () => {
+    setDisplayName(user.displayName || "");
+    setEditing(false);
+  };
+
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+
     try {
       setIsLoggingOut(true);
 
@@ -158,7 +304,13 @@ export default function ProfileScreen() {
       router.replace("/(tabs)/menu");
     } catch (error) {
       setIsLoggingOut(false);
+
       console.log("Logout Error:", error);
+
+      Alert.alert(
+        "Logout Failed",
+        "We couldn't log you out. Please try again.",
+      );
     }
   };
 
@@ -174,60 +326,171 @@ export default function ProfileScreen() {
       <AppHeader title="Profile" showBack />
 
       <ScrollView
-        style={[
-          styles.container,
+        style={styles.container}
+        contentContainerStyle={[
+          styles.content,
           {
-            backgroundColor: colors.background,
+            paddingBottom: TAB_BAR_HEIGHT + 30,
           },
         ]}
-        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* PROFILE HEADER */}
+
         <View
           style={[
-            styles.header,
+            styles.profileCard,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
           <View style={styles.avatarContainer}>
-            <Image
-              source={getAvatarSource(selectedAvatar)}
-              style={styles.avatar}
-              resizeMode="cover"
-            />
-
-            <TouchableOpacity
-              style={styles.cameraButton}
-              onPress={() => setShowAvatarPicker(true)}
+            <View
+              style={[
+                styles.avatarRing,
+                {
+                  borderColor: colors.primary,
+                  backgroundColor: colors.background,
+                },
+              ]}
             >
-              <Ionicons name="pencil" size={19} color="#FFFFFF" />
-            </TouchableOpacity>
+              <Image
+                source={
+                  hasSavedAvatar
+                    ? getAvatarSource(selectedAvatar)
+                    : require("@/assets/images/Avatar Image/blank-avatar.png")
+                }
+                style={styles.avatar}
+                resizeMode="cover"
+              />
+            </View>
+
+            <Pressable
+              onPress={() => setShowAvatarPicker(true)}
+              hitSlop={6}
+              style={({ pressed }) => [
+                styles.cameraButton,
+                {
+                  backgroundColor: colors.primary,
+                  borderColor: colors.card,
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              <Ionicons name="camera-outline" size={18} color="#FFFFFF" />
+            </Pressable>
           </View>
-          <Text
-            style={[
-              styles.name,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            {displayName || "AquaGuide User"}
-          </Text>
 
-          <TouchableOpacity
-            onPress={() =>
-              Alert.alert(
-                "Coming Soon",
-                "Editing profile name will be available in the next update.",
-              )
-            }
-          ></TouchableOpacity>
+          {!editing ? (
+            <>
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.profileName,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {displayName || "AquaGuide User"}
+              </Text>
+
+              <Pressable
+                onPress={() => setEditing(true)}
+                style={styles.editProfileButton}
+              >
+                <Ionicons
+                  name="create-outline"
+                  size={15}
+                  color={colors.primary}
+                />
+
+                <Text
+                  style={[
+                    styles.editProfileText,
+                    {
+                      color: colors.primary,
+                    },
+                  ]}
+                >
+                  Edit Name
+                </Text>
+              </Pressable>
+            </>
+          ) : (
+            <View style={styles.editContainer}>
+              <TextInput
+                value={displayName}
+                onChangeText={setDisplayName}
+                placeholder="Enter your name"
+                placeholderTextColor={colors.textSecondary}
+                style={[
+                  styles.nameInput,
+                  {
+                    color: colors.textPrimary,
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                  },
+                ]}
+                autoCapitalize="words"
+                editable={!savingName}
+                returnKeyType="done"
+                onSubmitEditing={saveDisplayName}
+              />
+
+              <View style={styles.editButtons}>
+                <Pressable
+                  onPress={cancelEditing}
+                  disabled={savingName}
+                  style={[
+                    styles.cancelButton,
+                    {
+                      backgroundColor: colors.background,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.cancelButtonText,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    Cancel
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={saveDisplayName}
+                  disabled={savingName}
+                  style={[
+                    styles.saveButton,
+                    {
+                      backgroundColor: colors.primary,
+                      opacity: savingName ? 0.7 : 1,
+                    },
+                  ]}
+                >
+                  {savingName ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Ionicons name="checkmark" size={17} color="#FFFFFF" />
+
+                      <Text style={styles.saveButtonText}>Save</Text>
+                    </>
+                  )}
+                </Pressable>
+              </View>
+            </View>
+          )}
 
           <Text
+            numberOfLines={1}
             style={[
               styles.email,
               {
@@ -240,184 +503,224 @@ export default function ProfileScreen() {
 
           <View
             style={[
-              styles.badge,
+              styles.syncBadge,
               {
-                backgroundColor: colors.success + "20",
+                backgroundColor: colors.success + "15",
+                borderColor: colors.success + "30",
               },
             ]}
           >
-            <Ionicons name="cloud-done" size={16} color={colors.success} />
+            <Ionicons
+              name="cloud-done-outline"
+              size={15}
+              color={colors.success}
+            />
+
             <Text
               style={[
-                styles.badgeText,
+                styles.syncBadgeText,
                 {
                   color: colors.success,
                 },
               ]}
             >
-              Cloud Sync
+              Cloud Sync Active
             </Text>
           </View>
         </View>
 
-        {/* Statistics */}
-        <View
-          style={[
-            styles.statsContainer,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: 1,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Your Statistics
-          </Text>
+        {/* QUICK STATS */}
 
-          <View style={styles.stats}>
-            <View
+        <View style={styles.sectionHeading}>
+          <View>
+            <Text
               style={[
-                styles.card,
+                styles.sectionTitle,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderWidth: 1,
+                  color: colors.textPrimary,
                 },
               ]}
             >
-              <Ionicons
-                name="notifications-outline"
-                size={28}
-                color="#00BCD4"
-              />
-              <Text
-                style={[
-                  styles.number,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {reminderCount}
-              </Text>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Reminders
-              </Text>
-            </View>
+              Your Activity
+            </Text>
 
-            <View
+            <Text
               style={[
-                styles.card,
+                styles.sectionSubtitle,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderWidth: 1,
+                  color: colors.textSecondary,
                 },
               ]}
             >
-              <Ionicons name="book-outline" size={28} color="#00BCD4" />
-              <Text
-                style={[
-                  styles.number,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {logCount}
-              </Text>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Logbooks
-              </Text>
-            </View>
+              Your saved fishkeeping activity
+            </Text>
           </View>
         </View>
 
-        {/* Settings */}
+        <View style={styles.statsRow}>
+          <StatCard
+            icon="notifications-outline"
+            value={reminderCount}
+            label="Reminders"
+          />
+
+          <StatCard
+            icon="book-outline"
+            value={logCount}
+            label="Logbook Entries"
+          />
+        </View>
+
+        {/* ACCOUNT SETTINGS */}
+
+        <View style={styles.sectionHeading}>
+          <View>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Account
+            </Text>
+
+            <Text
+              style={[
+                styles.sectionSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Manage your AquaGuide AI account
+            </Text>
+          </View>
+        </View>
+
         <View
           style={[
             styles.settingsCard,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
-          <Text
-            style={[
-              styles.settingsTitle,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Settings
-          </Text>
-
           <SettingItem
             icon="notifications-outline"
             title="Notifications"
+            subtitle="Manage your reminder notifications"
             onPress={() => router.push("/profile/notifications")}
           />
 
           <SettingItem
-            icon="key"
+            icon="key-outline"
             title="Change Password"
+            subtitle="Update your account password"
             onPress={() => router.push("/profile/change-password")}
           />
         </View>
 
-        <TouchableOpacity
+        {/* SECURITY INFORMATION */}
+
+        <View
           style={[
+            styles.infoCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.infoIcon,
+              {
+                backgroundColor: colors.primary + "12",
+              },
+            ]}
+          >
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={20}
+              color={colors.primary}
+            />
+          </View>
+
+          <View style={styles.infoContent}>
+            <Text
+              style={[
+                styles.infoTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Account Security
+            </Text>
+
+            <Text
+              style={[
+                styles.infoText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Your profile and fishkeeping data are synced securely with your
+              account.
+            </Text>
+          </View>
+        </View>
+
+        {/* LOGOUT */}
+
+        <Pressable
+          onPress={handleLogout}
+          disabled={isLoggingOut}
+          style={({ pressed }) => [
             styles.logoutButton,
             {
               backgroundColor: colors.danger,
+              opacity: pressed || isLoggingOut ? 0.75 : 1,
             },
           ]}
-          onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={22} color="#fff" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+          {isLoggingOut ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <>
+              <Ionicons name="log-out-outline" size={21} color="#FFFFFF" />
+
+              <Text style={styles.logoutText}>Log Out</Text>
+            </>
+          )}
+        </Pressable>
       </ScrollView>
+
+      {/* AVATAR PICKER */}
 
       <AvatarPicker
         visible={showAvatarPicker}
         selectedAvatar={selectedAvatar}
         onSelect={async (avatarId) => {
           try {
+            if (!user) return;
+
             await AsyncStorage.setItem(
-              `aquaguide_avatar_${user?.uid}`,
+              `aquaguide_avatar_${user.uid}`,
               avatarId,
             );
 
             setSelectedAvatar(avatarId);
+            setHasSavedAvatar(true);
             setShowAvatarPicker(false);
           } catch (error) {
             console.log("Failed to save avatar:", error);
+
+            Alert.alert("Unable to Save Avatar", "Please try again.");
           }
         }}
         onClose={() => setShowAvatarPicker(false)}
@@ -430,298 +733,392 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+  },
+
+  loadingScreen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
-    padding: 20,
-  },
-
-  header: {
-    alignItems: "center",
-    marginTop: 25,
-    marginBottom: 35,
-    borderRadius: 24,
-    padding: 24,
-  },
-
-  name: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginTop: 15,
-    color: "#111827",
-  },
-
-  email: {
-    fontSize: 15,
-    color: "#6B7280",
-    marginTop: 5,
-  },
-
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#DCFCE7",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginTop: 15,
-  },
-
-  badgeText: {
-    marginLeft: 6,
-    color: "#166534",
-    fontWeight: "600",
-  },
-
-  number: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginTop: 8,
-    color: "#111827",
-  },
-
-  label: {
-    color: "#6B7280",
-    marginTop: 5,
-  },
-
-  logoutText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-    marginLeft: 8,
-  },
-
-  input: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginTop: 15,
-    fontSize: 16,
-  },
-
-  editButtons: {
-    flexDirection: "row",
-    marginTop: 12,
-  },
-
-  saveButton: {
-    backgroundColor: "#00BCD4",
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-
-  cancelButton: {
-    backgroundColor: "#E5E7EB",
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-
-  saveButtonText: {
-    color: "#fff",
-    fontWeight: "700",
-  },
-
-  cancelButtonText: {
-    color: "#374151",
-    fontWeight: "700",
-  },
-
-  editName: {
-    color: "#00BCD4",
-    marginTop: 8,
-    fontWeight: "600",
-  },
-  settingsCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    paddingVertical: 8,
-    marginBottom: 25,
-    elevation: 2,
-  },
-
-  settingsTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111827",
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-  },
-
-  settingItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 18,
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#F3F4F6",
-  },
-
-  settingLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  settingText: {
-    marginLeft: 14,
-    fontSize: 16,
-    color: "#374151",
   },
 
   content: {
+    paddingHorizontal: 20,
+    paddingTop: 14,
+  },
+
+  /* PROFILE */
+
+  profileCard: {
+    borderRadius: 24,
+    borderWidth: 1,
     padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
-    flexGrow: 1,
-  },
-
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#111827",
-    marginBottom: 14,
-  },
-
-  statsContainer: {
-    marginBottom: 25,
-    borderRadius: 22,
-    padding: 20,
-  },
-  stats: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  card: {
-    flex: 1,
-    borderRadius: 18,
-    paddingVertical: 26,
-    marginHorizontal: 6,
     alignItems: "center",
-  },
+    marginBottom: 24,
+    elevation: 2,
 
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: "#00BCD4",
-    backgroundColor: "#E5E7EB",
-    transform: [{ scale: 1.18 }],
-  },
-
-  logoutButton: {
-    borderRadius: 18,
-    height: 58,
-    marginTop: 10,
-    marginBottom: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 9,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
   },
 
   avatarContainer: {
     position: "relative",
-    marginBottom: 15,
+    marginBottom: 13,
+  },
+
+  avatarRing: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    borderWidth: 3,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
 
   cameraButton: {
     position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "#00BCD4",
+
+    right: -1,
+    bottom: 1,
+
+    width: 36,
+    height: 36,
+
+    borderRadius: 18,
+
+    borderWidth: 3,
+
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#FFFFFF",
-    elevation: 5,
+
+    elevation: 4,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
   },
 
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.45)",
-    justifyContent: "center",
-    paddingHorizontal: 20,
+  profileName: {
+    maxWidth: "90%",
+    fontSize: 22,
+    fontWeight: "900",
+    textAlign: "center",
   },
 
-  avatarModal: {
-    borderRadius: 24,
-    padding: 20,
-    maxHeight: "80%",
-  },
-
-  modalHeader: {
+  editProfileButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 18,
+
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+
+    marginTop: 3,
   },
 
-  modalTitle: {
-    fontSize: 20,
+  editProfileText: {
+    fontSize: 12,
+    fontWeight: "800",
+    marginLeft: 4,
+  },
+
+  email: {
+    maxWidth: "92%",
+    fontSize: 13,
+    marginTop: 4,
+    textAlign: "center",
+  },
+
+  syncBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+
+    borderRadius: 20,
+    borderWidth: 1,
+
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+
+    marginTop: 12,
+  },
+
+  syncBadgeText: {
+    fontSize: 11,
+    fontWeight: "800",
+    marginLeft: 5,
+  },
+
+  /* EDIT NAME */
+
+  editContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+
+  nameInput: {
+    width: "100%",
+
+    height: 48,
+
+    borderRadius: 14,
+    borderWidth: 1,
+
+    paddingHorizontal: 13,
+
+    fontSize: 15,
+
+    textAlign: "center",
+  },
+
+  editButtons: {
+    flexDirection: "row",
+    marginTop: 9,
+  },
+
+  cancelButton: {
+    height: 40,
+
+    paddingHorizontal: 15,
+
+    borderRadius: 12,
+    borderWidth: 1,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginRight: 7,
+  },
+
+  cancelButtonText: {
+    fontSize: 12,
     fontWeight: "800",
   },
 
-  modalSubtitle: {
-    marginTop: 4,
-    fontSize: 13,
-  },
+  saveButton: {
+    minWidth: 78,
+    height: 40,
 
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+    paddingHorizontal: 15,
 
-  avatarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    rowGap: 14,
-  },
-
-  avatarOption: {
-    width: "23%",
-    aspectRatio: 1,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "transparent",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-
-  avatarOptionImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 50,
-  },
-
-  selectedCheck: {
-    position: "absolute",
-    right: -2,
-    bottom: -2,
-    width: 23,
-    height: 23,
     borderRadius: 12,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    flexDirection: "row",
+  },
+
+  saveButtonText: {
+    color: "#FFFFFF",
+
+    fontSize: 12,
+    fontWeight: "800",
+
+    marginLeft: 4,
+  },
+
+  /* SECTIONS */
+
+  sectionHeading: {
+    marginBottom: 10,
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: "900",
+  },
+
+  sectionSubtitle: {
+    fontSize: 11,
+    marginTop: 3,
+  },
+
+  /* STATS */
+
+  statsRow: {
+    flexDirection: "row",
+    marginHorizontal: -5,
+    marginBottom: 24,
+  },
+
+  statCard: {
+    flex: 1,
+
+    minHeight: 128,
+
+    borderRadius: 19,
+    borderWidth: 1,
+
+    padding: 14,
+
+    marginHorizontal: 5,
+
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
+  },
+
+  statIcon: {
+    width: 43,
+    height: 43,
+
+    borderRadius: 14,
+
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  statNumber: {
+    fontSize: 23,
+    fontWeight: "900",
+    marginTop: 7,
+  },
+
+  statLabel: {
+    fontSize: 11,
+    marginTop: 2,
+    textAlign: "center",
+  },
+
+  /* SETTINGS */
+
+  settingsCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+
+    overflow: "hidden",
+
+    marginBottom: 14,
+  },
+
+  settingItem: {
+    minHeight: 72,
+
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    borderBottomWidth: 1,
+  },
+
+  settingIcon: {
+    width: 42,
+    height: 42,
+
+    borderRadius: 13,
+
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  settingContent: {
+    flex: 1,
+
+    marginLeft: 11,
+    marginRight: 8,
+  },
+
+  settingTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  settingSubtitle: {
+    fontSize: 10,
+    marginTop: 3,
+  },
+
+  /* INFO */
+
+  infoCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+
+    padding: 13,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    marginBottom: 14,
+  },
+
+  infoIcon: {
+    width: 42,
+    height: 42,
+
+    borderRadius: 13,
+
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  infoContent: {
+    flex: 1,
+    marginLeft: 10,
+  },
+
+  infoTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+
+  infoText: {
+    fontSize: 10,
+    lineHeight: 16,
+    marginTop: 3,
+  },
+
+  /* LOGOUT */
+
+  logoutButton: {
+    height: 55,
+
+    borderRadius: 17,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    flexDirection: "row",
+
+    marginBottom: 20,
+
+    elevation: 2,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 7,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+
+  logoutText: {
+    color: "#FFFFFF",
+
+    fontSize: 15,
+    fontWeight: "800",
+
+    marginLeft: 7,
   },
 });

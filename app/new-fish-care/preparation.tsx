@@ -8,8 +8,15 @@ import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const checklist = [
   "My aquarium is fully cycled",
@@ -22,135 +29,347 @@ const checklist = [
 
 export default function PreparationScreen() {
   const colors = useAppColors();
+
+  const scrollRef = useRef<ScrollView>(null);
+
   const [checked, setChecked] = useState<boolean[]>(
     new Array(checklist.length).fill(false),
   );
 
   const completed = useMemo(() => checked.filter(Boolean).length, [checked]);
 
+  const progress = (completed / checklist.length) * 100;
+
   const toggleItem = (index: number) => {
     const copy = [...checked];
     copy[index] = !copy[index];
     setChecked(copy);
   };
-  const dynamicStyles = {
-    container: {
-      backgroundColor: colors.background,
-    },
 
-    iconContainer: {
-      backgroundColor: colors.card,
-    },
+  const continueToAcclimation = () => {
+    scrollRef.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
 
-    progressCard: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
-
-    item: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
-
-    sectionText: {
-      color: colors.textPrimary,
-    },
+    setTimeout(() => {
+      router.push("/new-fish-care/acclimation");
+    }, 150);
   };
+
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="Preparation" showBack />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ThemeCard style={styles.header}>
-          <View style={[styles.iconContainer, dynamicStyles.iconContainer]}>
-            <Ionicons
-              name="clipboard-outline"
-              size={60}
-              color={colors.primary}
-            />
-          </View>
+        <ScrollView
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[
+            styles.content,
+            {
+              paddingBottom: TAB_BAR_HEIGHT + 30,
+            },
+          ]}
+          automaticallyAdjustKeyboardInsets
+        >
+          {/* HEADER */}
 
-          <ThemeText variant="title" style={styles.title}>
-            Preparation Checklist
-          </ThemeText>
-
-          <ThemeText variant="body" style={styles.subtitle}>
-            Before introducing your new fish into the aquarium, make sure
-            everything below is ready.
-          </ThemeText>
-        </ThemeCard>
-
-        <ThemeCard style={[styles.progressCard, dynamicStyles.progressCard]}>
-          <ThemeText variant="subtitle" style={styles.progressTitle}>
-            Progress
-          </ThemeText>
-
-          <ThemeText variant="title" style={styles.progressValue}>
-            {completed} / {checklist.length}
-          </ThemeText>
-
-          <View style={styles.progressBar}>
+          <ThemeCard style={styles.header}>
             <View
               style={[
-                styles.progressFill,
+                styles.heroIcon,
                 {
-                  width: `${(completed / checklist.length) * 100}%`,
+                  backgroundColor: colors.primary + "14",
+                  borderColor: colors.primary + "28",
                 },
               ]}
-            />
-          </View>
-        </ThemeCard>
+            >
+              <Ionicons
+                name="clipboard-outline"
+                size={42}
+                color={colors.primary}
+              />
+            </View>
 
-        {checklist.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[styles.item, dynamicStyles.item]}
-            activeOpacity={0.8}
-            onPress={() => toggleItem(index)}
+            <View
+              style={[
+                styles.stepBadge,
+                {
+                  backgroundColor: colors.primary + "12",
+                },
+              ]}
+            >
+              <ThemeText
+                variant="subtitle"
+                style={[
+                  styles.stepBadgeText,
+                  {
+                    color: colors.primary,
+                  },
+                ]}
+              >
+                STEP 1 OF 5
+              </ThemeText>
+            </View>
+
+            <ThemeText variant="title" style={styles.title}>
+              Prepare Your Aquarium
+            </ThemeText>
+
+            <ThemeText
+              variant="body"
+              style={[
+                styles.subtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Make sure your aquarium is ready before beginning the acclimation
+              process.
+            </ThemeText>
+          </ThemeCard>
+
+          {/* PROGRESS */}
+
+          <ThemeCard style={styles.progressCard}>
+            <View style={styles.progressHeader}>
+              <View>
+                <ThemeText variant="subtitle" style={styles.progressTitle}>
+                  Preparation Progress
+                </ThemeText>
+
+                <ThemeText
+                  variant="body"
+                  style={[
+                    styles.progressDescription,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Complete every item before continuing.
+                </ThemeText>
+              </View>
+
+              <View
+                style={[
+                  styles.progressBadge,
+                  {
+                    backgroundColor:
+                      completed === checklist.length
+                        ? "#4CAF5018"
+                        : colors.primary + "14",
+                  },
+                ]}
+              >
+                <ThemeText
+                  variant="subtitle"
+                  style={[
+                    styles.progressBadgeText,
+                    {
+                      color:
+                        completed === checklist.length
+                          ? "#4CAF50"
+                          : colors.primary,
+                    },
+                  ]}
+                >
+                  {completed}/{checklist.length}
+                </ThemeText>
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.progressBackground,
+                {
+                  backgroundColor: colors.border,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${progress}%`,
+                    backgroundColor:
+                      completed === checklist.length
+                        ? "#4CAF50"
+                        : colors.primary,
+                  },
+                ]}
+              />
+            </View>
+          </ThemeCard>
+
+          {/* CHECKLIST */}
+
+          <View style={styles.sectionHeader}>
+            <ThemeText variant="subtitle" style={styles.sectionTitle}>
+              Aquarium Checklist
+            </ThemeText>
+
+            <ThemeText
+              variant="body"
+              style={[
+                styles.sectionHint,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Tap each item when ready
+            </ThemeText>
+          </View>
+
+          {checklist.map((item, index) => {
+            const isChecked = checked[index];
+
+            return (
+              <TouchableOpacity
+                key={index}
+                activeOpacity={0.85}
+                onPress={() => toggleItem(index)}
+                style={[
+                  styles.item,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: isChecked ? "#4CAF50" : colors.border,
+                  },
+                  isChecked && {
+                    backgroundColor: "#4CAF5009",
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.checkCircle,
+                    {
+                      backgroundColor: isChecked
+                        ? "#4CAF50"
+                        : colors.background,
+                      borderColor: isChecked ? "#4CAF50" : colors.border,
+                    },
+                  ]}
+                >
+                  {isChecked && (
+                    <Ionicons name="checkmark" size={19} color="#FFFFFF" />
+                  )}
+                </View>
+
+                <View style={styles.itemContent}>
+                  <ThemeText
+                    variant="body"
+                    style={[styles.itemText, isChecked && styles.completedText]}
+                  >
+                    {item}
+                  </ThemeText>
+
+                  {isChecked && (
+                    <ThemeText
+                      variant="body"
+                      style={[
+                        styles.readyText,
+                        {
+                          color: "#4CAF50",
+                        },
+                      ]}
+                    >
+                      Ready
+                    </ThemeText>
+                  )}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+
+          {/* TIP */}
+
+          <View
+            style={[
+              styles.tipCard,
+              {
+                backgroundColor: "#FFC10712",
+                borderColor: "#FFC10730",
+              },
+            ]}
           >
-            <Ionicons
-              name={checked[index] ? "checkbox" : "square-outline"}
-              size={28}
-              color={checked[index] ? "#4CAF50" : "#90A4AE"}
+            <View style={styles.tipIcon}>
+              <Ionicons name="bulb-outline" size={23} color="#FFC107" />
+            </View>
+
+            <View style={styles.tipContent}>
+              <ThemeText variant="subtitle" style={styles.tipTitle}>
+                AquaGuide AI Tip
+              </ThemeText>
+
+              <ThemeText
+                variant="body"
+                style={[
+                  styles.tipText,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Never open the transport bag until the temperature has adjusted.
+                Sudden changes can cause severe stress and water shock.
+              </ThemeText>
+            </View>
+          </View>
+
+          {/* CONTINUE */}
+
+          {completed === checklist.length ? (
+            <ThemeButton
+              title="Continue to Acclimation"
+              onPress={continueToAcclimation}
+              style={styles.nextButton}
             />
+          ) : (
+            <View
+              style={[
+                styles.disabledButton,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Ionicons
+                name="lock-closed-outline"
+                size={18}
+                color={colors.textSecondary}
+              />
 
-            <ThemeText variant="body" style={styles.itemText}>
-              {item}
-            </ThemeText>
-          </TouchableOpacity>
-        ))}
-
-        <ThemeCard style={styles.tipCard}>
-          <Ionicons name="bulb" size={30} color="#FFC107" />
-
-          <View style={{ flex: 1, marginLeft: 15 }}>
-            <ThemeText variant="subtitle" style={styles.tipTitle}>
-              AquaGuide AI Tip
-            </ThemeText>
-
-            <ThemeText variant="body" style={styles.tipText}>
-              Never open the transport bag until the temperature has adjusted.
-              Sudden changes can cause severe stress and water shock.
-            </ThemeText>
-          </View>
-        </ThemeCard>
-
-        {completed === checklist.length ? (
-          <ThemeButton
-            title="Continue to Acclimation"
-            onPress={() => router.push("/new-fish-care/acclimation")}
-            style={styles.nextButton}
-          />
-        ) : (
-          <View style={styles.disabledButton}>
-            <ThemeText variant="subtitle" style={styles.disabledText}>
-              Complete the checklist first
-            </ThemeText>
-          </View>
-        )}
-      </ScrollView>
+              <ThemeText
+                variant="subtitle"
+                style={[
+                  styles.disabledText,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Complete the checklist first
+              </ThemeText>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -158,137 +377,211 @@ export default function PreparationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2FBFD",
+  },
+
+  keyboardContainer: {
+    flex: 1,
   },
 
   content: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    padding: 18,
   },
 
   header: {
     alignItems: "center",
-    padding: 24,
+    padding: 22,
     borderRadius: 24,
-    marginBottom: 25,
+    marginBottom: 16,
   },
 
-  iconContainer: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+  heroIcon: {
+    width: 78,
+    height: 78,
+    borderRadius: 25,
+    borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 14,
+  },
+
+  stepBadge: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    marginBottom: 13,
+  },
+
+  stepBadgeText: {
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.7,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 26,
+    fontWeight: "900",
+    textAlign: "center",
   },
 
   subtitle: {
+    marginTop: 9,
     textAlign: "center",
-    marginTop: 10,
-    fontSize: 15,
-    lineHeight: 24,
-    opacity: 0.85,
+    fontSize: 14,
+    lineHeight: 22,
   },
 
   progressCard: {
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 25,
-    elevation: 2,
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 22,
+  },
+
+  progressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   progressTitle: {
     fontSize: 16,
-    opacity: 0.8,
-  },
-
-  progressValue: {
-    fontSize: 30,
     fontWeight: "800",
-    color: "#00BCD4",
-    marginVertical: 8,
   },
 
-  progressBar: {
-    height: 10,
-    backgroundColor: "#E0E0E0",
+  progressDescription: {
+    fontSize: 12,
+    marginTop: 3,
+  },
+
+  progressBadge: {
+    minWidth: 52,
+    height: 34,
+    paddingHorizontal: 10,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  progressBadgeText: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+
+  progressBackground: {
+    height: 9,
     borderRadius: 20,
     overflow: "hidden",
+    marginTop: 17,
   },
 
   progressFill: {
-    height: 10,
+    height: 9,
     borderRadius: 20,
-    backgroundColor: "#00BCD4",
+  },
+
+  sectionHeader: {
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+  },
+
+  sectionHint: {
+    fontSize: 12,
+    marginTop: 3,
   },
 
   item: {
+    minHeight: 72,
     borderRadius: 18,
-    padding: 18,
+    borderWidth: 1,
+    paddingHorizontal: 15,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 14,
-    elevation: 2,
+  },
+
+  checkCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  itemContent: {
+    flex: 1,
+    marginLeft: 13,
   },
 
   itemText: {
-    flex: 1,
-    marginLeft: 15,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 21,
+  },
+
+  completedText: {
+    fontWeight: "600",
+  },
+
+  readyText: {
+    fontSize: 11,
+    fontWeight: "700",
+    marginTop: 3,
   },
 
   tipCard: {
-    flexDirection: "row",
     borderRadius: 18,
-    padding: 18,
-    marginTop: 20,
-    marginBottom: 30,
+    borderWidth: 1,
+    padding: 16,
+    flexDirection: "row",
+    marginTop: 12,
+    marginBottom: 24,
+  },
+
+  tipIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#FFC10718",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  tipContent: {
+    flex: 1,
+    marginLeft: 12,
   },
 
   tipTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    marginBottom: 6,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 5,
   },
 
   tipText: {
-    fontSize: 14,
-    lineHeight: 22,
-    opacity: 0.85,
+    fontSize: 13.5,
+    lineHeight: 21,
   },
 
   nextButton: {
-    height: 58,
-    borderRadius: 18,
-    backgroundColor: "#00BCD4",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-  },
-
-  nextText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 17,
-    marginRight: 10,
+    height: 56,
+    borderRadius: 17,
   },
 
   disabledButton: {
-    height: 58,
-    borderRadius: 18,
+    height: 56,
+    borderRadius: 17,
+    borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
   },
 
   disabledText: {
+    fontSize: 14,
     fontWeight: "700",
-    fontSize: 16,
-    opacity: 0.7,
   },
 });

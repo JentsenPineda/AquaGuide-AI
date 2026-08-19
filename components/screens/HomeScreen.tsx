@@ -7,11 +7,15 @@ import {
   subscribeToPrograms,
 } from "@/services/newFishCareService";
 import { subscribeToReminders } from "@/services/reminderService";
-import { ScanItem, subscribeToScans } from "@/services/scanService";
+import {
+  ScanItem,
+  getDailyScanUsage,
+  subscribeToScans,
+} from "@/services/scanService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 type LogItem = {
@@ -33,76 +37,48 @@ type ReminderItem = {
   note?: string;
 };
 
-type ModuleCardProps = {
-  title: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  route: string;
-};
-
-function ModuleCard({ title, icon, route }: ModuleCardProps) {
-  const router = useRouter();
-  const colors = useAppColors();
-
-  return (
-    <Pressable
-      onPress={() => router.push(route as any)}
-      style={({ pressed }) => [
-        styles.moduleCard,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-        },
-        pressed && { opacity: 0.9 },
-      ]}
-    >
-      <Ionicons name={icon} size={26} color={colors.primary} />
-
-      <Text
-        style={[
-          styles.moduleTitle,
-          {
-            color: colors.textPrimary,
-          },
-        ]}
-      >
-        {title}
-      </Text>
-    </Pressable>
-  );
-}
+const DAILY_SCAN_LIMIT = 5;
 
 export default function HomeScreen() {
   const router = useRouter();
   const colors = useAppColors();
   const { user } = useAuth();
 
-  // ============================================================
-  // FISH CARE
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Fish Care                                                                */
+  /* ------------------------------------------------------------------------ */
 
   const [programs, setPrograms] = useState<FishCareProgram[]>([]);
 
-  // ============================================================
-  // SCANS
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Scans                                                                    */
+  /* ------------------------------------------------------------------------ */
 
   const [scans, setScans] = useState<ScanItem[]>([]);
 
-  // ============================================================
-  // REMINDERS
-  // ============================================================
+  const [dailyScanUsage, setDailyScanUsage] = useState({
+    used: 0,
+    remaining: DAILY_SCAN_LIMIT,
+    limit: DAILY_SCAN_LIMIT,
+  });
+
+  const [loadingScanUsage, setLoadingScanUsage] = useState(false);
+
+  /* ------------------------------------------------------------------------ */
+  /* Reminders                                                                */
+  /* ------------------------------------------------------------------------ */
 
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
 
-  // ============================================================
-  // LOGBOOK
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Logbook                                                                  */
+  /* ------------------------------------------------------------------------ */
 
   const [logs, setLogs] = useState<LogItem[]>([]);
 
-  // ============================================================
-  // SUBSCRIBE TO FISH CARE PROGRAMS
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Firebase subscriptions                                                   */
+  /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
     if (!user) {
@@ -113,10 +89,6 @@ export default function HomeScreen() {
     return subscribeToPrograms(user.uid, setPrograms);
   }, [user]);
 
-  // ============================================================
-  // SUBSCRIBE TO SCANS
-  // ============================================================
-
   useEffect(() => {
     if (!user) {
       setScans([]);
@@ -125,10 +97,6 @@ export default function HomeScreen() {
 
     return subscribeToScans(user.uid, setScans);
   }, [user]);
-
-  // ============================================================
-  // SUBSCRIBE TO REMINDERS
-  // ============================================================
 
   useEffect(() => {
     if (!user) {
@@ -139,10 +107,6 @@ export default function HomeScreen() {
     return subscribeToReminders(user.uid, setReminders);
   }, [user]);
 
-  // ============================================================
-  // SUBSCRIBE TO LOGBOOK
-  // ============================================================
-
   useEffect(() => {
     if (!user) {
       setLogs([]);
@@ -152,9 +116,60 @@ export default function HomeScreen() {
     return subscribeToLogs(user.uid, setLogs);
   }, [user]);
 
-  // ============================================================
-  // FISH CARE STATISTICS
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Daily Scan Usage                                                         */
+  /*                                                                          */
+  /* IMPORTANT: This is now the source of truth for the Home scan statistic.  */
+  /* It uses the exact same Firestore scanUsage document as the Scan module.  */
+  /* ------------------------------------------------------------------------ */
+
+  const loadDailyScanUsage = useCallback(async () => {
+    if (!user) {
+      setDailyScanUsage({
+        used: 0,
+        remaining: DAILY_SCAN_LIMIT,
+        limit: DAILY_SCAN_LIMIT,
+      });
+
+      return;
+    }
+
+    try {
+      setLoadingScanUsage(true);
+
+      const usage = await getDailyScanUsage(user.uid);
+
+      setDailyScanUsage({
+        used: usage.used,
+        remaining: usage.remaining,
+        limit: usage.limit,
+      });
+    } catch (error) {
+      console.error("Failed to load daily scan usage:", error);
+    } finally {
+      setLoadingScanUsage(false);
+    }
+  }, [user]);
+
+  /*
+   * Refresh whenever Home becomes active.
+   *
+   * Example:
+   *
+   * Home → Scan → use 5th scan → Back
+   *
+   * Home will immediately request the current Firestore usage
+   * and display 0 / 5.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      loadDailyScanUsage();
+    }, [loadDailyScanUsage]),
+  );
+
+  /* ------------------------------------------------------------------------ */
+  /* Fish Care statistics                                                     */
+  /* ------------------------------------------------------------------------ */
 
   const activePrograms = useMemo(
     () => programs.filter((program) => program.status === "active"),
@@ -174,10 +189,18 @@ export default function HomeScreen() {
     ? nextProgram.days.filter((day) => day.completed).length
     : 0;
 
-  // ============================================================
-  // SCANS TODAY
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Scan history                                                             */
+  /* ------------------------------------------------------------------------ */
 
+  /*
+   * This remains available for scan history-related functionality.
+   *
+   * IMPORTANT:
+   * This value is NO LONGER used for the Home scan limit.
+   *
+   * The actual daily limit comes from dailyScanUsage above.
+   */
   const scansToday = useMemo(() => {
     const now = new Date();
 
@@ -207,15 +230,29 @@ export default function HomeScreen() {
     }).length;
   }, [scans]);
 
-  // ============================================================
-  // DASHBOARD STATISTICS
-  // ============================================================
+  /* ------------------------------------------------------------------------ */
+  /* Dashboard statistics                                                     */
+  /* ------------------------------------------------------------------------ */
 
   const activeReminderCount = reminders.length;
 
   const logbookCount = logs.length;
 
   const activeFishCareCount = activePrograms.length;
+
+  const fishCareProgress = nextProgram
+    ? Math.min((nextProgramCompletedDays / 7) * 100, 100)
+    : 0;
+
+  /* ------------------------------------------------------------------------ */
+  /* Scan UI values                                                           */
+  /* ------------------------------------------------------------------------ */
+
+  const scanLimitReached = dailyScanUsage.remaining <= 0;
+
+  const scanRemainingText = scanLimitReached
+    ? "Daily limit reached"
+    : `${dailyScanUsage.remaining} remaining`;
 
   return (
     <View
@@ -227,93 +264,131 @@ export default function HomeScreen() {
       ]}
     >
       <AppHeader title="AquaGuide AI" showBack={false} showLogo />
+
       <ScrollView
         contentContainerStyle={[
           styles.container,
           {
-            paddingBottom: TAB_BAR_HEIGHT,
+            paddingBottom: TAB_BAR_HEIGHT + 30,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* =====================================================
-            HEADER
-        ===================================================== */}
+        {/* ------------------------------------------------------------------ */}
+        {/* Welcome                                                            */}
+        {/* ------------------------------------------------------------------ */}
 
-        {/* =====================================================
-            WELCOME BANNER
-        ===================================================== */}
+        <View style={styles.greetingRow}>
+          <View style={styles.greetingContent}>
+            <Text
+              style={[
+                styles.greeting,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              AQUARIUM MANAGEMENT
+            </Text>
 
-        <View
-          style={[
-            styles.banner,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          <Text
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Your aquarium,
+              {"\n"}simplified.
+            </Text>
+          </View>
+
+          <View
             style={[
-              styles.bannerTitle,
+              styles.statusIcon,
               {
-                color: colors.textPrimary,
+                backgroundColor: colors.primary + "14",
               },
             ]}
           >
-            Welcome to AquaGuide AI
-          </Text>
-
-          <Text
-            style={[
-              styles.bannerText,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Scan ornamental fish, access species information, receive care
-            recommendations, and manage your aquarium in one application.
-          </Text>
+            <Ionicons name="water-outline" size={25} color={colors.primary} />
+          </View>
         </View>
 
-        {/* =====================================================
-            SCAN BUTTON
-        ===================================================== */}
+        {/* ------------------------------------------------------------------ */}
+        {/* Scan                                                               */}
+        {/* ------------------------------------------------------------------ */}
 
         <Pressable
-          style={({ pressed }) => [
-            styles.scanButton,
-            pressed && { opacity: 0.9 },
-          ]}
           onPress={() => router.push("/scan")}
-        >
-          <Ionicons name="scan-outline" size={40} color="#FFFFFF" />
-
-          <Text style={styles.scanTitle}>Scan Ornamental Fish</Text>
-
-          <Text style={styles.scanSubtitle}>
-            AI-powered fish identification and care recommendation
-          </Text>
-        </Pressable>
-
-        {/* =====================================================
-            DASHBOARD STATISTICS
-        ===================================================== */}
-
-        <Text
-          style={[
-            styles.sectionTitle,
+          style={({ pressed }) => [
+            styles.scanCard,
             {
-              color: colors.textPrimary,
+              backgroundColor: colors.primary,
+              opacity: pressed ? 0.9 : 1,
+              transform: [
+                {
+                  scale: pressed ? 0.985 : 1,
+                },
+              ],
             },
           ]}
         >
-          Dashboard Statistics
-        </Text>
+          <View style={styles.scanIconContainer}>
+            <Ionicons name="scan-outline" size={28} color="#FFFFFF" />
+          </View>
 
-        <View style={styles.statsRow}>
-          {/* SCANS */}
+          <View style={styles.scanContent}>
+            <Text style={styles.scanLabel}>AI FISH SCAN</Text>
+
+            <Text style={styles.scanTitle}>Identify a fish</Text>
+
+            <Text style={styles.scanDescription}>
+              Scan an ornamental fish to identify its species and view care
+              recommendations.
+            </Text>
+          </View>
+
+          <View style={styles.scanArrow}>
+            <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+          </View>
+        </Pressable>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Overview                                                           */}
+        {/* ------------------------------------------------------------------ */}
+
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Overview
+            </Text>
+
+            <Text
+              style={[
+                styles.sectionSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Your aquarium activity
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.statsGrid}>
+          {/* ================================================================= */}
+          {/* Scans                                                             */}
+          {/* ================================================================= */}
 
           <View
             style={[
@@ -324,18 +399,53 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <Ionicons name="scan-outline" size={24} color={colors.primary} />
-
-            <Text
+            <View
               style={[
-                styles.statValue,
+                styles.statIcon,
                 {
-                  color: colors.textPrimary,
+                  backgroundColor: colors.primary + "14",
                 },
               ]}
             >
-              {scansToday} / 3
-            </Text>
+              <Ionicons name="scan-outline" size={20} color={colors.primary} />
+            </View>
+
+            {loadingScanUsage ? (
+              <Text
+                style={[
+                  styles.statValue,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                —
+              </Text>
+            ) : (
+              <View style={styles.scanStatValueRow}>
+                <Text
+                  style={[
+                    styles.statValue,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {dailyScanUsage.remaining}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.scanLimitText,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  / {DAILY_SCAN_LIMIT}
+                </Text>
+              </View>
+            )}
 
             <Text
               style={[
@@ -345,11 +455,24 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              Scans Today
+              AI scans remaining
+            </Text>
+
+            <Text
+              style={[
+                styles.scanRemaining,
+                {
+                  color: scanLimitReached ? "#E53935" : colors.primary,
+                },
+              ]}
+            >
+              {scanRemainingText}
             </Text>
           </View>
 
-          {/* LOGBOOK */}
+          {/* ================================================================= */}
+          {/* Logbook                                                           */}
+          {/* ================================================================= */}
 
           <View
             style={[
@@ -360,7 +483,16 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <Ionicons name="book-outline" size={24} color={colors.primary} />
+            <View
+              style={[
+                styles.statIcon,
+                {
+                  backgroundColor: colors.primary + "14",
+                },
+              ]}
+            >
+              <Ionicons name="book-outline" size={20} color={colors.primary} />
+            </View>
 
             <Text
               style={[
@@ -381,11 +513,13 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              Logbook Entries
+              Logbook
             </Text>
           </View>
 
-          {/* REMINDERS */}
+          {/* ================================================================= */}
+          {/* Reminders                                                         */}
+          {/* ================================================================= */}
 
           <View
             style={[
@@ -396,7 +530,20 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <Ionicons name="alarm-outline" size={24} color={colors.primary} />
+            <View
+              style={[
+                styles.statIcon,
+                {
+                  backgroundColor: colors.primary + "14",
+                },
+              ]}
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color={colors.primary}
+              />
+            </View>
 
             <Text
               style={[
@@ -417,11 +564,13 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              Active Reminders
+              Reminders
             </Text>
           </View>
 
-          {/* FISH CARE */}
+          {/* ================================================================= */}
+          {/* Fish Care                                                         */}
+          {/* ================================================================= */}
 
           <View
             style={[
@@ -432,7 +581,16 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <Ionicons name="fish-outline" size={24} color={colors.primary} />
+            <View
+              style={[
+                styles.statIcon,
+                {
+                  backgroundColor: colors.primary + "14",
+                },
+              ]}
+            >
+              <Ionicons name="fish-outline" size={20} color={colors.primary} />
+            </View>
 
             <Text
               style={[
@@ -453,24 +611,42 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              Fish Care
+              Fish care
             </Text>
           </View>
         </View>
 
-        {/* =====================================================
-            CONTINUE 7-DAY FISH CARE
-        ===================================================== */}
+        {/* ------------------------------------------------------------------ */}
+        {/* Fish Care                                                         */}
+        {/* ------------------------------------------------------------------ */}
+
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Fish Care
+            </Text>
+
+            <Text
+              style={[
+                styles.sectionSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Continue where you left off
+            </Text>
+          </View>
+        </View>
 
         <Pressable
-          style={({ pressed }) => [
-            styles.continueCard,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-            },
-            pressed && { opacity: 0.9 },
-          ]}
           onPress={() => {
             if (activePrograms.length === 0) {
               router.push("/new-fish-care");
@@ -484,57 +660,92 @@ export default function HomeScreen() {
                   programId: activePrograms[0].id,
                 },
               });
+
               return;
             }
 
             router.push("/new-fish-care");
           }}
+          style={({ pressed }) => [
+            styles.careCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              opacity: pressed ? 0.9 : 1,
+            },
+          ]}
         >
-          <View style={styles.continueHeader}>
-            <Ionicons name="fish-outline" size={30} color={colors.primary} />
-
-            <Text
+          <View style={styles.careTop}>
+            <View
               style={[
-                styles.continueTitle,
+                styles.careIcon,
                 {
-                  color: colors.textPrimary,
+                  backgroundColor: colors.primary + "14",
                 },
               ]}
             >
-              Continue 7-Day Fish Care
-            </Text>
+              <Ionicons name="fish-outline" size={23} color={colors.primary} />
+            </View>
+
+            <View style={styles.careHeading}>
+              <Text
+                style={[
+                  styles.careTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                7-Day Fish Care
+              </Text>
+
+              <Text
+                style={[
+                  styles.careSubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                {activePrograms.length} active program
+                {activePrograms.length === 1 ? "" : "s"}
+              </Text>
+            </View>
+
+            <Ionicons
+              name="chevron-forward"
+              size={21}
+              color={colors.textSecondary}
+            />
           </View>
 
           <Text
             style={[
-              styles.continueDay,
+              styles.careFish,
               {
-                color: colors.primary,
+                color: colors.textPrimary,
               },
             ]}
           >
-            {activePrograms.length} Active Program
-            {activePrograms.length === 1 ? "" : "s"}
+            {nextProgram ? nextProgram.fishName : "No active program"}
           </Text>
 
           <Text
             style={[
-              styles.continueTask,
+              styles.careDay,
               {
                 color: colors.textSecondary,
               },
             ]}
           >
             {nextProgram
-              ? `${nextProgram.fishName} • Day ${
-                  nextProgramCompletedDays + 1
-                } of 7`
-              : "No active fish care program. Tap to start your first 7-Day Fish Care Guide."}
+              ? `Day ${nextProgramCompletedDays + 1} of 7`
+              : "Start your first fish care program"}
           </Text>
 
           <View
             style={[
-              styles.progressBackground,
+              styles.progressTrack,
               {
                 backgroundColor: colors.border,
               },
@@ -545,40 +756,67 @@ export default function HomeScreen() {
                 styles.progressFill,
                 {
                   backgroundColor: colors.primary,
-                  width: nextProgram
-                    ? `${(nextProgramCompletedDays / 7) * 100}%`
-                    : "0%",
+                  width: `${fishCareProgress}%`,
                 },
               ]}
             />
           </View>
 
+          <View style={styles.careFooter}>
+            <Text
+              style={[
+                styles.progressText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              {nextProgramCompletedDays}/7 completed
+            </Text>
+
+            <Text
+              style={[
+                styles.openText,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              {nextProgram ? "Continue" : "Start"}
+            </Text>
+          </View>
+        </Pressable>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Summary                                                            */}
+        {/* ------------------------------------------------------------------ */}
+
+        <View
+          style={[
+            styles.summary,
+            {
+              borderTopColor: colors.border,
+            },
+          ]}
+        >
+          <Ionicons
+            name="information-circle-outline"
+            size={18}
+            color={colors.textSecondary}
+          />
+
           <Text
             style={[
-              styles.progressText,
+              styles.summaryText,
               {
                 color: colors.textSecondary,
               },
             ]}
           >
-            {totalPrograms} Total • {completedPrograms.length} Completed
+            AquaGuide AI helps you identify, understand, and care for your
+            ornamental fish.
           </Text>
-
-          <View
-            style={[
-              styles.continueButton,
-              {
-                backgroundColor: colors.primary,
-              },
-            ]}
-          >
-            <Text style={styles.continueButtonText}>
-              {nextProgram ? "Open Fish Care →" : "Start Fish Care →"}
-            </Text>
-          </View>
-        </Pressable>
-
-        <View style={{ height: 30 }} />
+        </View>
       </ScrollView>
     </View>
   );
@@ -590,179 +828,277 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    padding: 20,
+    paddingHorizontal: 18,
+    paddingTop: 16,
   },
 
-  header: {
-    marginBottom: 20,
-  },
+  /* ---------------------------------------------------------------------- */
+  /* Greeting                                                               */
+  /* ---------------------------------------------------------------------- */
 
-  appTitleRow: {
+  greetingRow: {
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  appIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    marginRight: 10,
-  },
-
-  appName: {
-    fontSize: 28,
-    fontWeight: "bold",
-  },
-
-  tagline: {
-    marginTop: 5,
-  },
-
-  banner: {
-    borderRadius: 20,
-    padding: 20,
+    justifyContent: "space-between",
     marginBottom: 20,
-    borderWidth: 1,
   },
 
-  bannerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+  greetingContent: {
+    flex: 1,
   },
 
-  bannerText: {
-    marginTop: 10,
-    lineHeight: 22,
+  greeting: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.4,
+    marginBottom: 5,
   },
 
-  scanButton: {
-    backgroundColor: "#00BCD4",
-    borderRadius: 20,
-    padding: 24,
+  title: {
+    fontSize: 27,
+    fontWeight: "900",
+    lineHeight: 32,
+  },
+
+  statusIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Scan                                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  scanCard: {
+    minHeight: 150,
+    borderRadius: 22,
+    padding: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 27,
+  },
+
+  scanIconContainer: {
+    width: 54,
+    height: 54,
+    borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
+  },
+
+  scanContent: {
+    flex: 1,
+  },
+
+  scanLabel: {
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 1.3,
+    marginBottom: 3,
   },
 
   scanTitle: {
     color: "#FFFFFF",
     fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 10,
+    fontWeight: "900",
   },
 
-  scanSubtitle: {
-    color: "#E0F7FA",
-    textAlign: "center",
-    marginTop: 8,
+  scanDescription: {
+    color: "rgba(255,255,255,0.82)",
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 5,
+  },
+
+  scanArrow: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.14)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Sections                                                               */
+  /* ---------------------------------------------------------------------- */
+
+  sectionHeader: {
+    marginBottom: 13,
   },
 
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontSize: 19,
+    fontWeight: "800",
   },
 
-  statsRow: {
+  sectionSubtitle: {
+    fontSize: 12.5,
+    marginTop: 3,
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Statistics                                                             */
+  /* ---------------------------------------------------------------------- */
+
+  statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 27,
   },
 
   statCard: {
-    width: "48%",
-    borderRadius: 16,
-    padding: 15,
-    alignItems: "center",
-    borderWidth: 1,
-    marginBottom: 12,
-  },
-
-  statValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 5,
-  },
-
-  statLabel: {
-    marginTop: 5,
-    textAlign: "center",
-    fontSize: 13,
-  },
-
-  moduleCard: {
-    width: "48%",
+    width: "48.2%",
+    minHeight: 108,
     borderRadius: 18,
-    padding: 18,
-    marginBottom: 15,
-    alignItems: "center",
     borderWidth: 1,
+    padding: 14,
+    marginBottom: 10,
   },
 
-  moduleTitle: {
-    textAlign: "center",
-    marginTop: 10,
-    fontWeight: "600",
-  },
-
-  continueCard: {
-    borderRadius: 22,
-    padding: 20,
-    marginBottom: 24,
-    borderWidth: 1,
-  },
-
-  continueHeader: {
-    flexDirection: "row",
+  statIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
-  },
-
-  continueTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginLeft: 10,
-    flex: 1,
-  },
-
-  continueDay: {
-    fontSize: 17,
-    fontWeight: "700",
     marginBottom: 8,
   },
 
-  continueTask: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 18,
+  statValue: {
+    fontSize: 22,
+    fontWeight: "900",
   },
 
-  progressBackground: {
-    height: 10,
-    borderRadius: 999,
+  statLabel: {
+    fontSize: 11.5,
+    marginTop: 2,
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Scan Statistic                                                         */
+  /* ---------------------------------------------------------------------- */
+
+  scanStatValueRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+
+  scanLimitText: {
+    fontSize: 13,
+    fontWeight: "700",
+    marginLeft: 2,
+  },
+
+  scanRemaining: {
+    fontSize: 10.5,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Fish Care                                                              */
+  /* ---------------------------------------------------------------------- */
+
+  careCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 17,
+    marginBottom: 24,
+  },
+
+  careTop: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  careIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  careHeading: {
+    flex: 1,
+    marginLeft: 11,
+  },
+
+  careTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  careSubtitle: {
+    fontSize: 11.5,
+    marginTop: 2,
+  },
+
+  careFish: {
+    fontSize: 18,
+    fontWeight: "800",
+    marginTop: 18,
+  },
+
+  careDay: {
+    fontSize: 12.5,
+    marginTop: 3,
+    marginBottom: 13,
+  },
+
+  progressTrack: {
+    height: 7,
+    borderRadius: 99,
     overflow: "hidden",
-    marginBottom: 10,
   },
 
   progressFill: {
     height: "100%",
-    borderRadius: 999,
+    borderRadius: 99,
+  },
+
+  careFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 9,
   },
 
   progressText: {
-    fontSize: 14,
-    marginBottom: 18,
+    fontSize: 11.5,
   },
 
-  continueButton: {
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: "center",
+  openText: {
+    fontSize: 12,
+    fontWeight: "800",
   },
 
-  continueButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
+  /* ---------------------------------------------------------------------- */
+  /* Summary                                                                */
+  /* ---------------------------------------------------------------------- */
+
+  summary: {
+    borderTopWidth: 1,
+    paddingTop: 16,
+    paddingBottom: 8,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  summaryText: {
+    flex: 1,
+    fontSize: 11.5,
+    lineHeight: 17,
+    marginLeft: 8,
   },
 });

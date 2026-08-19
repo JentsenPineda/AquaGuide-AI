@@ -7,7 +7,10 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { equipmentCategories } from "../../data/equipmentDatabase";
-const getCategoryIcon = (id: string) => {
+
+const getCategoryIcon = (
+  id: string,
+): keyof typeof MaterialCommunityIcons.glyphMap => {
   switch (id) {
     case "filters":
       return "filter-variant";
@@ -25,8 +28,10 @@ const getCategoryIcon = (id: string) => {
       return "fishbowl-outline";
   }
 };
+
 export default function EquipmentGuide() {
   const colors = useAppColors();
+
   return (
     <View
       style={[
@@ -37,57 +42,76 @@ export default function EquipmentGuide() {
       ]}
     >
       <AppHeader title="Equipment Guide" showBack />
+
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
+        {/* HERO */}
         <View
           style={[
             styles.hero,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
-          <Text
+          <View
             style={[
-              styles.heroLabel,
+              styles.heroIcon,
               {
-                color: colors.primary,
+                backgroundColor: colors.primary + "15",
               },
             ]}
           >
-            AQUARIUM GUIDE
-          </Text>
+            <MaterialCommunityIcons
+              name="tools"
+              size={30}
+              color={colors.primary}
+            />
+          </View>
 
-          <Text
-            style={[
-              styles.heroTitle,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Equipment Guide
-          </Text>
+          <View style={styles.heroContent}>
+            <Text
+              style={[
+                styles.heroLabel,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              AQUARIUM ESSENTIALS
+            </Text>
 
-          <Text
-            style={[
-              styles.heroSubtitle,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Learn about the essential aquarium equipment used to maintain a
-            healthy environment for ornamental fish.
-          </Text>
+            <Text
+              style={[
+                styles.heroTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Equipment Guide
+            </Text>
+
+            <Text
+              style={[
+                styles.heroSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Explore essential equipment for maintaining a healthy and stable
+              aquarium environment.
+            </Text>
+          </View>
         </View>
 
+        {/* SECTION HEADER */}
         <View style={styles.sectionHeader}>
-          <View>
+          <View style={styles.sectionText}>
             <Text
               style={[
                 styles.sectionTitle,
@@ -107,8 +131,7 @@ export default function EquipmentGuide() {
                 },
               ]}
             >
-              Select a category to explore its purpose and recommended
-              equipment.
+              Choose a category to learn more.
             </Text>
           </View>
 
@@ -116,7 +139,7 @@ export default function EquipmentGuide() {
             style={[
               styles.badge,
               {
-                backgroundColor: colors.primary + "18",
+                backgroundColor: colors.primary + "15",
               },
             ]}
           >
@@ -133,28 +156,34 @@ export default function EquipmentGuide() {
           </View>
         </View>
 
-        {equipmentCategories.map((item) => (
-          <Pressable
-            key={item.id}
-            style={[
-              styles.card,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderWidth: 1,
-              },
-            ]}
-            onPress={() =>
-              router.push({
-                pathname: "/equipment/equipment-category",
-                params: {
-                  category: item.id,
+        {/* CATEGORY CARDS */}
+        <View style={styles.cards}>
+          {equipmentCategories.map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() =>
+                router.push({
+                  pathname: "/equipment/equipment-category",
+                  params: {
+                    category: item.id,
+                  },
+                })
+              }
+              style={({ pressed }) => [
+                styles.card,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  opacity: pressed ? 0.85 : 1,
+                  transform: [
+                    {
+                      scale: pressed ? 0.985 : 1,
+                    },
+                  ],
                 },
-              })
-            }
-          >
-            <View style={styles.cardContent}>
-              <View style={styles.cardLeft}>
+              ]}
+            >
+              <View style={styles.cardContent}>
                 <View
                   style={[
                     styles.iconContainer,
@@ -164,8 +193,8 @@ export default function EquipmentGuide() {
                   ]}
                 >
                   <MaterialCommunityIcons
-                    name={getCategoryIcon(item.id) as any}
-                    size={28}
+                    name={getCategoryIcon(item.id)}
+                    size={27}
                     color={colors.primary}
                   />
                 </View>
@@ -178,6 +207,7 @@ export default function EquipmentGuide() {
                         color: colors.textPrimary,
                       },
                     ]}
+                    numberOfLines={1}
                   >
                     {item.title}
                   </Text>
@@ -193,17 +223,47 @@ export default function EquipmentGuide() {
                   >
                     {item.description}
                   </Text>
+
+                  <View style={styles.exploreRow}>
+                    <Text
+                      style={[
+                        styles.exploreText,
+                        {
+                          color: colors.primary,
+                        },
+                      ]}
+                    >
+                      Explore category
+                    </Text>
+
+                    <MaterialIcons
+                      name="arrow-forward"
+                      size={16}
+                      color={colors.primary}
+                    />
+                  </View>
+                </View>
+
+                <View
+                  style={[
+                    styles.arrowContainer,
+                    {
+                      backgroundColor: colors.background,
+                    },
+                  ]}
+                >
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={21}
+                    color={colors.textSecondary}
+                  />
                 </View>
               </View>
+            </Pressable>
+          ))}
+        </View>
 
-              <MaterialIcons
-                name="chevron-right"
-                size={26}
-                color={colors.textSecondary}
-              />
-            </View>
-          </Pressable>
-        ))}
+        <View style={styles.bottomSpace} />
       </ScrollView>
     </View>
   );
@@ -212,127 +272,151 @@ export default function EquipmentGuide() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
   },
 
   container: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: TAB_BAR_HEIGHT + 25,
   },
 
   hero: {
-    backgroundColor: "#102331",
-    padding: 22,
-    borderRadius: 24,
-    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 22,
+    borderWidth: 1,
+    padding: 18,
+    marginBottom: 26,
   },
 
-  heroTitle: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "bold",
+  heroIcon: {
+    width: 58,
+    height: 58,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 15,
   },
 
-  heroSubtitle: {
-    color: "#B0BEC5",
-    marginTop: 8,
-    lineHeight: 22,
+  heroContent: {
+    flex: 1,
   },
 
   heroLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 2,
-    marginBottom: 8,
-    textTransform: "uppercase",
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.4,
+    marginBottom: 4,
+  },
+
+  heroTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
+  heroSubtitle: {
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginTop: 5,
   },
 
   sectionHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+
+  sectionText: {
+    flex: 1,
+    paddingRight: 15,
   },
 
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: 20,
+    fontWeight: "800",
   },
 
   sectionSubtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 3,
   },
 
   badge: {
-    minWidth: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
 
   badgeText: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "800",
+  },
+
+  cards: {
+    gap: 12,
   },
 
   card: {
-    borderRadius: 22,
-    padding: 18,
-    marginBottom: 16,
-  },
-
-  title: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-
-  description: {
-    color: "#B0BEC5",
-    lineHeight: 22,
-  },
-
-  heroIconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "#2A7FFF20",
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
-    marginBottom: 16,
-  },
-
-  heroIcon: {
-    fontSize: 36,
+    borderRadius: 19,
+    borderWidth: 1,
+    padding: 15,
   },
 
   cardContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-  },
-
-  cardLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
   },
 
   iconContainer: {
-    width: 58,
-    height: 58,
+    width: 55,
+    height: 55,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
+    marginRight: 13,
   },
 
   textContainer: {
     flex: 1,
+  },
+
+  title: {
+    fontSize: 17,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+
+  description: {
+    fontSize: 12.5,
+    lineHeight: 18,
+  },
+
+  exploreRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+
+  exploreText: {
+    fontSize: 11.5,
+    fontWeight: "700",
+    marginRight: 4,
+  },
+
+  arrowContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+
+  bottomSpace: {
+    height: 10,
   },
 });

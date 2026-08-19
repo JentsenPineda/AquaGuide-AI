@@ -1,8 +1,6 @@
-import ThemeButton from "@/components/buttons/ThemeButton";
-import ThemeCard from "@/components/cards/ThemeCard";
+// app/(tabs)/new-fish-care/index.tsx
+
 import AppHeader from "@/components/layout/AppHeader";
-import ThemeText from "@/components/text/ThemeText";
-import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   FishCareProgram,
@@ -10,216 +8,184 @@ import {
 } from "@/services/newFishCareService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  Image,
-  Modal,
+  ActivityIndicator,
+  Pressable,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
+  Text,
   View,
 } from "react-native";
+
+const TERMS_KEY = "new_fish_care_terms_accepted";
+const TERMS_VERSION = "1.0";
 
 export default function NewFishCareScreen() {
   const colors = useAppColors();
   const { user } = useAuth();
 
   const [programs, setPrograms] = useState<FishCareProgram[]>([]);
-  const [showEducation, setShowEducation] = useState(false);
-  const [showAcclimationModal, setShowAcclimationModal] = useState(false);
-  const [showActivePrograms, setShowActivePrograms] = useState(true);
-  const [showCompletedPrograms, setShowCompletedPrograms] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [checkingTerms, setCheckingTerms] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const activePrograms = programs.filter(
-    (program) => program.status === "active",
-  );
-
-  const completedPrograms = programs.filter(
-    (program) => program.status === "completed",
-  );
+  /* ---------------------------------------------------------------------- */
+  /* Check Terms Acceptance                                                 */
+  /* ---------------------------------------------------------------------- */
 
   useEffect(() => {
-    if (!user) {
+    const checkTerms = async () => {
+      try {
+        if (!user) {
+          setTermsAccepted(false);
+          return;
+        }
+
+        const acceptedVersion = await AsyncStorage.getItem(TERMS_KEY);
+
+        setTermsAccepted(acceptedVersion === TERMS_VERSION);
+      } catch (error) {
+        console.error("Failed to check New Fish Care terms:", error);
+        setTermsAccepted(false);
+      } finally {
+        setCheckingTerms(false);
+      }
+    };
+
+    checkTerms();
+  }, [user]);
+
+  /* ---------------------------------------------------------------------- */
+  /* Subscribe to Fish Care Programs                                        */
+  /* ---------------------------------------------------------------------- */
+
+  useEffect(() => {
+    if (!user || !termsAccepted) {
       setPrograms([]);
+      setLoading(false);
       return;
     }
 
-    return subscribeToPrograms(user.uid, setPrograms);
-  }, [user]);
+    setLoading(true);
 
-  const dynamicStyles = {
-    container: {
-      backgroundColor: colors.background,
-    },
+    const unsubscribe = subscribeToPrograms(user.uid, (data) => {
+      setPrograms(data);
+      setLoading(false);
+    });
 
-    heroIcon: {
-      backgroundColor: colors.card,
-    },
+    return unsubscribe;
+  }, [user, termsAccepted]);
 
-    sectionTitle: {
-      color: colors.textPrimary,
-    },
+  /* ---------------------------------------------------------------------- */
+  /* Separate Active / Completed Programs                                   */
+  /* ---------------------------------------------------------------------- */
 
-    card: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
+  const activePrograms = useMemo(
+    () => programs.filter((program) => program.status === "active"),
+    [programs],
+  );
 
-    timeCard: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
-  };
+  const completedPrograms = useMemo(
+    () => programs.filter((program) => program.status === "completed"),
+    [programs],
+  );
 
-  /*
-   * Guest authentication gate.
-   *
-   * New Fish Care is personalized because programs and progress
-   * are connected to the user's account.
-   */
+  /* ---------------------------------------------------------------------- */
+  /* Loading                                                                */
+  /* ---------------------------------------------------------------------- */
+
+  if (checkingTerms) {
+    return (
+      <View
+        style={[
+          styles.loadingScreen,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+
+        <Text
+          style={[
+            styles.loadingText,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
+          Checking your access...
+        </Text>
+      </View>
+    );
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Guest User                                                            */
+  /* ---------------------------------------------------------------------- */
+
   if (!user) {
     return (
-      <View style={[styles.container, dynamicStyles.container]}>
+      <View
+        style={[
+          styles.screen,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
         <AppHeader title="New Fish Care" showBack />
 
-        <ScrollView
-          contentContainerStyle={styles.authContent}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.centerContent}>
           <View
             style={[
-              styles.authIconContainer,
+              styles.accessIcon,
               {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
+                backgroundColor: colors.primary + "14",
               },
             ]}
           >
-            <Ionicons name="fish-outline" size={58} color={colors.primary} />
+            <Ionicons name="person-outline" size={38} color={colors.primary} />
           </View>
 
-          <ThemeText
-            variant="title"
+          <Text
             style={[
-              styles.authTitle,
+              styles.accessTitle,
               {
                 color: colors.textPrimary,
               },
             ]}
           >
-            Personalized Fish Care
-          </ThemeText>
+            Account Required
+          </Text>
 
-          <ThemeText
-            variant="body"
+          <Text
             style={[
-              styles.authDescription,
+              styles.accessDescription,
               {
                 color: colors.textSecondary,
               },
             ]}
           >
-            Sign in to create and save a personalized care plan for your new
-            fish. Your progress, care programs, and recommendations can be
-            available whenever you return.
-          </ThemeText>
+            New Fish Care requires an AquaGuide AI account before you can begin.
+          </Text>
 
-          <ThemeCard
+          <Text
             style={[
-              styles.authInfoCard,
+              styles.accessDescription,
               {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
+                color: colors.textSecondary,
               },
             ]}
           >
-            <View style={styles.authInfoItem}>
-              <View
-                style={[
-                  styles.authInfoIcon,
-                  {
-                    backgroundColor: colors.background,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="bookmark-outline"
-                  size={22}
-                  color={colors.primary}
-                />
-              </View>
+            Create an account or sign in to continue to the New Fish Care
+            module.
+          </Text>
 
-              <View style={styles.authInfoText}>
-                <ThemeText variant="subtitle">Save Your Progress</ThemeText>
-
-                <ThemeText variant="body">
-                  Continue your fish care program whenever you return.
-                </ThemeText>
-              </View>
-            </View>
-
-            <View style={styles.authInfoItem}>
-              <View
-                style={[
-                  styles.authInfoIcon,
-                  {
-                    backgroundColor: colors.background,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="calendar-outline"
-                  size={22}
-                  color={colors.primary}
-                />
-              </View>
-
-              <View style={styles.authInfoText}>
-                <ThemeText variant="subtitle">Track Your Care</ThemeText>
-
-                <ThemeText variant="body">
-                  Keep track of your 7-day fish care progress.
-                </ThemeText>
-              </View>
-            </View>
-
-            <View style={styles.authInfoItem}>
-              <View
-                style={[
-                  styles.authInfoIcon,
-                  {
-                    backgroundColor: colors.background,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="person-outline"
-                  size={22}
-                  color={colors.primary}
-                />
-              </View>
-
-              <View style={styles.authInfoText}>
-                <ThemeText variant="subtitle">
-                  Personalized Experience
-                </ThemeText>
-
-                <ThemeText variant="body">
-                  Your fish care programs are connected to your account.
-                </ThemeText>
-              </View>
-            </View>
-          </ThemeCard>
-
-          <TouchableOpacity
-            style={[
-              styles.authPrimaryButton,
-              {
-                backgroundColor: colors.primary,
-              },
-            ]}
-            activeOpacity={0.85}
+          <Pressable
             onPress={() =>
               router.push({
                 pathname: "/auth/login",
@@ -228,725 +194,1149 @@ export default function NewFishCareScreen() {
                 },
               })
             }
-          >
-            <Ionicons name="log-in-outline" size={22} color="#FFFFFF" />
-
-            <ThemeText style={styles.authPrimaryButtonText}>Sign In</ThemeText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
             style={[
-              styles.authSecondaryButton,
+              styles.primaryButton,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Log In</Text>
+
+            <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+          </Pressable>
+
+          <Pressable
+            onPress={() => router.push("/auth/register")}
+            style={[
+              styles.secondaryButton,
               {
                 borderColor: colors.border,
                 backgroundColor: colors.card,
               },
             ]}
-            activeOpacity={0.85}
-            onPress={() => router.push("/auth/register")}
           >
-            <Ionicons
-              name="person-add-outline"
-              size={22}
-              color={colors.primary}
-            />
-
-            <ThemeText
+            <Text
               style={[
-                styles.authSecondaryButtonText,
+                styles.secondaryButtonText,
                 {
                   color: colors.textPrimary,
                 },
               ]}
             >
               Create Account
-            </ThemeText>
-          </TouchableOpacity>
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
-          <ThemeText
-            variant="body"
+  /* ---------------------------------------------------------------------- */
+  /* Terms Not Accepted                                                     */
+  /* ---------------------------------------------------------------------- */
+
+  if (!termsAccepted) {
+    return (
+      <View
+        style={[
+          styles.screen,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        <AppHeader title="New Fish Care" showBack />
+
+        <View style={styles.centerContent}>
+          <View
             style={[
-              styles.authFooter,
+              styles.accessIcon,
+              {
+                backgroundColor: colors.primary + "14",
+              },
+            ]}
+          >
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={38}
+              color={colors.primary}
+            />
+          </View>
+
+          <Text
+            style={[
+              styles.accessTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Before You Begin
+          </Text>
+
+          <Text
+            style={[
+              styles.accessDescription,
               {
                 color: colors.textSecondary,
               },
             ]}
           >
-            You can continue using the other AquaGuide AI features as a guest.
-          </ThemeText>
-        </ScrollView>
+            Please read and acknowledge the New Fish Care notice before
+            accessing the module.
+          </Text>
+
+          <Text
+            style={[
+              styles.accessDescription,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            The notice explains important information about fish acclimation,
+            aquarium conditions, and the limitations of the guidance provided by
+            AquaGuide AI.
+          </Text>
+
+          <Pressable
+            onPress={() => router.push("/new-fish-care/terms")}
+            style={[
+              styles.primaryButton,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Read Notice & Continue</Text>
+
+            <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+          </Pressable>
+        </View>
       </View>
     );
   }
 
+  /* ---------------------------------------------------------------------- */
+  /* Authenticated + Terms Accepted                                         */
+  /* ---------------------------------------------------------------------- */
+
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
+    <View
+      style={[
+        styles.screen,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="New Fish Care" showBack />
 
       <ScrollView
-        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        {/* Dashboard Header */}
-        <View style={styles.dashboardHeader}>
-          <View style={styles.dashboardTitleRow}>
-            <Image
-              source={require("@/assets/images/image-library-UI/aquaguide-icon.png")}
-              style={styles.dashboardIcon}
-            />
+        {/* ---------------------------------------------------------------- */}
+        {/* PAGE HEADER                                                       */}
+        {/* ---------------------------------------------------------------- */}
 
-            <ThemeText variant="title" style={styles.dashboardTitle}>
-              Fish Care Dashboard
-            </ThemeText>
+        <View style={styles.pageHeader}>
+          <View
+            style={[
+              styles.pageIcon,
+              {
+                backgroundColor: colors.primary + "14",
+              },
+            ]}
+          >
+            <Ionicons name="fish-outline" size={32} color={colors.primary} />
           </View>
 
-          <ThemeText variant="body" style={styles.dashboardSubtitle}>
-            Manage your active fish care programs and start new ones.
-          </ThemeText>
+          <View style={styles.pageHeaderText}>
+            <Text
+              style={[
+                styles.pageTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              New Fish Care
+            </Text>
+
+            <Text
+              style={[
+                styles.pageSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              A guided approach to introducing and caring for a new ornamental
+              fish.
+            </Text>
+          </View>
         </View>
 
-        {/* Learn About Acclimation */}
-        <ThemeCard
+        {/* ---------------------------------------------------------------- */}
+        {/* GETTING STARTED                                                   */}
+        {/* ---------------------------------------------------------------- */}
+
+        <View
           style={[
-            styles.educationCard,
+            styles.infoCard,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
             },
           ]}
         >
-          <TouchableOpacity
-            onPress={() => setShowEducation(!showEducation)}
-            style={styles.educationHeader}
-            activeOpacity={0.8}
-          >
-            <View style={styles.educationTitleRow}>
-              <Ionicons
-                name="school-outline"
-                size={26}
-                color={colors.primary}
-              />
-
-              <ThemeText variant="subtitle" style={styles.educationTitle}>
-                Learn About Proper Acclimation
-              </ThemeText>
-            </View>
-
-            <View style={styles.chevronContainer}>
-              <Ionicons
-                name={showEducation ? "chevron-up" : "chevron-down"}
-                size={20}
-                color={colors.textSecondary}
-              />
-            </View>
-          </TouchableOpacity>
-
-          {showEducation && (
-            <View style={styles.educationContent}>
-              <View style={styles.educationItem}>
-                <Ionicons name="heart" size={22} color="#E53935" />
-
-                <View style={styles.educationText}>
-                  <ThemeText variant="subtitle">Reduce Stress</ThemeText>
-
-                  <ThemeText variant="body">
-                    Fish experience stress during transportation. Proper
-                    acclimation helps them recover safely.
-                  </ThemeText>
-                </View>
-              </View>
-
-              <View style={styles.educationItem}>
-                <Ionicons name="water" size={22} color="#2196F3" />
-
-                <View style={styles.educationText}>
-                  <ThemeText variant="subtitle">Prevent Water Shock</ThemeText>
-
-                  <ThemeText variant="body">
-                    Sudden changes in water temperature or chemistry can
-                    seriously harm your fish.
-                  </ThemeText>
-                </View>
-              </View>
-
-              <View style={styles.educationItem}>
-                <Ionicons name="shield-checkmark" size={22} color="#4CAF50" />
-
-                <View style={styles.educationText}>
-                  <ThemeText variant="subtitle">Prevent Diseases</ThemeText>
-
-                  <ThemeText variant="body">
-                    A proper acclimation process strengthens the immune system
-                    and lowers disease risk.
-                  </ThemeText>
-                </View>
-              </View>
-
-              <View style={styles.educationItem}>
-                <Ionicons name="time-outline" size={22} color="#FF9800" />
-
-                <View style={styles.educationText}>
-                  <ThemeText variant="subtitle">Estimated Duration</ThemeText>
-
-                  <ThemeText variant="body">
-                    Approximately 30–45 minutes.
-                  </ThemeText>
-                </View>
-              </View>
-            </View>
-          )}
-        </ThemeCard>
-
-        {/* My Fish Care Programs */}
-        {user && (
-          <>
-            <ThemeText
-              variant="title"
-              style={[styles.sectionTitle, dynamicStyles.sectionTitle]}
-            >
-              My Fish Care Programs
-            </ThemeText>
-
-            <>
-              {activePrograms.length > 0 && (
-                <>
-                  <TouchableOpacity
-                    style={styles.educationHeader}
-                    onPress={() => setShowActivePrograms(!showActivePrograms)}
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.educationTitleRow}>
-                      <Ionicons
-                        name="fish-outline"
-                        size={24}
-                        color={colors.primary}
-                      />
-
-                      <ThemeText
-                        variant="subtitle"
-                        style={styles.educationTitle}
-                      >
-                        Active Programs ({activePrograms.length})
-                      </ThemeText>
-                    </View>
-
-                    <View style={styles.chevronContainer}>
-                      <Ionicons
-                        name={
-                          showActivePrograms ? "chevron-up" : "chevron-down"
-                        }
-                        size={20}
-                        color={colors.textSecondary}
-                      />
-                    </View>
-                  </TouchableOpacity>
-
-                  {showActivePrograms &&
-                    activePrograms.map((program) => {
-                      const completedDays = program.days.filter(
-                        (day) => day.completed,
-                      ).length;
-
-                      return (
-                        <ThemeCard
-                          key={program.id}
-                          style={[styles.card, dynamicStyles.card]}
-                        >
-                          <View style={{ flex: 1 }}>
-                            <ThemeText variant="subtitle">
-                              {program.fishName}
-                            </ThemeText>
-
-                            <ThemeText variant="body">
-                              {program.species}
-                            </ThemeText>
-
-                            <ThemeText variant="body" style={{ marginTop: 6 }}>
-                              Day {completedDays + 1} of 7
-                            </ThemeText>
-                          </View>
-
-                          <ThemeButton
-                            title="Continue"
-                            onPress={() =>
-                              router.push({
-                                pathname: "/new-fish-care/sevenDays",
-                                params: {
-                                  programId: program.id,
-                                },
-                              })
-                            }
-                          />
-                        </ThemeCard>
-                      );
-                    })}
-                </>
-              )}
-
-              {completedPrograms.length > 0 && (
-                <>
-                  <ThemeText
-                    variant="subtitle"
-                    style={{
-                      marginTop: 20,
-                      marginBottom: 12,
-                    }}
-                  >
-                    Completed Programs
-                  </ThemeText>
-
-                  {completedPrograms.map((program) => (
-                    <ThemeCard
-                      key={program.id}
-                      style={[styles.card, dynamicStyles.card]}
-                    >
-                      <View style={{ flex: 1 }}>
-                        <ThemeText variant="subtitle">
-                          {program.fishName}
-                        </ThemeText>
-
-                        <ThemeText variant="body">{program.species}</ThemeText>
-
-                        <ThemeText variant="body" style={{ marginTop: 6 }}>
-                          Completed
-                        </ThemeText>
-                      </View>
-
-                      <ThemeButton
-                        title="View"
-                        onPress={() =>
-                          router.push({
-                            pathname: "/new-fish-care/sevenDays",
-                            params: {
-                              programId: program.id,
-                            },
-                          })
-                        }
-                      />
-                    </ThemeCard>
-                  ))}
-                </>
-              )}
-            </>
-          </>
-        )}
-
-        <ThemeButton
-          title={
-            activePrograms.length > 0
-              ? "Start Another Fish Care Program"
-              : "Start Fish Care Guide"
-          }
-          onPress={() => router.push("/new-fish-care/preparation")}
-          style={styles.startButton}
-        />
-
-        <TouchableOpacity
-          style={styles.learnButton}
-          onPress={() => setShowAcclimationModal(true)}
-        >
-          <Ionicons
-            name="information-circle-outline"
-            size={22}
-            color="#00BCD4"
-          />
-
-          <ThemeText variant="subtitle" style={styles.learnText}>
-            Why Is Acclimation Important?
-          </ThemeText>
-        </TouchableOpacity>
-
-        <Modal
-          visible={showAcclimationModal}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowAcclimationModal(false)}
-        >
-          <View style={styles.modalOverlay}>
+          <View style={styles.infoHeader}>
             <View
               style={[
-                styles.modalContent,
+                styles.infoIcon,
                 {
-                  backgroundColor: colors.card,
+                  backgroundColor: colors.primary + "14",
                 },
               ]}
             >
-              <ThemeText variant="title">🐟 Fish Acclimation Guide</ThemeText>
-
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <ThemeText variant="subtitle" style={styles.modalSection}>
-                  What is Fish Acclimation?
-                </ThemeText>
-
-                <ThemeText variant="body">
-                  Fish acclimation is the process of slowly adjusting a newly
-                  purchased fish to the conditions of its new aquarium. This
-                  prevents stress caused by sudden changes in temperature, pH,
-                  and water quality.
-                </ThemeText>
-
-                <ThemeText variant="subtitle" style={styles.modalSection}>
-                  ❤️ Why is it Important?
-                </ThemeText>
-
-                <ThemeText variant="body">
-                  • Reduces stress{"\n"}• Helps fish adapt safely{"\n"}•
-                  Improves survival rate{"\n"}• Encourages normal eating
-                  behavior{"\n"}• Strengthens fish immunity
-                </ThemeText>
-
-                <ThemeText variant="subtitle" style={styles.modalSection}>
-                  ⚠️ What Problems Can It Prevent?
-                </ThemeText>
-
-                <ThemeText variant="body">
-                  • Temperature shock{"\n"}• pH shock{"\n"}• Loss of appetite
-                  {"\n"}• Increased disease risk{"\n"}• Sudden death after
-                  introduction
-                </ThemeText>
-
-                <ThemeText variant="subtitle" style={styles.modalSection}>
-                  💧 Proper Acclimation Tips
-                </ThemeText>
-
-                <ThemeText variant="body">
-                  • Match water temperature first{"\n"}• Slowly mix aquarium
-                  water{"\n"}• Avoid sudden parameter changes{"\n"}• Observe
-                  fish behavior after release
-                </ThemeText>
-              </ScrollView>
-
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setShowAcclimationModal(false)}
-              >
-                <ThemeText style={styles.closeText}>Close</ThemeText>
-              </TouchableOpacity>
+              <Ionicons
+                name="information-circle-outline"
+                size={20}
+                color={colors.primary}
+              />
             </View>
+
+            <Text
+              style={[
+                styles.infoTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Getting Started
+            </Text>
           </View>
-        </Modal>
+
+          <Text
+            style={[
+              styles.infoText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Follow the preparation, acclimation, and first-week care guidance to
+            help provide a stable transition for your new fish.
+          </Text>
+        </View>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* START NEW GUIDE — ALWAYS NEAR THE TOP                            */}
+        {/* ---------------------------------------------------------------- */}
+
+        <Pressable
+          onPress={() => router.push("/new-fish-care/preparation")}
+          style={({ pressed }) => [
+            styles.startCard,
+            {
+              backgroundColor: colors.primary,
+              opacity: pressed ? 0.9 : 1,
+            },
+          ]}
+        >
+          <View style={styles.startIcon}>
+            <Ionicons name="add" size={25} color="#FFFFFF" />
+          </View>
+
+          <View style={styles.startContent}>
+            <Text style={styles.startTitle}>Start Fish Care Guide</Text>
+
+            <Text style={styles.startSubtitle}>
+              Begin a new preparation and acclimation journey.
+            </Text>
+          </View>
+
+          <Ionicons name="chevron-forward" size={22} color="#FFFFFF" />
+        </Pressable>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* LOADING                                                           */}
+        {/* ---------------------------------------------------------------- */}
+
+        {loading ? (
+          <View style={styles.programLoading}>
+            <ActivityIndicator size="small" color={colors.primary} />
+
+            <Text
+              style={[
+                styles.loadingText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Loading your fish care programs...
+            </Text>
+          </View>
+        ) : (
+          <>
+            {/* ============================================================ */}
+            {/* ACTIVE PROGRAMS                                               */}
+            {/* ============================================================ */}
+
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionHeaderText}>
+                <Text
+                  style={[
+                    styles.sectionTitle,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Active Programs
+                </Text>
+
+                <Text
+                  style={[
+                    styles.sectionSubtitle,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Continue caring for your fish
+                </Text>
+              </View>
+
+              <View
+                style={[
+                  styles.countBadge,
+                  {
+                    backgroundColor: colors.primary + "14",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.countBadgeText,
+                    {
+                      color: colors.primary,
+                    },
+                  ]}
+                >
+                  {activePrograms.length}
+                </Text>
+              </View>
+            </View>
+
+            {activePrograms.length > 0 ? (
+              activePrograms.map((program) => (
+                <Pressable
+                  key={program.id}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/new-fish-care/sevenDays",
+                      params: {
+                        programId: program.id,
+                      },
+                    })
+                  }
+                  style={({ pressed }) => [
+                    styles.activeCard,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                      opacity: pressed ? 0.92 : 1,
+                    },
+                  ]}
+                >
+                  <View style={styles.programHeader}>
+                    <View
+                      style={[
+                        styles.programIcon,
+                        {
+                          backgroundColor: colors.primary + "14",
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name="fish-outline"
+                        size={23}
+                        color={colors.primary}
+                      />
+                    </View>
+
+                    <View style={styles.programInfo}>
+                      <Text
+                        style={[
+                          styles.programName,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {program.fishName}
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.programSpecies,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {program.species}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={[
+                        styles.activeBadge,
+                        {
+                          backgroundColor: "#4CAF50" + "18",
+                        },
+                      ]}
+                    >
+                      <View style={styles.activeDot} />
+
+                      <Text
+                        style={[
+                          styles.activeBadgeText,
+                          {
+                            color: "#4CAF50",
+                          },
+                        ]}
+                      >
+                        Active
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.progressRow}>
+                    <Text
+                      style={[
+                        styles.progressText,
+                        {
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      Day {Math.min(program.currentDay, 7)} of 7
+                    </Text>
+
+                    <Text
+                      style={[
+                        styles.progressPercent,
+                        {
+                          color: colors.primary,
+                        },
+                      ]}
+                    >
+                      {Math.round((Math.min(program.currentDay, 7) / 7) * 100)}%
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.progressTrack,
+                      {
+                        backgroundColor: colors.border,
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.progressFill,
+                        {
+                          backgroundColor: colors.primary,
+                          width: `${
+                            (Math.min(program.currentDay, 7) / 7) * 100
+                          }%`,
+                        },
+                      ]}
+                    />
+                  </View>
+
+                  <View style={styles.continueRow}>
+                    <Text
+                      style={[
+                        styles.continueText,
+                        {
+                          color: colors.primary,
+                        },
+                      ]}
+                    >
+                      Continue Care Plan
+                    </Text>
+
+                    <Ionicons
+                      name="arrow-forward"
+                      size={18}
+                      color={colors.primary}
+                    />
+                  </View>
+                </Pressable>
+              ))
+            ) : (
+              <View
+                style={[
+                  styles.emptyCard,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.emptyIcon,
+                    {
+                      backgroundColor: colors.primary + "14",
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="fish-outline"
+                    size={25}
+                    color={colors.primary}
+                  />
+                </View>
+
+                <View style={styles.emptyContent}>
+                  <Text
+                    style={[
+                      styles.emptyTitle,
+                      {
+                        color: colors.textPrimary,
+                      },
+                    ]}
+                  >
+                    No active programs
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.emptyText,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    Start a guide above when you bring home a new fish.
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* ============================================================ */}
+            {/* COMPLETED PROGRAMS                                            */}
+            {/* ============================================================ */}
+
+            {completedPrograms.length > 0 && (
+              <>
+                <View style={[styles.sectionHeader, styles.completedHeader]}>
+                  <View style={styles.sectionHeaderText}>
+                    <Text
+                      style={[
+                        styles.sectionTitle,
+                        {
+                          color: colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      Completed Programs
+                    </Text>
+
+                    <Text
+                      style={[
+                        styles.sectionSubtitle,
+                        {
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      Your completed care history
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.completedCountBadge,
+                      {
+                        backgroundColor: colors.border + "80",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.countBadgeText,
+                        {
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {completedPrograms.length}
+                    </Text>
+                  </View>
+                </View>
+
+                {completedPrograms.map((program) => (
+                  <Pressable
+                    key={program.id}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/new-fish-care/sevenDays",
+                        params: {
+                          programId: program.id,
+                        },
+                      })
+                    }
+                    style={({ pressed }) => [
+                      styles.completedCard,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                        opacity: pressed ? 0.9 : 1,
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.completedIcon,
+                        {
+                          backgroundColor: "#4CAF50" + "14",
+                        },
+                      ]}
+                    >
+                      <Ionicons name="checkmark" size={20} color="#4CAF50" />
+                    </View>
+
+                    <View style={styles.completedContent}>
+                      <Text
+                        style={[
+                          styles.completedName,
+                          {
+                            color: colors.textPrimary,
+                          },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {program.fishName}
+                      </Text>
+
+                      <Text
+                        style={[
+                          styles.completedSpecies,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {program.species} • 7-Day Care Completed
+                      </Text>
+                    </View>
+
+                    <View style={styles.completedAction}>
+                      <Text
+                        style={[
+                          styles.viewText,
+                          {
+                            color: colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        View
+                      </Text>
+
+                      <Ionicons
+                        name="chevron-forward"
+                        size={19}
+                        color={colors.textSecondary}
+                      />
+                    </View>
+                  </Pressable>
+                ))}
+              </>
+            )}
+          </>
+        )}
+
+        <View style={styles.bottomSpace} />
       </ScrollView>
     </View>
   );
 }
 
+/* ====================================================================== */
+/* STYLES                                                                 */
+/* ====================================================================== */
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F2FBFD",
-  },
-
-  content: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
-  },
-
-  authContent: {
-    flexGrow: 1,
-    justifyContent: "center",
-    padding: 24,
-    paddingBottom: TAB_BAR_HEIGHT + 30,
-  },
-
-  authIconContainer: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    marginBottom: 24,
-  },
-
-  authTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    textAlign: "center",
-  },
-
-  authDescription: {
-    marginTop: 12,
-    fontSize: 15,
-    lineHeight: 23,
-    textAlign: "center",
-  },
-
-  authInfoCard: {
-    borderRadius: 20,
-    borderWidth: 1,
-    padding: 18,
-    marginTop: 28,
-    marginBottom: 24,
-  },
-
-  authInfoItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 18,
-  },
-
-  authInfoIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 14,
-  },
-
-  authInfoText: {
+  screen: {
     flex: 1,
   },
 
-  authPrimaryButton: {
-    height: 56,
-    borderRadius: 17,
+  /* -------------------------------------------------------------------- */
+  /* Loading                                                              */
+  /* -------------------------------------------------------------------- */
+
+  loadingScreen: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 12,
   },
 
-  authPrimaryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "800",
-  },
-
-  authSecondaryButton: {
-    height: 56,
-    borderRadius: 17,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    borderWidth: 1,
-  },
-
-  authSecondaryButtonText: {
-    fontSize: 16,
-    fontWeight: "800",
-  },
-
-  authFooter: {
-    textAlign: "center",
+  loadingText: {
     fontSize: 13,
-    lineHeight: 20,
-    marginTop: 20,
+    marginTop: 10,
   },
 
-  hero: {
+  /* -------------------------------------------------------------------- */
+  /* Guest / Terms Access                                                 */
+  /* -------------------------------------------------------------------- */
+
+  centerContent: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    padding: 24,
-    borderRadius: 24,
-    marginTop: 15,
-    marginBottom: 30,
+    paddingHorizontal: 28,
+    paddingBottom: 40,
   },
 
-  dashboardHeader: {
-    marginTop: 20,
-    marginBottom: 30,
-  },
-
-  dashboardTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-  },
-
-  dashboardSubtitle: {
-    marginTop: 6,
-    fontSize: 15,
-    lineHeight: 22,
-  },
-
-  heroIcon: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+  accessIcon: {
+    width: 82,
+    height: 82,
+    borderRadius: 27,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
 
-  title: {
-    fontSize: 30,
-    fontWeight: "800",
+  accessTitle: {
+    fontSize: 25,
+    fontWeight: "900",
     textAlign: "center",
+    marginBottom: 10,
   },
 
-  subtitle: {
-    marginTop: 15,
-    fontSize: 16,
-    lineHeight: 25,
-    textAlign: "center",
-  },
-
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#003B57",
-    marginBottom: 15,
-  },
-
-  card: {
-    flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 18,
-    elevation: 2,
-  },
-
-  cardContent: {
-    flex: 1,
-    marginLeft: 15,
-  },
-
-  educationCard: {
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 20,
-  },
-
-  cardText: {
+  accessDescription: {
+    fontSize: 14,
     lineHeight: 22,
-    fontSize: 15,
-  },
-
-  timeCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    alignItems: "center",
-    padding: 25,
-    marginTop: 10,
-    marginBottom: 30,
-    elevation: 2,
-  },
-
-  timeTitle: {
-    marginTop: 10,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-
-  timeValue: {
-    marginTop: 8,
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#FF9800",
-  },
-
-  startButton: {
-    backgroundColor: "#00BCD4",
-    borderRadius: 18,
-    height: 58,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end",
-  },
-
-  modalContent: {
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 24,
-    maxHeight: "80%",
-  },
-
-  modalSection: {
-    marginTop: 20,
+    textAlign: "center",
     marginBottom: 8,
   },
 
-  closeButton: {
+  primaryButton: {
+    width: "100%",
+    minHeight: 55,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 9,
     marginTop: 20,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: "#00BCD4",
-    justifyContent: "center",
-    alignItems: "center",
   },
 
-  closeText: {
+  primaryButtonText: {
     color: "#FFFFFF",
-    fontWeight: "700",
+    fontSize: 15.5,
+    fontWeight: "800",
   },
 
-  learnButton: {
-    borderWidth: 2,
-    borderColor: "#00BCD4",
-    borderRadius: 18,
-    height: 56,
+  secondaryButton: {
+    width: "100%",
+    minHeight: 55,
+    borderRadius: 17,
+    borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "row",
+    marginTop: 10,
   },
 
-  chevronContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  learnText: {
-    fontSize: 17,
-    fontWeight: "700",
-    marginLeft: 8,
-  },
-
-  educationHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  educationTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    paddingRight: 16,
-  },
-
-  educationTitle: {
-    marginLeft: 12,
-    fontSize: 17,
+  secondaryButtonText: {
+    fontSize: 15,
     fontWeight: "700",
   },
 
-  educationContent: {
-    marginTop: 22,
+  /* -------------------------------------------------------------------- */
+  /* Main Screen                                                          */
+  /* -------------------------------------------------------------------- */
+
+  scrollContent: {
+    padding: 18,
+    paddingBottom: 40,
   },
 
-  educationItem: {
+  pageHeader: {
     flexDirection: "row",
+    alignItems: "center",
     marginBottom: 18,
   },
 
-  educationText: {
+  pageIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 19,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  pageHeaderText: {
     flex: 1,
+    marginLeft: 13,
+  },
+
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
+  pageSubtitle: {
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginTop: 3,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Information                                                          */
+  /* -------------------------------------------------------------------- */
+
+  infoCard: {
+    borderRadius: 19,
+    borderWidth: 1,
+    padding: 17,
+    marginBottom: 14,
+  },
+
+  infoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 9,
+  },
+
+  infoIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  infoTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    marginLeft: 9,
+  },
+
+  infoText: {
+    fontSize: 13.5,
+    lineHeight: 21,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Start Guide                                                          */
+  /* -------------------------------------------------------------------- */
+
+  startCard: {
+    minHeight: 82,
+    borderRadius: 20,
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 28,
+  },
+
+  startIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 15,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  startContent: {
+    flex: 1,
+    marginLeft: 12,
+    marginRight: 8,
+  },
+
+  startTitle: {
+    color: "#FFFFFF",
+    fontSize: 15.5,
+    fontWeight: "800",
+  },
+
+  startSubtitle: {
+    color: "rgba(255,255,255,0.82)",
+    fontSize: 11.5,
+    lineHeight: 17,
+    marginTop: 3,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Loading Programs                                                     */
+  /* -------------------------------------------------------------------- */
+
+  programLoading: {
+    alignItems: "center",
+    paddingVertical: 35,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Section Headers                                                      */
+  /* -------------------------------------------------------------------- */
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+
+  sectionHeaderText: {
+    flex: 1,
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: "900",
+  },
+
+  sectionSubtitle: {
+    fontSize: 12,
+    marginTop: 3,
+  },
+
+  countBadge: {
+    minWidth: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 12,
   },
 
-  dashboardTitleRow: {
+  completedCountBadge: {
+    minWidth: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+
+  countBadgeText: {
+    fontSize: 13,
+    fontWeight: "900",
+  },
+
+  completedHeader: {
+    marginTop: 24,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Active Programs                                                      */
+  /* -------------------------------------------------------------------- */
+
+  activeCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 17,
+    marginBottom: 12,
+  },
+
+  programHeader: {
     flexDirection: "row",
     alignItems: "center",
   },
 
-  dashboardIcon: {
-    width: 38,
-    height: 38,
+  programIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  programInfo: {
+    flex: 1,
+    marginLeft: 11,
+    marginRight: 8,
+  },
+
+  programName: {
+    fontSize: 17,
+    fontWeight: "800",
+  },
+
+  programSpecies: {
+    fontSize: 12,
+    marginTop: 3,
+  },
+
+  activeBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  activeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#4CAF50",
+    marginRight: 5,
+  },
+
+  activeBadgeText: {
+    fontSize: 10.5,
+    fontWeight: "800",
+  },
+
+  progressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 17,
+    marginBottom: 7,
+  },
+
+  progressText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  progressPercent: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
+
+  progressTrack: {
+    height: 7,
     borderRadius: 10,
-    marginRight: 10,
+    overflow: "hidden",
+  },
+
+  progressFill: {
+    height: 7,
+    borderRadius: 10,
+  },
+
+  continueRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: 14,
+    gap: 6,
+  },
+
+  continueText: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Empty State                                                          */
+  /* -------------------------------------------------------------------- */
+
+  emptyCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  emptyIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  emptyContent: {
+    flex: 1,
+    marginLeft: 11,
+  },
+
+  emptyTitle: {
+    fontSize: 14.5,
+    fontWeight: "800",
+  },
+
+  emptyText: {
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 3,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Completed Programs                                                   */
+  /* -------------------------------------------------------------------- */
+
+  completedCard: {
+    minHeight: 68,
+    borderRadius: 17,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 9,
+  },
+
+  completedIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  completedContent: {
+    flex: 1,
+    marginLeft: 11,
+    marginRight: 8,
+  },
+
+  completedName: {
+    fontSize: 14.5,
+    fontWeight: "800",
+  },
+
+  completedSpecies: {
+    fontSize: 11.5,
+    marginTop: 3,
+  },
+
+  completedAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+
+  viewText: {
+    fontSize: 11.5,
+    fontWeight: "700",
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* Bottom                                                               */
+  /* -------------------------------------------------------------------- */
+
+  bottomSpace: {
+    height: 30,
   },
 });

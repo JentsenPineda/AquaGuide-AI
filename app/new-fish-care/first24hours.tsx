@@ -8,7 +8,7 @@ import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useRef } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 const timeline = [
@@ -67,66 +67,176 @@ const timeline = [
 
 export default function First24HoursScreen() {
   const colors = useAppColors();
-  const dynamicStyles = {
-    container: {
-      backgroundColor: colors.background,
-    },
+  const scrollRef = useRef<ScrollView>(null);
 
-    header: {
-      backgroundColor: colors.card,
-    },
+  const continueToCreate = () => {
+    scrollRef.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
 
-    card: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-    },
+    setTimeout(() => {
+      router.push("/new-fish-care/create");
+    }, 150);
   };
+
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
+    >
       <AppHeader title="New Fish Care" showBack />
+
       <ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingBottom: TAB_BAR_HEIGHT + 30,
+          },
+        ]}
       >
-        <ThemeCard style={[styles.header, dynamicStyles.header]}>
-          <Ionicons name="time" size={70} color={colors.primary} />
+        {/* HEADER */}
+
+        <ThemeCard style={styles.header}>
+          <View
+            style={[
+              styles.heroIcon,
+              {
+                backgroundColor: colors.primary + "14",
+              },
+            ]}
+          >
+            <Ionicons name="time-outline" size={46} color={colors.primary} />
+          </View>
+
+          <View
+            style={[
+              styles.stepBadge,
+              {
+                backgroundColor: colors.primary + "12",
+              },
+            ]}
+          >
+            <ThemeText
+              variant="subtitle"
+              style={[
+                styles.stepText,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              STEP 4 OF 5
+            </ThemeText>
+          </View>
+
           <ThemeText variant="title" style={styles.title}>
             First 24 Hours
           </ThemeText>
-          <ThemeText variant="body" style={styles.subtitle}>
+
+          <ThemeText
+            variant="body"
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
             The first day is the most important. Follow these simple steps to
             help your fish settle into its new home.
           </ThemeText>
         </ThemeCard>
+
+        {/* TIMELINE */}
+
+        <View style={styles.sectionHeader}>
+          <ThemeText variant="subtitle" style={styles.sectionTitle}>
+            Your First Day
+          </ThemeText>
+
+          <ThemeText
+            variant="body"
+            style={[
+              styles.sectionHint,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Follow the timeline as your fish settles.
+          </ThemeText>
+        </View>
+
         {timeline.map((item, index) => (
           <View key={index} style={styles.timelineContainer}>
-            <View style={styles.leftSide}>
+            <View style={styles.timelineSide}>
               <View
                 style={[
-                  styles.circle,
+                  styles.timelineCircle,
                   {
-                    backgroundColor: item.color,
+                    backgroundColor: item.color + "18",
+                    borderColor: item.color + "35",
                   },
                 ]}
               >
-                <Ionicons name={item.icon as any} size={24} color="#FFFFFF" />
+                <Ionicons
+                  name={item.icon as any}
+                  size={21}
+                  color={item.color}
+                />
               </View>
 
-              {index !== timeline.length - 1 && <View style={styles.line} />}
+              {index !== timeline.length - 1 && (
+                <View
+                  style={[
+                    styles.timelineLine,
+                    {
+                      backgroundColor: colors.border,
+                    },
+                  ]}
+                />
+              )}
             </View>
 
-            <ThemeCard style={[styles.card, dynamicStyles.card]}>
-              <ThemeText variant="subtitle" style={styles.time}>
-                {item.time}
-              </ThemeText>
+            <ThemeCard style={styles.timelineCard}>
+              <View style={styles.timeBadge}>
+                <ThemeText
+                  variant="subtitle"
+                  style={[
+                    styles.timeText,
+                    {
+                      color: item.color,
+                    },
+                  ]}
+                >
+                  {item.time}
+                </ThemeText>
+              </View>
+
               <ThemeText variant="subtitle" style={styles.cardTitle}>
                 {item.title}
               </ThemeText>
-              {item.tasks.map((task, i) => (
-                <View key={i} style={styles.taskRow}>
+
+              {item.tasks.map((task, taskIndex) => (
+                <View key={taskIndex} style={styles.taskRow}>
                   <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
 
-                  <ThemeText variant="body" style={styles.taskText}>
+                  <ThemeText
+                    variant="body"
+                    style={[
+                      styles.taskText,
+                      {
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
                     {task}
                   </ThemeText>
                 </View>
@@ -135,22 +245,44 @@ export default function First24HoursScreen() {
           </View>
         ))}
 
-        <ThemeCard style={styles.tipCard}>
-          <Ionicons name="bulb" size={28} color="#FFC107" />
+        {/* TIP */}
 
-          <View style={{ flex: 1, marginLeft: 15 }}>
+        <View
+          style={[
+            styles.tipCard,
+            {
+              backgroundColor: "#FFC10712",
+              borderColor: "#FFC10730",
+            },
+          ]}
+        >
+          <View style={styles.tipIcon}>
+            <Ionicons name="bulb-outline" size={22} color="#FFC107" />
+          </View>
+
+          <View style={styles.tipContent}>
             <ThemeText variant="subtitle" style={styles.tipTitle}>
               AquaGuide AI Tip
             </ThemeText>
-            <ThemeText variant="body" style={styles.tipText}>
+
+            <ThemeText
+              variant="body"
+              style={[
+                styles.tipText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
               It is completely normal if your new fish hides during the first
               day. Give it time to adjust before becoming concerned.
             </ThemeText>
           </View>
-        </ThemeCard>
+        </View>
+
         <ThemeButton
           title="Continue"
-          onPress={() => router.push("/new-fish-care/create")}
+          onPress={continueToCreate}
           style={styles.button}
         />
       </ScrollView>
@@ -161,123 +293,166 @@ export default function First24HoursScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3FBFD",
   },
 
   content: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    padding: 18,
   },
 
   header: {
     alignItems: "center",
-    padding: 24,
+    padding: 22,
     borderRadius: 24,
-    marginBottom: 30,
+    marginBottom: 22,
+  },
+
+  heroIcon: {
+    width: 78,
+    height: 78,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 13,
+  },
+
+  stepBadge: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    marginBottom: 12,
+  },
+
+  stepText: {
+    fontSize: 11,
+    fontWeight: "900",
+    letterSpacing: 0.7,
   },
 
   title: {
-    marginTop: 10,
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 27,
+    fontWeight: "900",
     textAlign: "center",
   },
 
   subtitle: {
-    marginTop: 10,
+    marginTop: 9,
     textAlign: "center",
-    fontSize: 15,
-    lineHeight: 24,
-    opacity: 0.85,
+    fontSize: 14,
+    lineHeight: 22,
+  },
+
+  sectionHeader: {
+    marginBottom: 15,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+  },
+
+  sectionHint: {
+    fontSize: 12,
+    marginTop: 3,
   },
 
   timelineContainer: {
     flexDirection: "row",
-    marginBottom: 20,
+    alignItems: "stretch",
   },
 
-  leftSide: {
+  timelineSide: {
+    width: 42,
     alignItems: "center",
-    width: 50,
   },
 
-  circle: {
+  timelineCircle: {
     width: 42,
     height: 42,
     borderRadius: 21,
+    borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
   },
 
-  line: {
-    width: 3,
+  timelineLine: {
+    width: 2,
     flex: 1,
-    backgroundColor: "#CFD8DC",
-    marginTop: 6,
+    marginVertical: 4,
   },
 
-  card: {
+  timelineCard: {
     flex: 1,
     borderRadius: 18,
-    padding: 18,
-    marginLeft: 12,
-    elevation: 2,
+    padding: 17,
+    marginLeft: 10,
+    marginBottom: 14,
   },
 
-  time: {
-    color: "#00BCD4",
-    fontWeight: "700",
-    fontSize: 14,
-    marginBottom: 6,
-    letterSpacing: 0.3,
+  timeBadge: {
+    alignSelf: "flex-start",
+    marginBottom: 7,
+  },
+
+  timeText: {
+    fontSize: 12,
+    fontWeight: "800",
   },
 
   cardTitle: {
-    fontSize: 19,
-    fontWeight: "700",
-    marginBottom: 12,
+    fontSize: 17,
+    fontWeight: "800",
+    marginBottom: 11,
   },
 
   taskRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
+    alignItems: "flex-start",
+    marginBottom: 7,
   },
 
   taskText: {
-    marginLeft: 8,
-    fontSize: 15,
     flex: 1,
-    lineHeight: 22,
-    opacity: 0.9,
+    marginLeft: 8,
+    fontSize: 13.5,
+    lineHeight: 20,
   },
 
   tipCard: {
-    flexDirection: "row",
     borderRadius: 18,
-    padding: 18,
-    marginTop: 10,
-    marginBottom: 30,
+    borderWidth: 1,
+    padding: 16,
+    flexDirection: "row",
+    marginTop: 8,
+    marginBottom: 24,
+  },
+
+  tipIcon: {
+    width: 43,
+    height: 43,
+    borderRadius: 14,
+    backgroundColor: "#FFC10718",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  tipContent: {
+    flex: 1,
+    marginLeft: 12,
   },
 
   tipTitle: {
-    fontWeight: "700",
-    fontSize: 17,
-    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 5,
   },
 
   tipText: {
-    fontSize: 15,
-    lineHeight: 22,
-    opacity: 0.85,
+    fontSize: 13.5,
+    lineHeight: 21,
   },
 
   button: {
-    height: 58,
-    borderRadius: 18,
-    backgroundColor: "#00BCD4",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    height: 56,
+    borderRadius: 17,
   },
 });

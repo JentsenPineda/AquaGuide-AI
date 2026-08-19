@@ -14,11 +14,19 @@ import {
 } from "react-native";
 
 import { equipmentData } from "../../data/equipmentDatabase";
+
 export default function EquipmentCategory() {
   const colors = useAppColors();
   const { category } = useLocalSearchParams();
 
-  const equipment = equipmentData[category as keyof typeof equipmentData] || [];
+  const categoryKey = String(category);
+
+  const equipment =
+    equipmentData[categoryKey as keyof typeof equipmentData] || [];
+
+  const categoryTitle = categoryKey
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
   return (
     <View
@@ -30,89 +38,158 @@ export default function EquipmentCategory() {
       ]}
     >
       <AppHeader title="Equipment Categories" showBack />
+
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Text
-          style={[
-            styles.title,
-            {
-              color: colors.textPrimary,
-            },
-          ]}
-        >
-          {String(category).replace("-", " ").toUpperCase()}
-        </Text>
-
-        {equipment.map((item) => (
-          <Pressable
-            key={item.id}
+        {/* HEADER */}
+        <View style={styles.header}>
+          <Text
             style={[
-              styles.card,
+              styles.eyebrow,
               {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderWidth: 1,
+                color: colors.primary,
               },
             ]}
-            onPress={() =>
-              router.push({
-                pathname: "/equipment/equipment-detail",
-                params: {
-                  category: String(category),
-                  equipment: item.id,
-                },
-              })
-            }
           >
-            <Image source={item.image} style={styles.image} />
+            EQUIPMENT
+          </Text>
 
-            <View style={styles.content}>
-              <Text
+          <Text
+            style={[
+              styles.title,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            {categoryTitle}
+          </Text>
+
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Explore available equipment and learn how each one supports your
+            aquarium.
+          </Text>
+        </View>
+
+        {/* EQUIPMENT CARDS */}
+        <View style={styles.list}>
+          {equipment.map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() =>
+                router.push({
+                  pathname: "/equipment/equipment-detail",
+                  params: {
+                    category: categoryKey,
+                    equipment: item.id,
+                  },
+                })
+              }
+              style={({ pressed }) => [
+                styles.card,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  opacity: pressed ? 0.88 : 1,
+                  transform: [
+                    {
+                      scale: pressed ? 0.985 : 1,
+                    },
+                  ],
+                },
+              ]}
+            >
+              {/* IMAGE */}
+              <View
                 style={[
-                  styles.name,
+                  styles.imageContainer,
                   {
-                    color: colors.textPrimary,
+                    backgroundColor: colors.background,
                   },
                 ]}
               >
-                {item.name}
-              </Text>
+                <Image
+                  source={item.image}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              </View>
 
-              <Text
-                style={[
-                  styles.description,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-                numberOfLines={2}
-              >
-                {item.description}
-              </Text>
-
-              <View style={styles.footer}>
+              {/* CONTENT */}
+              <View style={styles.content}>
                 <Text
                   style={[
-                    styles.footerText,
+                    styles.name,
                     {
-                      color: colors.primary,
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                  numberOfLines={2}
+                >
+                  {item.name}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.description,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                  numberOfLines={2}
+                >
+                  {item.description}
+                </Text>
+
+                <View
+                  style={[
+                    styles.footer,
+                    {
+                      borderTopColor: colors.border,
                     },
                   ]}
                 >
-                  Tap to View Details
-                </Text>
+                  <Text
+                    style={[
+                      styles.footerText,
+                      {
+                        color: colors.primary,
+                      },
+                    ]}
+                  >
+                    View details
+                  </Text>
 
-                <MaterialIcons
-                  name="arrow-forward-ios"
-                  size={16}
-                  color={colors.primary}
-                />
+                  <View
+                    style={[
+                      styles.footerIcon,
+                      {
+                        backgroundColor: colors.primary + "15",
+                      },
+                    ]}
+                  >
+                    <MaterialIcons
+                      name="arrow-forward"
+                      size={16}
+                      color={colors.primary}
+                    />
+                  </View>
+                </View>
               </View>
-            </View>
-          </Pressable>
-        ))}
+            </Pressable>
+          ))}
+        </View>
+
+        <View style={styles.bottomSpace} />
       </ScrollView>
     </View>
   );
@@ -121,33 +198,57 @@ export default function EquipmentCategory() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
   },
 
   container: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: TAB_BAR_HEIGHT + 25,
   },
 
-  title: {
-    color: "#fff",
-    fontSize: 26,
-    fontWeight: "bold",
+  header: {
     marginBottom: 20,
   },
 
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.4,
+    marginBottom: 5,
+  },
+
+  title: {
+    fontSize: 27,
+    fontWeight: "900",
+  },
+
+  subtitle: {
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 6,
+  },
+
+  list: {
+    gap: 14,
+  },
+
   card: {
-    backgroundColor: "#102331",
     borderRadius: 20,
+    borderWidth: 1,
     overflow: "hidden",
-    marginBottom: 15,
+  },
+
+  imageContainer: {
+    width: "100%",
+    height: 155,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 12,
   },
 
   image: {
     width: "100%",
-    height: 220,
-    resizeMode: "contain",
-    backgroundColor: "#FFFFFF",
+    height: "100%",
   },
 
   content: {
@@ -155,26 +256,39 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: "#fff",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 
   description: {
-    color: "#B0BEC5",
+    fontSize: 12.5,
+    lineHeight: 18,
     marginTop: 5,
   },
 
   footer: {
-    marginTop: 16,
+    borderTopWidth: 1,
+    marginTop: 13,
+    paddingTop: 11,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
   },
 
   footerText: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginRight: 6,
+    fontSize: 12,
+    fontWeight: "800",
+  },
+
+  footerIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  bottomSpace: {
+    height: 10,
   },
 });

@@ -2,6 +2,7 @@ import ModuleCard from "@/components/cards/ModuleCard";
 import AppHeader from "@/components/layout/AppHeader";
 import ThemeText from "@/components/text/ThemeText";
 import { useAppColors } from "@/theme/useAppColors";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
@@ -21,19 +22,99 @@ export default function FishCareScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingBottom: 110,
+          },
+        ]}
       >
-        {/* SECTION HEADER */}
+        {/* ---------------------------------------------------------------- */}
+        {/* PAGE HEADER                                                      */}
+        {/* ---------------------------------------------------------------- */}
 
-        <ThemeText variant="title" style={styles.sectionTitle}>
-          Features
-        </ThemeText>
+        <View style={styles.header}>
+          <View style={styles.headerText}>
+            <ThemeText
+              style={[
+                styles.title,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              AquaGuide AI Modules
+            </ThemeText>
 
-        <ThemeText variant="body" style={styles.sectionSubtitle}>
-          Choose a fish care topic to learn more.
-        </ThemeText>
+            <ThemeText
+              style={[
+                styles.subtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Everything you need to manage, understand, and care for your
+              ornamental fish.
+            </ThemeText>
+          </View>
 
-        {/* MODULE CARDS */}
+          <View
+            style={[
+              styles.countBadge,
+              {
+                backgroundColor: colors.primary + "14",
+              },
+            ]}
+          >
+            <Ionicons name="grid-outline" size={19} color={colors.primary} />
+
+            <ThemeText
+              style={[
+                styles.countText,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              7
+            </ThemeText>
+          </View>
+        </View>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* FEATURES                                                         */}
+        {/* ---------------------------------------------------------------- */}
+
+        <View style={styles.sectionHeader}>
+          <View>
+            <ThemeText
+              style={[
+                styles.sectionTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Features
+            </ThemeText>
+
+            <ThemeText
+              style={[
+                styles.sectionSubtitle,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Select a module to get started.
+            </ThemeText>
+          </View>
+        </View>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* MODULE CARDS                                                     */}
+        {/* ---------------------------------------------------------------- */}
 
         <View style={styles.cards}>
           <ModuleCard
@@ -99,6 +180,36 @@ export default function FishCareScreen() {
             iconBackground="#E3F2FD"
           />
         </View>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* FOOTER                                                           */}
+        {/* ---------------------------------------------------------------- */}
+
+        <View
+          style={[
+            styles.footer,
+            {
+              borderTopColor: colors.border,
+            },
+          ]}
+        >
+          <Ionicons
+            name="information-circle-outline"
+            size={17}
+            color={colors.textSecondary}
+          />
+
+          <ThemeText
+            style={[
+              styles.footerText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Use these modules to make informed decisions about your aquarium.
+          </ThemeText>
+        </View>
       </ScrollView>
     </View>
   );
@@ -110,23 +221,97 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 18,
+    paddingTop: 18,
   },
 
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "800",
+  /* -------------------------------------------------------------------- */
+  /* HEADER                                                               */
+  /* -------------------------------------------------------------------- */
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 28,
+  },
+
+  headerText: {
+    flex: 1,
+    paddingRight: 14,
+  },
+
+  title: {
+    fontSize: 25,
+    fontWeight: "900",
+    lineHeight: 31,
     marginBottom: 6,
   },
 
-  sectionSubtitle: {
-    fontSize: 15,
-    marginBottom: 24,
-    lineHeight: 22,
+  subtitle: {
+    fontSize: 13,
+    lineHeight: 19,
   },
 
+  countBadge: {
+    width: 48,
+    height: 42,
+    borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    marginLeft: 8,
+  },
+
+  countText: {
+    fontSize: 15,
+    fontWeight: "800",
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* FEATURES                                                             */
+  /* -------------------------------------------------------------------- */
+
+  sectionHeader: {
+    marginBottom: 14,
+  },
+
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: "800",
+  },
+
+  sectionSubtitle: {
+    fontSize: 12.5,
+    marginTop: 3,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* MODULE CARDS                                                         */
+  /* -------------------------------------------------------------------- */
+
   cards: {
-    gap: 14,
+    width: "100%",
+    gap: 12,
+  },
+
+  /* -------------------------------------------------------------------- */
+  /* FOOTER                                                               */
+  /* -------------------------------------------------------------------- */
+
+  footer: {
+    marginTop: 26,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  footerText: {
+    flex: 1,
+    fontSize: 11.5,
+    lineHeight: 17,
+    marginLeft: 7,
   },
 });

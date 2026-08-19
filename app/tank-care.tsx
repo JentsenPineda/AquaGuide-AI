@@ -648,7 +648,10 @@ export default function TankCareScreen() {
 
                         <ThemeText
                           variant="body"
-                          style={styles.aiRecommendation}
+                          style={[
+                            styles.aiRecommendation,
+                            { color: colors.textSecondary },
+                          ]}
                         >
                           Based on {quantity} {selectedFish.commonName}
                           {quantity > 1 ? "s" : ""}, AquaGuide recommends a
@@ -775,13 +778,14 @@ const styles = StyleSheet.create({
   heroHeader: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 62,
   },
 
   heroIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    marginRight: 16,
+    width: 62,
+    height: 62,
+    borderRadius: 18,
+    marginRight: 15,
   },
 
   heroContent: {
@@ -800,66 +804,92 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: TAB_BAR_HEIGHT + 24,
   },
 
   hero: {
     backgroundColor: "#102331",
-    borderRadius: 24,
-    padding: 22,
-    marginBottom: 24,
+    borderRadius: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 23,
+    marginBottom: 28,
+    borderWidth: 1,
+    borderColor: "#245066",
+    elevation: 6,
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 7 },
   },
 
   heroTitle: {
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 27,
+    fontWeight: "900",
+    letterSpacing: -0.5,
   },
 
   heroSubtitle: {
-    color: "#B0BEC5",
-    marginTop: 10,
-    lineHeight: 22,
+    color: "#C5D3D9",
+    marginTop: 15,
+    lineHeight: 23,
+    fontSize: 14.5,
   },
 
   sectionTitle: {
     color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 12,
-    marginTop: 10,
+    fontWeight: "900",
+    marginBottom: 13,
+    marginTop: 16,
+    letterSpacing: -0.25,
   },
 
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    alignItems: "stretch",
+    gap: 10,
+    marginBottom: 22,
   },
 
   selectorCard: {
-    borderRadius: 20,
-    paddingVertical: 22,
-    paddingHorizontal: 16,
+    borderRadius: 24,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    minHeight: 150,
+    minHeight: 152,
+    elevation: 3,
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
   },
 
   selectorActive: {
     borderColor: "#00D4FF",
+    borderWidth: 2,
+    elevation: 6,
+    shadowOpacity: 0.2,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 5 },
   },
 
   selectorTitle: {
-    fontWeight: "700",
+    fontWeight: "900",
     textAlign: "center",
+    fontSize: 16,
+    marginTop: 5,
+    letterSpacing: -0.15,
   },
 
   selectorSubtitle: {
     marginTop: 6,
     textAlign: "center",
     fontSize: 12,
-    lineHeight: 18,
+    lineHeight: 17,
+    opacity: 0.72,
   },
 
   chipContainer: {
@@ -870,10 +900,18 @@ const styles = StyleSheet.create({
 
   generateButton: {
     backgroundColor: "#00D4FF",
-    borderRadius: 16,
+    borderRadius: 19,
+    minHeight: 58,
+    paddingHorizontal: 20,
     paddingVertical: 16,
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "center",
+    marginTop: 20,
+    marginBottom: 18,
+    elevation: 5,
+    shadowOpacity: 0.24,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
   },
 
   resultCard: {
@@ -885,36 +923,31 @@ const styles = StyleSheet.create({
   },
 
   resultTitle: {
-    color: "#FFFFFF",
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 18,
   },
 
   resultLabel: {
-    color: "#00D4FF",
     marginTop: 10,
     marginBottom: 4,
     fontWeight: "700",
   },
 
-  resultValue: {
-    color: "#FFFFFF",
-  },
+  resultValue: {},
 
   equipment: {
-    color: "#FFFFFF",
     marginBottom: 4,
   },
 
   aiRecommendation: {
-    color: "#CFD8DC",
-    lineHeight: 22,
-    marginTop: 6,
+    lineHeight: 23,
+    marginTop: 7,
   },
 
   resultSection: {
     marginTop: 18,
+    paddingBottom: 2,
   },
 
   heroTitleContainer: {
@@ -922,8 +955,9 @@ const styles = StyleSheet.create({
   },
 
   heroCaption: {
-    marginTop: 4,
-    opacity: 0.75,
+    marginTop: 5,
+    opacity: 0.78,
+    fontSize: 12.5,
   },
 
   fishGrid: {
@@ -972,40 +1006,56 @@ const styles = StyleSheet.create({
 
   fishDropdown: {
     borderWidth: 1,
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderRadius: 22,
+    paddingHorizontal: 15,
+    paddingVertical: 11,
     marginBottom: 22,
+    minHeight: 78,
+    justifyContent: "center",
+    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 9,
+    shadowOffset: { width: 0, height: 3 },
   },
 
   fishDropdownContent: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 48,
   },
 
   dropdownImage: {
-    width: 48,
-    height: 48,
-    marginRight: 14,
+    width: 54,
+    height: 54,
+    marginRight: 13,
+    borderRadius: 16,
   },
 
   dropdownTitle: {
-    fontWeight: "700",
+    fontWeight: "900",
+    fontSize: 16,
   },
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: "rgba(0,0,0,0.62)",
     justifyContent: "flex-end",
   },
 
   modalContainer: {
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingHorizontal: 18,
+    paddingTop: 11,
     paddingBottom: 30,
-    maxHeight: "75%",
+    maxHeight: "80%",
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: "#2B5367",
+    elevation: 16,
+    shadowOpacity: 0.34,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: -8 },
   },
 
   modalBackdrop: {
@@ -1014,33 +1064,46 @@ const styles = StyleSheet.create({
 
   modalTitle: {
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "800",
     textAlign: "center",
     marginBottom: 18,
+    paddingTop: 8,
+    letterSpacing: -0.2,
   },
 
   modalFishItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 16,
-    marginBottom: 10,
+    borderRadius: 19,
+    marginBottom: 9,
+    borderWidth: 1,
+    borderColor: "transparent",
+    minHeight: 76,
   },
 
   modalFishImage: {
     width: 58,
     height: 58,
-    marginRight: 14,
+    marginRight: 13,
+    borderRadius: 15,
   },
 
   assessmentContainer: {
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 24,
-    paddingTop: 18,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
+    paddingHorizontal: 20,
+    paddingTop: 10,
     paddingBottom: 30,
-    maxHeight: "88%",
+    maxHeight: "91%",
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: "#2B5367",
+    elevation: 18,
+    shadowOpacity: 0.36,
+    shadowRadius: 26,
+    shadowOffset: { width: 0, height: -9 },
   },
 
   assessmentDragArea: {
@@ -1048,12 +1111,12 @@ const styles = StyleSheet.create({
   },
 
   assessmentHandle: {
-    width: 55,
+    width: 50,
     height: 5,
     borderRadius: 999,
-    backgroundColor: "#BDBDBD",
+    backgroundColor: "#78909C",
     alignSelf: "center",
-    marginBottom: 18,
+    marginBottom: 15,
   },
   assessmentCloseArea: {
     alignItems: "center",
@@ -1061,8 +1124,9 @@ const styles = StyleSheet.create({
   assessmentTitle: {
     textAlign: "center",
     fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 20,
+    fontWeight: "900",
+    marginBottom: 19,
+    letterSpacing: -0.4,
   },
 
   assessmentFishImage: {

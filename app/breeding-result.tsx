@@ -1,7 +1,7 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -9,9 +9,16 @@ import { breedingDatabase } from "../data/breedingDatabase";
 
 export default function BreedingResult() {
   const colors = useAppColors();
-  const { fish } = useLocalSearchParams();
 
-  const guide = breedingDatabase[fish as keyof typeof breedingDatabase];
+  const { fish } = useLocalSearchParams<{
+    fish?: string;
+  }>();
+
+  const fishKey = Array.isArray(fish) ? fish[0] : fish;
+
+  const guide = fishKey
+    ? breedingDatabase[fishKey as keyof typeof breedingDatabase]
+    : undefined;
 
   if (!guide) {
     return (
@@ -23,16 +30,44 @@ export default function BreedingResult() {
           },
         ]}
       >
-        <View style={styles.center}>
+        <AppHeader title="Breeding Guide" showBack />
+
+        <View style={styles.errorContainer}>
+          <View
+            style={[
+              styles.errorIcon,
+              {
+                backgroundColor: colors.primary + "15",
+              },
+            ]}
+          >
+            <Ionicons
+              name="alert-circle-outline"
+              size={38}
+              color={colors.primary}
+            />
+          </View>
+
           <Text
             style={[
-              styles.errorText,
+              styles.errorTitle,
               {
                 color: colors.textPrimary,
               },
             ]}
           >
-            Breeding guide not found.
+            Breeding Guide Not Found
+          </Text>
+
+          <Text
+            style={[
+              styles.errorText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            We couldn't find breeding information for the selected fish species.
           </Text>
         </View>
       </View>
@@ -40,122 +75,210 @@ export default function BreedingResult() {
   }
 
   return (
-    <View style={styles.safe}>
-      <AppHeader title="Breeding Guide" showBack />
-      <ScrollView
-        style={{
+    <View
+      style={[
+        styles.safe,
+        {
           backgroundColor: colors.background,
-        }}
-        contentContainerStyle={styles.container}
+        },
+      ]}
+    >
+      <AppHeader title="Breeding Guide" showBack />
+
+      <ScrollView
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingBottom: TAB_BAR_HEIGHT + 35,
+          },
+        ]}
       >
-        <Text
+        {/* HEADER */}
+
+        <View
           style={[
-            styles.title,
+            styles.headerCard,
             {
-              color: colors.textPrimary,
+              backgroundColor: colors.card,
+              borderColor: colors.border,
             },
           ]}
         >
-          <View style={styles.titleContainer}>
-            <View
-              style={[
-                styles.iconContainer,
-                {
-                  backgroundColor: colors.primary + "15",
-                },
-              ]}
-            >
-              <MaterialCommunityIcons
-                name="fishbowl"
-                size={36}
-                color={colors.primary}
-              />
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {guide.name}
-              </Text>
-
-              <Text
-                style={[
-                  styles.subtitle,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Step-by-Step Breeding Guide
-              </Text>
-            </View>
-          </View>
-        </Text>
-
-        <Text
-          style={[
-            styles.subtitle,
-            {
-              color: colors.textSecondary,
-            },
-          ]}
-        >
-          Step-by-Step Breeding Guide
-        </Text>
-
-        {guide.steps.map((step, index) => (
           <View
-            key={index}
             style={[
-              styles.stepCard,
+              styles.headerIcon,
               {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderWidth: 1,
+                backgroundColor: colors.primary + "15",
               },
             ]}
           >
+            <Ionicons name="fish-outline" size={34} color={colors.primary} />
+          </View>
+
+          <View style={styles.headerContent}>
             <Text
               style={[
-                styles.stepNumber,
+                styles.title,
                 {
-                  color: colors.primary,
+                  color: colors.textPrimary,
                 },
               ]}
             >
-              STEP {index + 1}
+              {guide.name}
             </Text>
 
             <Text
               style={[
-                styles.stepTitle,
-                {
-                  color: colors.primary,
-                },
-              ]}
-            >
-              {step.title}
-            </Text>
-
-            <Text
-              style={[
-                styles.stepDescription,
+                styles.subtitle,
                 {
                   color: colors.textSecondary,
                 },
               ]}
             >
-              {step.description}
+              Step-by-step breeding guide
             </Text>
           </View>
+        </View>
+
+        {/* OVERVIEW */}
+
+        <View
+          style={[
+            styles.introCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.introIcon,
+              {
+                backgroundColor: colors.primary + "15",
+              },
+            ]}
+          >
+            <Ionicons
+              name="information-circle-outline"
+              size={22}
+              color={colors.primary}
+            />
+          </View>
+
+          <View style={styles.introContent}>
+            <Text
+              style={[
+                styles.introTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Breeding Process
+            </Text>
+
+            <Text
+              style={[
+                styles.introText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Follow each step carefully and maintain stable water conditions
+              throughout the breeding process.
+            </Text>
+          </View>
+        </View>
+
+        {/* STEPS */}
+
+        <View style={styles.sectionHeading}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Breeding Steps
+          </Text>
+
+          <Text
+            style={[
+              styles.sectionSubtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Follow the recommended sequence.
+          </Text>
+        </View>
+
+        {guide.steps.map((step, index) => (
+          <View
+            key={`${step.title}-${index}`}
+            style={[
+              styles.stepCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.stepNumberContainer,
+                {
+                  backgroundColor: colors.primary,
+                },
+              ]}
+            >
+              <Text style={styles.stepNumber}>{index + 1}</Text>
+            </View>
+
+            <View style={styles.stepContent}>
+              <Text
+                style={[
+                  styles.stepLabel,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                STEP {index + 1}
+              </Text>
+
+              <Text
+                style={[
+                  styles.stepTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {step.title}
+              </Text>
+
+              <Text
+                style={[
+                  styles.stepDescription,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                {step.description}
+              </Text>
+            </View>
+          </View>
         ))}
+
+        {/* COMMON MISTAKES */}
 
         <View
           style={[
@@ -163,40 +286,69 @@ export default function BreedingResult() {
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons
-              name="alert-circle-outline"
-              size={22}
-              color={colors.primary}
-            />
-
-            <Text
+            <View
               style={[
-                styles.sectionTitle,
+                styles.sectionIcon,
                 {
-                  color: colors.primary,
+                  backgroundColor: colors.primary + "15",
                 },
               ]}
             >
-              Common Mistakes
-            </Text>
+              <Ionicons
+                name="warning-outline"
+                size={21}
+                color={colors.primary}
+              />
+            </View>
+
+            <View style={styles.sectionHeaderText}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Common Mistakes
+              </Text>
+
+              <Text
+                style={[
+                  styles.sectionSubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Things to avoid during breeding.
+              </Text>
+            </View>
           </View>
 
-          {guide.mistakes?.map((mistake: string) => (
-            <View key={mistake} style={styles.listItemRow}>
-              <MaterialCommunityIcons
+          {guide.mistakes?.map((mistake: string, index: number) => (
+            <View
+              key={`${mistake}-${index}`}
+              style={[
+                styles.listRow,
+                {
+                  borderBottomColor: colors.border,
+                },
+              ]}
+            >
+              <Ionicons
                 name="close-circle-outline"
-                size={18}
+                size={19}
                 color={colors.primary}
               />
 
               <Text
                 style={[
-                  styles.listItem,
+                  styles.listText,
                   {
                     color: colors.textSecondary,
                   },
@@ -208,46 +360,73 @@ export default function BreedingResult() {
           ))}
         </View>
 
+        {/* FRY CARE */}
+
         <View
           style={[
             styles.sectionCard,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons
-              name="fish"
-              size={22}
-              color={colors.primary}
-            />
-
-            <Text
+            <View
               style={[
-                styles.sectionTitle,
+                styles.sectionIcon,
                 {
-                  color: colors.primary,
+                  backgroundColor: colors.primary + "15",
                 },
               ]}
             >
-              Fry Care
-            </Text>
+              <Ionicons name="fish-outline" size={21} color={colors.primary} />
+            </View>
+
+            <View style={styles.sectionHeaderText}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Fry Care
+              </Text>
+
+              <Text
+                style={[
+                  styles.sectionSubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Important care after spawning.
+              </Text>
+            </View>
           </View>
 
-          {guide.fryCare?.map((tip: string) => (
-            <View key={tip} style={styles.listItemRow}>
-              <MaterialCommunityIcons
-                name="check-circle-outline"
-                size={18}
+          {guide.fryCare?.map((tip: string, index: number) => (
+            <View
+              key={`${tip}-${index}`}
+              style={[
+                styles.listRow,
+                {
+                  borderBottomColor: colors.border,
+                },
+              ]}
+            >
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={19}
                 color={colors.primary}
               />
 
               <Text
                 style={[
-                  styles.listItem,
+                  styles.listText,
                   {
                     color: colors.textSecondary,
                   },
@@ -259,48 +438,52 @@ export default function BreedingResult() {
           ))}
         </View>
 
+        {/* PRO TIP */}
+
         <View
           style={[
-            styles.sectionCard,
+            styles.tipCard,
             {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              borderWidth: 1,
+              backgroundColor: colors.primary + "10",
+              borderColor: colors.primary + "35",
             },
           ]}
         >
-          <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons
-              name="lightbulb-outline"
-              size={22}
-              color={colors.primary}
-            />
+          <View
+            style={[
+              styles.tipIcon,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
+          >
+            <Ionicons name="bulb-outline" size={21} color="#FFFFFF" />
+          </View>
 
+          <View style={styles.tipContent}>
             <Text
               style={[
-                styles.sectionTitle,
+                styles.tipTitle,
                 {
-                  color: colors.primary,
+                  color: colors.textPrimary,
                 },
               ]}
             >
               Pro Tip
             </Text>
+
+            <Text
+              style={[
+                styles.tipText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              {guide.tip}
+            </Text>
           </View>
-
-          <Text
-            style={[
-              styles.tipText,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            {guide.tip}
-          </Text>
         </View>
-
-        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -309,120 +492,311 @@ export default function BreedingResult() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
   },
 
   container: {
-    padding: 20,
-    paddingBottom: TAB_BAR_HEIGHT,
+    paddingHorizontal: 20,
+    paddingTop: 14,
   },
 
-  center: {
-    flex: 1,
+  /* HEADER */
+
+  headerCard: {
+    borderRadius: 23,
+    borderWidth: 1,
+
+    padding: 17,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    marginBottom: 12,
+
+    elevation: 2,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+  },
+
+  headerIcon: {
+    width: 62,
+    height: 62,
+
+    borderRadius: 19,
+
     justifyContent: "center",
     alignItems: "center",
+
+    marginRight: 14,
   },
 
-  errorText: {
-    color: "#FFFFFF",
-    fontSize: 18,
+  headerContent: {
+    flex: 1,
   },
 
   title: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 5,
+    fontSize: 21,
+    fontWeight: "900",
   },
 
   subtitle: {
-    color: "#B0BEC5",
-    marginBottom: 20,
+    fontSize: 13,
+    lineHeight: 18,
+
+    marginTop: 4,
   },
 
-  stepCard: {
-    backgroundColor: "#102331",
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
+  /* INTRO */
+
+  introCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+
+    padding: 13,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    marginBottom: 23,
   },
 
-  stepTitle: {
-    color: "#00D4FF",
-    fontWeight: "700",
-    marginBottom: 6,
+  introIcon: {
+    width: 43,
+    height: 43,
+
+    borderRadius: 14,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginRight: 11,
   },
 
-  stepText: {
-    color: "#FFFFFF",
-    lineHeight: 22,
+  introContent: {
+    flex: 1,
   },
 
-  sectionCard: {
-    backgroundColor: "#102331",
-    borderRadius: 20,
-    padding: 16,
-    marginTop: 15,
+  introTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  introText: {
+    fontSize: 12,
+    lineHeight: 18,
+
+    marginTop: 3,
+  },
+
+  /* SECTION */
+
+  sectionHeading: {
+    marginBottom: 11,
   },
 
   sectionTitle: {
-    color: "#00D4FF",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 10,
+    fontSize: 19,
+    fontWeight: "800",
   },
 
-  listItem: {
-    color: "#FFFFFF",
-    marginBottom: 6,
+  sectionSubtitle: {
+    fontSize: 12,
+    lineHeight: 17,
+
+    marginTop: 3,
   },
 
-  tipText: {
-    color: "#CFD8DC",
-    lineHeight: 22,
+  /* STEPS */
+
+  stepCard: {
+    borderRadius: 19,
+    borderWidth: 1,
+
+    padding: 14,
+
+    flexDirection: "row",
+
+    marginBottom: 11,
+  },
+
+  stepNumberContainer: {
+    width: 39,
+    height: 39,
+
+    borderRadius: 13,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginRight: 12,
   },
 
   stepNumber: {
-    color: "#00D4FF",
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  stepContent: {
+    flex: 1,
+  },
+
+  stepLabel: {
+    fontSize: 9,
     fontWeight: "700",
-    marginBottom: 6,
+
+    marginBottom: 2,
+  },
+
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+
+    lineHeight: 21,
+
+    marginBottom: 5,
   },
 
   stepDescription: {
-    color: "#CFD8DC",
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 20,
   },
 
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
+  /* SECTIONS */
 
-  iconContainer: {
-    width: 72,
-    height: 72,
+  sectionCard: {
     borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
     borderWidth: 1,
-    elevation: 3, // Android
-    shadowColor: "#000", // iOS
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
+
+    padding: 15,
+
+    marginTop: 7,
   },
 
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+
+    marginBottom: 7,
   },
 
-  listItemRow: {
+  sectionIcon: {
+    width: 42,
+    height: 42,
+
+    borderRadius: 13,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginRight: 10,
+  },
+
+  sectionHeaderText: {
+    flex: 1,
+  },
+
+  listRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 8,
+
+    paddingVertical: 10,
+
+    borderBottomWidth: 1,
+  },
+
+  listText: {
+    flex: 1,
+
+    fontSize: 13,
+    lineHeight: 20,
+
+    marginLeft: 9,
+  },
+
+  /* PRO TIP */
+
+  tipCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+
+    padding: 15,
+
+    marginTop: 14,
+
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  tipIcon: {
+    width: 42,
+    height: 42,
+
+    borderRadius: 13,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginRight: 11,
+  },
+
+  tipContent: {
+    flex: 1,
+  },
+
+  tipTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  tipText: {
+    fontSize: 13,
+    lineHeight: 21,
+
+    marginTop: 5,
+  },
+
+  /* ERROR */
+
+  errorContainer: {
+    flex: 1,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    paddingHorizontal: 35,
+  },
+
+  errorIcon: {
+    width: 80,
+    height: 80,
+
+    borderRadius: 25,
+
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  errorTitle: {
+    fontSize: 21,
+    fontWeight: "800",
+
+    textAlign: "center",
+
+    marginTop: 17,
+  },
+
+  errorText: {
+    fontSize: 14,
+    lineHeight: 21,
+
+    textAlign: "center",
+
+    marginTop: 7,
   },
 });

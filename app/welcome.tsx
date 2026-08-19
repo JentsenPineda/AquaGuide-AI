@@ -4,7 +4,14 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 function FeatureCard({
   icon,
@@ -27,8 +34,15 @@ function FeatureCard({
         },
       ]}
     >
-      <View style={styles.featureIcon}>
-        <Ionicons name={icon} size={22} color="#00BCD4" />
+      <View
+        style={[
+          styles.featureIcon,
+          {
+            backgroundColor: colors.primary + "18",
+          },
+        ]}
+      >
+        <Ionicons name={icon} size={21} color={colors.primary} />
       </View>
 
       <Text
@@ -71,7 +85,7 @@ export default function WelcomeScreen() {
     return (
       <View
         style={[
-          styles.container,
+          styles.loadingContainer,
           {
             backgroundColor: colors.background,
           },
@@ -89,13 +103,30 @@ export default function WelcomeScreen() {
         },
       ]}
     >
-      <AppHeader title=" " showBack={false} />
+      <AppHeader title="" showBack={false} />
 
-      <View style={styles.content}>
-        {/* LOGO */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {/* HERO */}
         <View style={styles.hero}>
-          <View style={styles.logoWrapper}>
-            <Image source={require("../Icon/iconnn.png")} style={styles.logo} />
+          <View style={styles.logoOuter}>
+            <View
+              style={[
+                styles.logoWrapper,
+                {
+                  backgroundColor: colors.card,
+                },
+              ]}
+            >
+              <Image
+                source={require("../Icon/iconnn.png")}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
           </View>
 
           <Text
@@ -109,71 +140,118 @@ export default function WelcomeScreen() {
             AquaGuide AI
           </Text>
 
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: colors.primary + "15",
+              },
+            ]}
+          >
+            <Ionicons name="sparkles" size={14} color={colors.primary} />
+
+            <Text
+              style={[
+                styles.badgeText,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              SMART ORNAMENTAL FISH CARE
+            </Text>
+          </View>
+
           <Text
             style={[
               styles.subtitle,
               {
-                color: colors.primary,
+                color: colors.textSecondary,
               },
             ]}
           >
-            Intelligent Fish Care Assistant
+            Your intelligent companion for better fish keeping.
           </Text>
         </View>
 
         {/* FEATURES */}
-        <View style={styles.features}>
-          <FeatureCard
-            icon="scan-outline"
-            title="AI Identification"
-            subtitle="Identify fish with AI"
-          />
+        <View style={styles.featureSection}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          >
+            Everything you need for your aquarium
+          </Text>
 
-          <FeatureCard
-            icon="water-outline"
-            title="Tank & Care"
-            subtitle="Tank and water guidance"
-          />
+          <Text
+            style={[
+              styles.sectionSubtitle,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Explore tools and guides designed to help you care for your
+            ornamental fish.
+          </Text>
 
-          <FeatureCard
-            icon="library-outline"
-            title="Species Library"
-            subtitle="Explore ornamental fish"
-          />
+          <View style={styles.features}>
+            <FeatureCard
+              icon="scan-outline"
+              title="AI Identification"
+              subtitle="Identify ornamental fish with AI"
+            />
 
-          <FeatureCard
-            icon="medkit-outline"
-            title="Disease Guide"
-            subtitle="Learn common fish diseases"
-          />
+            <FeatureCard
+              icon="water-outline"
+              title="Tank & Care"
+              subtitle="Water, tank and maintenance guidance"
+            />
+
+            <FeatureCard
+              icon="library-outline"
+              title="Species Library"
+              subtitle="Explore ornamental fish species"
+            />
+
+            <FeatureCard
+              icon="medkit-outline"
+              title="Disease Guide"
+              subtitle="Learn about common fish diseases"
+            />
+          </View>
         </View>
 
-        {/* ACTION BUTTONS */}
+        {/* ACTIONS */}
         <View style={styles.actions}>
           <TouchableOpacity
             style={[
-              styles.loginButton,
+              styles.primaryButton,
               {
                 backgroundColor: colors.primary,
               },
             ]}
-            activeOpacity={0.9}
+            activeOpacity={0.85}
             onPress={() => router.push("/auth/login")}
           >
             <Ionicons name="log-in-outline" size={21} color="#FFFFFF" />
 
-            <Text style={styles.loginText}>Login</Text>
+            <Text style={styles.primaryButtonText}>Sign In</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
-              styles.registerButton,
+              styles.secondaryButton,
               {
-                borderColor: colors.primary,
                 backgroundColor: colors.card,
+                borderColor: colors.primary,
               },
             ]}
-            activeOpacity={0.9}
+            activeOpacity={0.85}
             onPress={() => router.push("/auth/register")}
           >
             <Ionicons
@@ -184,7 +262,7 @@ export default function WelcomeScreen() {
 
             <Text
               style={[
-                styles.registerText,
+                styles.secondaryButtonText,
                 {
                   color: colors.primary,
                 },
@@ -214,9 +292,28 @@ export default function WelcomeScreen() {
               name="arrow-forward"
               size={16}
               color={colors.textSecondary}
-              style={{ marginLeft: 5 }}
             />
           </TouchableOpacity>
+        </View>
+
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={14}
+            color={colors.textSecondary}
+          />
+
+          <Text
+            style={[
+              styles.footerText,
+              {
+                color: colors.textSecondary,
+              },
+            ]}
+          >
+            Built for ornamental fish keepers
+          </Text>
         </View>
 
         <Text
@@ -229,7 +326,7 @@ export default function WelcomeScreen() {
         >
           AquaGuide AI • Version 1.0
         </Text>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -239,99 +336,155 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  content: {
+  loadingContainer: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 12,
   },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
+  },
+
+  /* HERO */
 
   hero: {
     alignItems: "center",
-    marginTop: 8,
+    paddingTop: 10,
   },
 
-  logoWrapper: {
-    width: 105,
-    height: 105,
-    borderRadius: 52.5,
+  logoOuter: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
 
-    backgroundColor: "#E8FAFD",
+    backgroundColor: "#FFFFFF",
 
     justifyContent: "center",
     alignItems: "center",
 
-    elevation: 4,
+    elevation: 5,
 
     shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 5,
+    },
+  },
+
+  logoWrapper: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    elevation: 5,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 5,
     },
   },
 
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 22,
+    width: 84,
+    height: 84,
+    borderRadius: 24,
   },
 
   title: {
-    marginTop: 12,
-    fontSize: 30,
+    marginTop: 16,
+    fontSize: 32,
     fontWeight: "900",
     textAlign: "center",
+    letterSpacing: -0.5,
+  },
+
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+
+    borderRadius: 20,
+
+    marginTop: 10,
+  },
+
+  badgeText: {
+    marginLeft: 6,
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.7,
   },
 
   subtitle: {
-    marginTop: 4,
+    marginTop: 10,
     fontSize: 15,
-    fontWeight: "700",
+    lineHeight: 21,
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+
+  /* FEATURES */
+
+  featureSection: {
+    marginTop: 30,
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "800",
     textAlign: "center",
   },
 
-  description: {
-    marginTop: 8,
-    textAlign: "center",
+  sectionSubtitle: {
+    marginTop: 6,
     fontSize: 13,
     lineHeight: 19,
-    paddingHorizontal: 18,
+    textAlign: "center",
+    paddingHorizontal: 12,
   },
 
   features: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginTop: 25,
+    marginTop: 18,
     gap: 10,
   },
 
   featureCard: {
-    flex: 1,
-    minHeight: 150,
+    width: "48.5%",
+    minHeight: 132,
 
     borderRadius: 18,
     borderWidth: 1,
 
-    paddingHorizontal: 10,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
 
     alignItems: "center",
     justifyContent: "center",
   },
 
   featureIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-
-    backgroundColor: "#E8FAFD",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginBottom: 7,
+    marginBottom: 9,
   },
 
   featureTitle: {
@@ -341,29 +494,30 @@ const styles = StyleSheet.create({
   },
 
   featureSubtitle: {
-    marginTop: 3,
-    fontSize: 10,
-    lineHeight: 14,
+    marginTop: 4,
+    fontSize: 10.5,
+    lineHeight: 15,
     textAlign: "center",
   },
 
+  /* ACTIONS */
+
   actions: {
-    marginTop: 20,
-    paddingTop: 0,
+    marginTop: 26,
   },
 
-  loginButton: {
-    height: 52,
+  primaryButton: {
+    height: 56,
     borderRadius: 17,
 
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
 
-    flexDirection: "row",
-
     elevation: 4,
 
-    shadowOpacity: 0.2,
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
     shadowRadius: 8,
     shadowOffset: {
       width: 0,
@@ -371,37 +525,36 @@ const styles = StyleSheet.create({
     },
   },
 
-  loginText: {
+  primaryButtonText: {
     color: "#FFFFFF",
     fontSize: 17,
     fontWeight: "800",
-    marginLeft: 7,
+    marginLeft: 8,
   },
 
-  registerButton: {
-    height: 52,
+  secondaryButton: {
+    height: 56,
     borderRadius: 17,
 
     marginTop: 10,
 
-    borderWidth: 2,
-
-    justifyContent: "center",
-    alignItems: "center",
+    borderWidth: 1.5,
 
     flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  registerText: {
+  secondaryButtonText: {
     fontSize: 17,
     fontWeight: "800",
-    marginLeft: 7,
+    marginLeft: 8,
   },
 
   guestButton: {
-    height: 42,
+    height: 46,
 
-    marginTop: 5,
+    marginTop: 7,
 
     flexDirection: "row",
     justifyContent: "center",
@@ -411,11 +564,27 @@ const styles = StyleSheet.create({
   guestText: {
     fontSize: 14,
     fontWeight: "700",
+    marginRight: 5,
+  },
+
+  /* FOOTER */
+
+  footer: {
+    marginTop: 16,
+
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  footerText: {
+    fontSize: 11,
+    marginLeft: 5,
   },
 
   version: {
     textAlign: "center",
-    fontSize: 11,
-    marginTop: 3,
+    fontSize: 10,
+    marginTop: 6,
   },
 });

@@ -94,6 +94,7 @@ export default function LoginScreen() {
       }
 
       Alert.alert("Login Failed", message);
+
       return;
     } finally {
       setLoading(false);
@@ -102,11 +103,10 @@ export default function LoginScreen() {
     console.log("LOGIN SUCCESSFUL");
     console.log("LOGIN REDIRECT:", redirect);
 
-    /*
-     * MENU
-     *
-     * Menu → Login → Successful Login → Welcome → Proceed → Menu
-     */
+    /* ------------------------------------------------------------------ */
+    /* MENU                                                               */
+    /* ------------------------------------------------------------------ */
+
     if (redirect === "menu") {
       Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`, [
         {
@@ -120,22 +120,40 @@ export default function LoginScreen() {
       return;
     }
 
-    /*
-     * NEW FISH CARE
-     *
-     * Fish Care → New Fish Care → Login
-     * → Successful Login → Welcome → Proceed
-     * → New Fish Care
-     *
-     * IMPORTANT:
-     * This must NOT go to /(tabs).
-     */
+    /* ------------------------------------------------------------------ */
+    /* NEW FISH CARE                                                      */
+    /* ------------------------------------------------------------------ */
+
     if (redirect === "newFishCare") {
+      /*
+       * Important:
+       *
+       * Do NOT send the user directly to
+       * /new-fish-care here.
+       *
+       * The New Fish Care screen is responsible
+       * for checking whether the user has accepted
+       * the New Fish Care notice.
+       *
+       * Therefore we return the user to the
+       * New Fish Care entry screen first.
+       *
+       * If the notice has NOT been accepted:
+       *     /new-fish-care
+       *          ↓
+       *     /new-fish-care/terms
+       *
+       * If the notice HAS already been accepted:
+       *     /new-fish-care
+       *          ↓
+       *     Dashboard
+       */
+
       Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`, [
         {
           text: "Proceed",
           onPress: () => {
-            router.replace("/new-fish-care");
+            router.replace("/new-fish-care/terms");
           },
         },
       ]);
@@ -143,9 +161,10 @@ export default function LoginScreen() {
       return;
     }
 
-    /*
-     * OTHER LOGIN DESTINATIONS
-     */
+    /* ------------------------------------------------------------------ */
+    /* OTHER LOGIN DESTINATIONS                                           */
+    /* ------------------------------------------------------------------ */
+
     Alert.alert("Welcome!", `Hello ${user.displayName ?? "Aquarist"}`, [
       {
         text: "Proceed",
@@ -208,7 +227,9 @@ export default function LoginScreen() {
             name="fish"
             size={80}
             color="#00BCD4"
-            style={{ alignSelf: "center" }}
+            style={{
+              alignSelf: "center",
+            }}
           />
 
           <Text
@@ -233,6 +254,8 @@ export default function LoginScreen() {
             Sign in to continue using AquaGuide AI.
           </Text>
 
+          {/* Email */}
+
           <TextInput
             placeholder="Email Address"
             placeholderTextColor={colors.textSecondary}
@@ -252,6 +275,8 @@ export default function LoginScreen() {
             value={email}
             onChangeText={setEmail}
           />
+
+          {/* Password */}
 
           <View
             style={[
@@ -280,7 +305,7 @@ export default function LoginScreen() {
               onChangeText={setPassword}
             />
 
-            <TouchableOpacity onPress={() => setSecure(!secure)}>
+            <TouchableOpacity onPress={() => setSecure(!secure)} hitSlop={8}>
               <Ionicons
                 name={secure ? "eye-off-outline" : "eye-outline"}
                 size={24}
@@ -289,8 +314,15 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Login */}
+
           <TouchableOpacity
-            style={styles.button}
+            style={[
+              styles.button,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
             onPress={handleLogin}
             disabled={loading}
           >
@@ -301,14 +333,36 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
+          {/* Forgot Password */}
+
           <TouchableOpacity
             onPress={() => router.push("/auth/forgot-password")}
           >
-            <Text style={styles.link}>Forgot Password?</Text>
+            <Text
+              style={[
+                styles.link,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              Forgot Password?
+            </Text>
           </TouchableOpacity>
 
+          {/* Register */}
+
           <TouchableOpacity onPress={() => router.push("/auth/register")}>
-            <Text style={styles.link}>Don't have an account? Register</Text>
+            <Text
+              style={[
+                styles.link,
+                {
+                  color: colors.primary,
+                },
+              ]}
+            >
+              Don't have an account? Register
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -319,7 +373,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2FBFD",
   },
 
   content: {
@@ -332,24 +385,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 30,
     fontWeight: "800",
-    color: "#003B57",
     marginTop: 20,
   },
 
   subtitle: {
     textAlign: "center",
-    color: "#607D8B",
     marginTop: 10,
     marginBottom: 35,
     fontSize: 15,
   },
 
   input: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
     marginBottom: 16,
     fontSize: 16,
   },
@@ -357,10 +406,8 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
     paddingHorizontal: 16,
     marginBottom: 20,
   },
@@ -372,7 +419,6 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#00BCD4",
     paddingVertical: 16,
     borderRadius: 14,
     alignItems: "center",
@@ -386,7 +432,6 @@ const styles = StyleSheet.create({
 
   link: {
     textAlign: "center",
-    color: "#00BCD4",
     marginTop: 20,
     fontSize: 16,
     fontWeight: "700",

@@ -36,7 +36,10 @@ async function sendRequest(body: object): Promise<AIResponse> {
         Authorization: `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        ...body,
+        model: MODEL,
+      }),
     });
 
     const json = await response.json();
@@ -52,7 +55,7 @@ async function sendRequest(body: object): Promise<AIResponse> {
 
     return {
       success: true,
-      message: json.choices?.[0]?.message?.content ?? "",
+      message: json?.choices?.[0]?.message?.content ?? "",
     };
   } catch (error) {
     return {
@@ -65,7 +68,6 @@ async function sendRequest(body: object): Promise<AIResponse> {
 
 export async function askAI(prompt: string): Promise<AIResponse> {
   return sendRequest({
-    model: MODEL,
     messages: [
       {
         role: "user",
@@ -80,7 +82,6 @@ export async function askVisionAI(
   prompt: string,
 ): Promise<AIResponse> {
   return sendRequest({
-    model: MODEL,
     messages: [
       {
         role: "user",

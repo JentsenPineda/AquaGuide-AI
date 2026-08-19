@@ -288,7 +288,7 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              AQUARIUM MANAGEMENT
+              Ornamental Fish Management
             </Text>
 
             <Text
@@ -299,8 +299,8 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              Your aquarium,
-              {"\n"}simplified.
+              AquaGuide AI,
+              {"\n"}Everything you need for better fishkeeping.
             </Text>
           </View>
 

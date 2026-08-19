@@ -1,32 +1,90 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
+import { setGlobalOptions } from "firebase-functions";
+import { onRequest } from "firebase-functions/https";
 import * as logger from "firebase-functions/logger";
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
-
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
 setGlobalOptions({ maxInstances: 10 });
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+const NARA_API_KEY = process.env.NARA_API_KEY;
+const NARA_BASE_URL =
+  process.env.NARA_BASE_URL || "https://router.bynara.id/v1";
+const NARA_MODEL = process.env.NARA_MODEL || "gpt-5.6-terra";
+
+export const analyzeFish = onRequest(async (req, res) => {
+  // Basic CORS support for the mobile application.
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).json({
+      success: false,
+      error: "Method not allowed.",
+    });
+    return;
+  }
+
+  if (!NARA_API_KEY) {
+    logger.error("Missing NARA_API_KEY.");
+    res.status(500).json({
+      success: false,
+      error: "AI service is not configured.",
+    });
+    return;
+  }
+
+  try {
+    const { messages } = req.body ?? {};
+    if (!messages || !Array.isArray(messages)) {
+      res.status(400).json({
+        success: false,
+        error: "Invalid request. Messages are required.",
+      });
+      return;
+    }
+
+    const response = await fetch(`${NARA_BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${NARA_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: NARA_MODEL,
+        messages,
+      }),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+      logger.error("NaraRouter request failed", {
+        status: response.status,
+        error: json?.error?.message ?? json?.message,
+      });
+
+      res.status(response.status).json({
+        success: false,
+        error:
+          json?.error?.message ?? json?.message ?? "Unknown AI service error.",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: json.choices?.[0]?.message?.content ?? "",
+    });
+  } catch (error) {
+    logger.error("AI proxy error", error);
+
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error.",
+    });
+  }
+});

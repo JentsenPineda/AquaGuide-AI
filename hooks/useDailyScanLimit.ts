@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import {
-    getDailyScanUsage,
-    releaseDailyScan,
-    reserveDailyScan,
+  getDailyScanUsage,
+  releaseDailyScan,
+  reserveDailyScan,
 } from "@/services/scanService";
 
 export const DAILY_SCAN_LIMIT = 5;
@@ -18,7 +18,7 @@ export default function useDailyScanLimit() {
 
   const loadUsage = useCallback(async () => {
     if (!user) {
-      setRemainingScans(0);
+      setRemainingScans(DAILY_SCAN_LIMIT);
       setLoading(false);
       return;
     }
@@ -74,7 +74,7 @@ export default function useDailyScanLimit() {
     remainingScans,
     limit: DAILY_SCAN_LIMIT,
     loading,
-    canScan: !!user && remainingScans > 0,
+    canScan: remainingScans > 0,
     reserveScan,
     releaseScan,
     refreshUsage: loadUsage,

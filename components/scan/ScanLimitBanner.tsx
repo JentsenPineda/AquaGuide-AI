@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 interface ScanLimitBannerProps {
   remainingScans: number;
   limit?: number;
+  loading?: boolean;
   primaryColor: string;
   textPrimary: string;
   textSecondary: string;
@@ -15,13 +16,14 @@ interface ScanLimitBannerProps {
 export default function ScanLimitBanner({
   remainingScans,
   limit = 5,
+  loading = false,
   primaryColor,
   textPrimary,
   textSecondary,
   cardColor,
   borderColor,
 }: ScanLimitBannerProps) {
-  const limitReached = remainingScans <= 0;
+  const limitReached = !loading && remainingScans <= 0;
 
   return (
     <View

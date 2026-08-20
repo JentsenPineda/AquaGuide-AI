@@ -10,7 +10,7 @@ import { addScan } from "@/services/scanService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -34,10 +34,16 @@ type ScanState =
   | "error";
 
 export default function ScanScreen() {
+  const router = useRouter();
   const colors = useAppColors();
   const cameraRef = useRef<CameraView>(null);
   const { user } = useAuth();
-  const { remainingScans, reserveScan, releaseScan } = useDailyScanLimit();
+  const {
+    remainingScans,
+    reserveScan,
+    releaseScan,
+    loading: scanLimitLoading,
+  } = useDailyScanLimit();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [cameraReady, setCameraReady] = useState(false);
@@ -207,6 +213,25 @@ export default function ScanScreen() {
       }, 30);
     });
   const onScan = async () => {
+    if (!user) {
+      Alert.alert(
+        "Login Required",
+        "Please sign in to use AI Fish Identification.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Login",
+            onPress: () => router.push("/auth/login?redirect=scan"),
+          },
+        ],
+      );
+
+      return;
+    }
+
     if (!cameraReady || !cameraRef.current) {
       Alert.alert(
         "Camera Not Ready",
@@ -219,24 +244,6 @@ export default function ScanScreen() {
 
     try {
       if (!cameraRef.current) return;
-      if (!user) {
-        Alert.alert(
-          "Login Required",
-          "Please sign in to use AI Fish Identification.",
-          [
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
-            {
-              text: "Login",
-              onPress: () => router.push("/auth/login?redirect=scan"),
-            },
-          ],
-        );
-
-        return;
-      }
 
       const scanReservation = await reserveScan();
 
@@ -739,6 +746,7 @@ Use exactly this structure:
         <ScanLimitBanner
           remainingScans={remainingScans}
           limit={5}
+          loading={scanLimitLoading}
           primaryColor={colors.primary}
           textPrimary={colors.textPrimary}
           textSecondary={colors.textSecondary}
@@ -1568,7 +1576,9 @@ Use exactly this structure:
           permissionGranted={permission?.granted ?? false}
           scanState={scanState}
           canScan={Boolean(
-            user && cameraReady && remainingScans > 0 && scanState === "ready",
+            cameraReady &&
+            scanState === "ready" &&
+            (!user || remainingScans > 0),
           )}
           onReset={onReset}
           onScan={onScan}

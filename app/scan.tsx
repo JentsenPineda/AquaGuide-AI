@@ -124,7 +124,9 @@ export default function ScanScreen() {
     scanLineY.stopAnimation();
     pulse.stopAnimation();
   };
-
+  useEffect(() => {
+    console.log("SCAN: cameraReady state changed:", cameraReady);
+  }, [cameraReady]);
   // Progress simulation
   useEffect(() => {
     if (scanState !== "processing") return;
@@ -154,11 +156,14 @@ export default function ScanScreen() {
   useEffect(() => {
     if (!permission) return;
 
+    console.log("SCAN: cameraReady set FALSE by permission effect");
     setCameraReady(false);
-
-    if (permission.granted) setScanState("ready");
-    else setScanState("idle");
-  }, [permission]);
+    if (permission.granted) {
+      setScanState("ready");
+    } else {
+      setScanState("idle");
+    }
+  }, [permission?.granted]);
 
   useEffect(() => {
     if (!permission?.granted || capturedUri || scanState === "processing") {
@@ -178,6 +183,7 @@ export default function ScanScreen() {
   const onRequestPermission = async () => {
     const res = await requestPermission();
     if (res.granted) {
+      console.log("SCAN: cameraReady set FALSE by permission request");
       setCameraReady(false);
       setScanState("ready");
     }
@@ -188,11 +194,16 @@ export default function ScanScreen() {
 
   const onReset = () => {
     setCapturedUri(null);
-    setCameraReady(false);
     setResult(null);
     setProgress(0);
-    setScanState(permission?.granted ? "ready" : "idle");
+
+    if (permission?.granted) {
+      setScanState("ready");
+    } else {
+      setScanState("idle");
+    }
   };
+
   const waitForProgress = () =>
     new Promise<void>((resolve) => {
       setProgress(0);
@@ -213,6 +224,7 @@ export default function ScanScreen() {
       }, 30);
     });
   const onScan = async () => {
+    console.log("SCAN: onScan started");
     if (!user) {
       Alert.alert(
         "Login Required",
@@ -261,11 +273,16 @@ export default function ScanScreen() {
           "Camera is not ready. Please wait a moment and try again.",
         );
       }
+      console.log("SCAN: camera capture started");
 
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.7,
         skipProcessing: true,
         base64: true,
+      });
+
+      console.log("SCAN: camera capture completed", {
+        hasUri: Boolean(photo?.uri),
       });
 
       if (!photo?.base64) {
@@ -274,8 +291,9 @@ export default function ScanScreen() {
 
       setCapturedUri(photo.uri ?? null);
       setScanState("processing");
+      console.log("SCAN: AI request starting");
 
-      const aiTask = askVisionAI(
+      const response = await askVisionAI(
         photo.base64,
         `You are AquaGuide AI, an expert ornamental fish identification assistant.
 
@@ -483,13 +501,15 @@ Use exactly this structure:
   "confidence": 0.95,
   "introduction": "Short 1–2 sentence introduction about the fish."
 }`,
-      );
+      ).then((response) => {
+        console.log("SCAN: AI response returned", {
+          success: response.success,
+          hasMessage: Boolean(response.message),
+          error: response.error,
+        });
 
-      const [response] = await Promise.all([aiTask, waitForProgress()]);
-
-      if (!response.success) {
-        throw new Error(response.error ?? "AI request failed.");
-      }
+        return response;
+      });
 
       let aiResult: {
         species: string;
@@ -500,6 +520,7 @@ Use exactly this structure:
       };
 
       try {
+        console.log("SCAN: parsing AI response");
         let cleanedResponse = response.message.trim();
 
         // Remove markdown code fences if the model included them.
@@ -518,6 +539,10 @@ Use exactly this structure:
         }
 
         aiResult = JSON.parse(cleanedResponse);
+        console.log("SCAN: AI response parsed successfully", {
+          species: aiResult.species,
+          confidence: aiResult.confidence,
+        });
 
         // Basic validation.
         if (
@@ -564,6 +589,8 @@ Use exactly this structure:
         scientificName: aiResult.scientificName ?? null,
       });
 
+      console.log("SCAN: saving scan to Firestore");
+
       if (user) {
         await addScan(user.uid, {
           label: aiResult.species,
@@ -572,6 +599,8 @@ Use exactly this structure:
         });
       }
 
+      console.log("SCAN: Firestore scan saved");
+      console.log("SCAN: completed successfully");
       setScanState("done");
     } catch (error) {
       console.error(error);
@@ -773,8 +802,12 @@ Use exactly this structure:
                 style={styles.preview}
                 facing={facing}
                 onCameraReady={() => {
+                  console.log("SCAN: CameraView onCameraReady fired");
+
                   setCameraReady(true);
                   setScanState("ready");
+
+                  console.log("SCAN: Camera ready state requested");
                 }}
               />
             )

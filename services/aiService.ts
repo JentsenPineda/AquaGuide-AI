@@ -29,7 +29,29 @@ export interface FishScanAIResult {
 }
 
 async function sendRequest(body: object): Promise<AIResponse> {
+  const controller = new AbortController();
+
+  // Prevent the scan from waiting indefinitely.
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, 45000);
+
   try {
+    if (!API_KEY || !BASE_URL || !MODEL) {
+      console.error("AI configuration is incomplete.");
+
+      return {
+        success: false,
+        message: "",
+        error: "AI service configuration is incomplete.",
+      };
+    }
+
+    console.log("AI request started:", {
+      baseUrl: BASE_URL,
+      model: MODEL,
+    });
+
     const response = await fetch(`${BASE_URL}/chat/completions`, {
       method: "POST",
       headers: {
@@ -40,29 +62,85 @@ async function sendRequest(body: object): Promise<AIResponse> {
         ...body,
         model: MODEL,
       }),
+      signal: controller.signal,
     });
 
-    const json = await response.json();
+    console.log("AI response received:", response.status);
+
+    let json: any;
+
+    try {
+      json = await response.json();
+    } catch (error) {
+      console.error("Failed to parse AI response:", error);
+
+      return {
+        success: false,
+        message: "",
+        error: "The AI service returned an invalid response.",
+      };
+    }
 
     if (!response.ok) {
+      const errorMessage =
+        json?.error?.message ??
+        json?.message ??
+        `AI service error (${response.status}).`;
+
+      console.error("AI service HTTP error:", {
+        status: response.status,
+        error: errorMessage,
+      });
+
+      return {
+        success: false,
+        message: "",
+        error: errorMessage,
+      };
+    }
+
+    const message = json?.choices?.[0]?.message?.content;
+
+    if (typeof message !== "string" || !message.trim()) {
+      console.error("AI service returned an empty response:", json);
+
+      return {
+        success: false,
+        message: "",
+        error: "The AI service returned an empty response.",
+      };
+    }
+
+    console.log("AI request completed successfully.");
+
+    return {
+      success: true,
+      message,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      console.error("AI request timed out after 45 seconds.");
+
       return {
         success: false,
         message: "",
         error:
-          json?.error?.message ?? json?.message ?? "Unknown AI service error.",
+          "The AI request timed out. Please check your internet connection and try again.",
       };
     }
 
-    return {
-      success: true,
-      message: json?.choices?.[0]?.message?.content ?? "",
-    };
-  } catch (error) {
+    console.error("AI request failed:", error);
+
     return {
       success: false,
       message: "",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unable to connect to the AI service.",
     };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

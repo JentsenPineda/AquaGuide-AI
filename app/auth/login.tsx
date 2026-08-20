@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -336,7 +337,13 @@ export default function LoginScreen() {
           {/* Forgot Password */}
 
           <TouchableOpacity
-            onPress={() => router.push("/auth/forgot-password")}
+            onPress={() => {
+              Keyboard.dismiss();
+
+              requestAnimationFrame(() => {
+                router.push("/auth/forgot-password");
+              });
+            }}
           >
             <Text
               style={[

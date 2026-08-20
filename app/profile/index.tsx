@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,8 +20,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  deleteCurrentUserAccount,
+  reauthenticateCurrentUser,
+} from "../../services/authService";
 import { subscribeToLogs } from "../../services/logbookService";
 import { subscribeToReminders } from "../../services/reminderService";
 
@@ -151,12 +155,12 @@ function StatCard({
 
 export default function ProfileScreen() {
   const colors = useAppColors();
-
   const { user, loading, logout } = useAuth();
-
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
   const [reminderCount, setReminderCount] = useState(0);
+  const [showDeletePasswordModal, setShowDeletePasswordModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [logCount, setLogCount] = useState(0);
 
   const [displayName, setDisplayName] = useState("");
@@ -312,6 +316,28 @@ export default function ProfileScreen() {
         "We couldn't log you out. Please try again.",
       );
     }
+  };
+
+  const handleDeleteAccount = () => {
+    if (!user) return;
+
+    Alert.alert(
+      "Delete Account?",
+      "This will permanently delete your AquaGuide AI account and associated fishkeeping data. This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Continue",
+          onPress: () => {
+            setDeletePassword("");
+            setShowDeletePasswordModal(true);
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -621,6 +647,13 @@ export default function ProfileScreen() {
             subtitle="Update your account password"
             onPress={() => router.push("/profile/change-password")}
           />
+
+          <SettingItem
+            icon="trash-outline"
+            title="Delete Account"
+            subtitle="Permanently delete your account and data"
+            onPress={handleDeleteAccount}
+          />
         </View>
 
         {/* SECURITY INFORMATION */}
@@ -726,6 +759,180 @@ export default function ProfileScreen() {
         onClose={() => setShowAvatarPicker(false)}
         colors={colors}
       />
+
+      <Modal
+        visible={showDeletePasswordModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          if (!isDeletingAccount) {
+            setShowDeletePasswordModal(false);
+            setDeletePassword("");
+          }
+        }}
+      >
+        <View style={styles.deleteModalOverlay}>
+          <View
+            style={[
+              styles.deleteModalCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.deleteModalIcon,
+                {
+                  backgroundColor: colors.danger + "15",
+                },
+              ]}
+            >
+              <Ionicons
+                name="lock-closed-outline"
+                size={24}
+                color={colors.danger}
+              />
+            </View>
+
+            <Text
+              style={[
+                styles.deleteModalTitle,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Confirm Your Password
+            </Text>
+
+            <Text
+              style={[
+                styles.deleteModalMessage,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Enter your current password to permanently delete your account.
+            </Text>
+
+            <TextInput
+              value={deletePassword}
+              onChangeText={setDeletePassword}
+              placeholder="Enter your password"
+              placeholderTextColor={colors.textSecondary}
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!isDeletingAccount}
+              style={[
+                styles.deletePasswordInput,
+                {
+                  color: colors.textPrimary,
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                },
+              ]}
+            />
+
+            <View style={styles.deleteModalButtons}>
+              <Pressable
+                disabled={isDeletingAccount}
+                onPress={() => {
+                  setShowDeletePasswordModal(false);
+                  setDeletePassword("");
+                }}
+                style={[
+                  styles.deleteCancelButton,
+                  {
+                    backgroundColor: colors.background,
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.deleteCancelText,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Cancel
+                </Text>
+              </Pressable>
+
+              <Pressable
+                disabled={isDeletingAccount}
+                onPress={async () => {
+                  if (!deletePassword.trim()) {
+                    Alert.alert(
+                      "Password Required",
+                      "Please enter your password to continue.",
+                    );
+                    return;
+                  }
+
+                  try {
+                    setIsDeletingAccount(true);
+
+                    await reauthenticateCurrentUser(deletePassword);
+                    await deleteCurrentUserAccount();
+
+                    setShowDeletePasswordModal(false);
+                    setDeletePassword("");
+
+                    Alert.alert(
+                      "Account Deleted",
+                      "Your AquaGuide AI account and associated data have been deleted.",
+                      [
+                        {
+                          text: "OK",
+                          onPress: () => router.replace("/"),
+                        },
+                      ],
+                    );
+                  } catch (error: any) {
+                    console.error("Delete Account Error:", error);
+
+                    if (
+                      error?.code === "auth/wrong-password" ||
+                      error?.code === "auth/invalid-credential"
+                    ) {
+                      Alert.alert(
+                        "Incorrect Password",
+                        "The password you entered is incorrect. Please try again.",
+                      );
+                    } else {
+                      Alert.alert(
+                        "Unable to Delete Account",
+                        "We couldn't delete your account. Please try again.",
+                      );
+                    }
+                  } finally {
+                    setIsDeletingAccount(false);
+                  }
+                }}
+                style={[
+                  styles.deleteConfirmButton,
+                  {
+                    backgroundColor: colors.danger,
+                    opacity: isDeletingAccount ? 0.7 : 1,
+                  },
+                ]}
+              >
+                {isDeletingAccount ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.deleteConfirmText}>Delete Account</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1120,5 +1327,89 @@ const styles = StyleSheet.create({
     fontWeight: "800",
 
     marginLeft: 7,
+  },
+
+  deleteModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+
+  deleteModalCard: {
+    width: "100%",
+    maxWidth: 400,
+    borderRadius: 22,
+    borderWidth: 1,
+    padding: 22,
+  },
+
+  deleteModalIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    marginBottom: 14,
+  },
+
+  deleteModalTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+
+  deleteModalMessage: {
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: "center",
+    marginTop: 7,
+    marginBottom: 18,
+  },
+
+  deletePasswordInput: {
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    fontSize: 14,
+  },
+
+  deleteModalButtons: {
+    flexDirection: "row",
+    marginTop: 14,
+  },
+
+  deleteCancelButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 13,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 6,
+  },
+
+  deleteCancelText: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+
+  deleteConfirmButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 13,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 6,
+  },
+
+  deleteConfirmText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "800",
+    textAlign: "center",
   },
 });

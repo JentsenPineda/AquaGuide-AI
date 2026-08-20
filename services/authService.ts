@@ -1,5 +1,8 @@
 import {
+  EmailAuthProvider,
   createUserWithEmailAndPassword,
+  deleteUser,
+  reauthenticateWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -7,8 +10,14 @@ import {
   updateProfile,
 } from "firebase/auth";
 
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import { auth, db } from "../config/firebase";
 
 export const registerUser = async (
@@ -56,4 +65,46 @@ export const logoutUser = async () => {
 
 export const resetPassword = async (email: string) => {
   await sendPasswordResetEmail(auth, email);
+};
+
+export const reauthenticateCurrentUser = async (password: string) => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("No authenticated user found.");
+  }
+
+  if (!user.email) {
+    throw new Error("This account does not have an email address.");
+  }
+
+  const credential = EmailAuthProvider.credential(user.email, password);
+
+  await reauthenticateWithCredential(user, credential);
+};
+
+export const deleteCurrentUserAccount = async () => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("No authenticated user found.");
+  }
+
+  const uid = user.uid;
+
+  const subcollections = ["logs", "reminders", "scans", "scanUsage"];
+
+  for (const subcollectionName of subcollections) {
+    const collectionRef = collection(db, "users", uid, subcollectionName);
+
+    const snapshot = await getDocs(collectionRef);
+
+    for (const document of snapshot.docs) {
+      await deleteDoc(document.ref);
+    }
+  }
+
+  await deleteDoc(doc(db, "users", uid));
+
+  await deleteUser(user);
 };

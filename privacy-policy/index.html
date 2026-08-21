@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AquaGuide AI — Privacy Policy</title>
+<style>
+:root{--primary:#1687c7;--dark:#123c55;--text:#1f2937;--muted:#64748b;--bg:#f4f9fc;--border:#dbe7ef}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.65}
+main{max-width:900px;margin:auto;padding:28px 16px 60px} article{background:#fff;border:1px solid var(--border);border-radius:18px;padding:34px;box-shadow:0 8px 30px rgba(15,55,80,.06)}
+h1{margin:0;color:var(--primary);font-size:32px} .subtitle{font-size:20px;font-weight:700;margin:4px 0}.effective{color:var(--muted);font-size:14px;border-bottom:1px solid var(--border);padding-bottom:18px}
+h2{color:var(--dark);font-size:21px;margin-top:30px} h3{color:#245b78;font-size:17px;margin-top:22px} p{margin:12px 0}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:18px}
+@media(max-width:600px){article{padding:22px 18px;border-radius:14px}h1{font-size:27px}}
+</style>
+</head>
+<body><main><article>
+<h1>AquaGuide AI</h1>
+<p class="subtitle">Privacy Policy</p>
+<p class="effective"><strong>Effective Date: August 20, 2026</strong></p>
+<h2>1. Information We Collect</h2>
+<h3>1.1 Account Information</h3>
+<p>When you create an AquaGuide AI account, we collect information necessary to create and manage your account, including: Full name; Username; Email address; Firebase user ID; Account creation date. AquaGuide AI uses Firebase Authentication to manage account authentication. Passwords are handled by Firebase Authentication and are not stored in the AquaGuide AI Firestore user profile.</p>
+<h3>1.2 Fishkeeping Information</h3>
+<p>When you use features such as the Logbook and Reminders, you may provide: Log type, notes, and dates; Reminder type, repeat schedule, day, time, notes, and notification information. This information is used to provide the application&#x27;s fishkeeping management features.</p>
+<h3>1.3 AI Fish Identification</h3>
+<p>When you choose AI Fish Identification, the selected fish image is transmitted from the AquaGuide AI mobile application to the third-party AI service used by AquaGuide AI for AI analysis. The image is processed to generate information such as fish species, variant, scientific name, confidence level, and identification information.</p>
+<p>AquaGuide AI does not intentionally store submitted fish images in Cloud Firestore or Firebase Storage as part of the AI scanning process.</p>
+<p>The submitted image and AI request are transmitted to NaraRouter, the AI gateway used by AquaGuide AI, which routes requests to the configured underlying AI model provider. The third-party AI service may process submitted images and request content and may maintain service-related usage, request records, logs, or analytics according to its applicable policies and terms.</p>
+<h3>1.4 AI Scan History and Usage</h3>
+<p>For authenticated users, AquaGuide AI stores identification results, confidence scores, scan notes, scan date/time, and daily scan usage count. AquaGuide AI limits authenticated users to five AI fish scans per day.</p>
+<h2>2. How We Use Information</h2>
+<p>We use collected information to: Create and manage user accounts; Authenticate users; Provide AI-powered fish identification; Store AI scan history; Enforce daily AI scan limits; Provide fishkeeping reminders and Logbook features; Schedule device notifications; Provide ornamental fish management features; Maintain and improve application functionality; Respond to support and privacy requests.</p>
+<p>AquaGuide AI does not sell users&#x27; personal information.</p>
+<h2>3. Firebase Services</h2>
+<p>AquaGuide AI uses Firebase services, including Firebase Authentication and Cloud Firestore, to provide account authentication and store application data such as user profiles, Logbook entries, reminders, AI scan history, and daily scan usage.</p>
+<p>Firebase Authentication is used for account creation, login, email verification, password reset, and authentication persistence.</p>
+<p>Cloud Firestore stores authenticated-user application information including user profile information, Logbook entries, reminders, AI scan history, and daily scan usage.</p>
+<h2>4. AI Processing and Third-Party Services</h2>
+<p>AquaGuide AI uses NaraRouter as an AI gateway to process AI fish identification requests. When a user performs an AI fish scan, the mobile application sends the selected fish image and the associated AI request to the configured AI service.</p>
+<p>NaraRouter routes the request to the underlying AI model provider used by AquaGuide AI. AquaGuide AI does not intentionally store the submitted fish image in its own Cloud Firestore database or Firebase Storage through the AI scanning function.</p>
+<p>The third-party AI service may process submitted content and maintain service-related records according to its own applicable privacy policies and terms.</p>
+<p>NaraRouter provides AI request routing and may maintain usage tracking, credit controls, rate limits, logs, and analytics associated with requests.</p>
+<p>Users should avoid submitting unnecessary personal or sensitive information through the AI scanning feature.</p>
+<h2>5. User-Generated Content</h2>
+<p>Users may voluntarily enter Logbook notes, Reminder notes, fishkeeping records, and fish images submitted for AI identification.</p>
+<p>Users are responsible for ensuring that information they voluntarily submit does not contain unnecessary sensitive personal information belonging to themselves or others.</p>
+<h2>6. Notifications</h2>
+<p>AquaGuide AI may use device notifications to provide reminders created by users, including feeding, water change, water testing, medication, tank cleaning, and plant maintenance reminders.</p>
+<p>Notification preferences are stored locally on the user&#x27;s device. Users can control notification permissions through their device settings.</p>
+<h2>7. Local Device Storage</h2>
+<p>AquaGuide AI uses local device storage for certain application functions, including Firebase authentication persistence, notification preferences, and user-selected application settings.</p>
+<p>Local notification settings are stored on the user&#x27;s device and are not used for advertising.</p>
+<h2>8. Data Storage and Security</h2>
+<p>AquaGuide AI uses Firebase services to store account and application data.</p>
+<p>We take reasonable measures to protect information handled by the application, including authentication controls and secure communication between the application and backend services.</p>
+<p>AquaGuide AI uses configured service credentials to communicate with its AI service provider. The application takes reasonable measures to protect information transmitted between the application and its service providers.</p>
+<p>However, no electronic storage or transmission method can be guaranteed to be completely secure.</p>
+<h2>9. Data Retention</h2>
+<p>AquaGuide AI retains account and user-created information for as long as reasonably necessary to provide the application&#x27;s features.</p>
+<p>Users may delete their account through the application&#x27;s Delete Account feature.</p>
+<p>When an account is deleted, AquaGuide AI deletes the Firebase Authentication account and associated Firestore data controlled by the application, including the user profile, Logbook entries, reminders, AI scan history, and daily scan usage records.</p>
+<p>Third-party service providers may retain information according to their own applicable policies and retention practices.</p>
+<h2>10. Account and Data Deletion</h2>
+<p>AquaGuide AI provides a Delete Account function within the application&#x27;s Profile section.</p>
+<p>Users can permanently delete their account by:</p>
+<p><strong>Profile → Account → Delete Account</strong></p>
+<p>The application requires the user to confirm the deletion and re-authenticate using their account password.</p>
+<p>Upon successful deletion, AquaGuide AI removes the user&#x27;s Firebase Authentication account and associated application data under the user&#x27;s account.</p>
+<p>Account deletion is permanent and cannot be undone.</p>
+<p>If you are unable to access the deletion function or need assistance, contact: aquaguideai@gmail.com</p>
+<h2>11. Information Sharing</h2>
+<p>AquaGuide AI does not sell personal information.</p>
+<p>Information may be processed by third-party service providers necessary for application functionality, including:</p>
+<p>Firebase / Google — authentication, cloud database services, and application data storage.</p>
+<p>NaraRouter / AI service providers — processing AI fish identification requests.</p>
+<p>Third-party providers may process information according to their respective privacy policies and terms.</p>
+<h2>12. Children&#x27;s Privacy</h2>
+<p>AquaGuide AI is not specifically designed or directed toward children.</p>
+<p>We do not knowingly collect personal information from children for purposes unrelated to providing the application&#x27;s functionality.</p>
+<p>If a parent or legal guardian believes that a child has provided personal information through AquaGuide AI, they may contact: aquaguideai@gmail.com</p>
+<h2>13. Your Privacy Choices</h2>
+<p>You may contact us regarding questions about your personal information, correction of account information, account deletion, deletion of associated application information, or privacy concerns.</p>
+<p>You may also permanently delete your account through the application&#x27;s Delete Account feature.</p>
+<p>For assistance: aquaguideai@gmail.com</p>
+<h2>14. Changes to This Privacy Policy</h2>
+<p>We may update this Privacy Policy when AquaGuide AI&#x27;s features, services, third-party providers, or data-handling practices change.</p>
+<p>When changes are made, the Effective Date at the beginning of this policy will be updated.</p>
+<h2>15. Contact Us</h2>
+<p>For privacy questions, account deletion assistance, or other concerns regarding AquaGuide AI:</p>
+<p>AquaGuide AI<br>Email: aquaguideai@gmail.com</p>
+</article><div class="footer">AquaGuide AI · Privacy Policy</div></main></body></html>

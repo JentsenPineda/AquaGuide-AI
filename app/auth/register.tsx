@@ -6,6 +6,7 @@ import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -32,16 +33,22 @@ export default function RegisterScreen() {
 
   const [loading, setLoading] = useState(false);
 
-  /*
-   * Real-time validation
-   */
+  const navigateAfterKeyboardDismiss = (path: "/auth/login") => {
+    Keyboard.dismiss();
+
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        router.push(path);
+      }, 100);
+    });
+  };
+
   const validation = useMemo(() => {
     const trimmedName = fullName.trim();
     const trimmedUsername = username.trim();
     const trimmedEmail = email.trim();
 
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
-
     const usernameValid = /^[a-zA-Z0-9_]{3,20}$/.test(trimmedUsername);
 
     const fullNameValid =
@@ -90,9 +97,6 @@ export default function RegisterScreen() {
     };
   }, [fullName, username, email, password, confirmPassword]);
 
-  /*
-   * Registration
-   */
   const handleRegister = async () => {
     const normalizedEmail = email.trim().toLowerCase();
     const normalizedUsername = username.trim();
@@ -158,6 +162,7 @@ export default function RegisterScreen() {
     }
 
     try {
+      Keyboard.dismiss();
       setLoading(true);
 
       await registerUser(
@@ -167,14 +172,12 @@ export default function RegisterScreen() {
         password,
       );
 
-      Alert.alert("Welcome!", `Hello ${normalizedFullName}`, [
-        {
-          text: "Proceed",
-          onPress: () => {
-            router.replace("/(tabs)/menu");
-          },
+      router.replace({
+        pathname: "/auth/verify-email",
+        params: {
+          email: normalizedEmail,
         },
-      ]);
+      });
     } catch (error: any) {
       let message = "Unable to create your account.";
 
@@ -192,6 +195,11 @@ export default function RegisterScreen() {
             "The password does not meet Firebase security requirements.";
           break;
 
+        case "auth/network-request-failed":
+          message =
+            "Network connection failed. Please check your internet connection and try again.";
+          break;
+
         default:
           message = error?.message ?? message;
       }
@@ -202,9 +210,6 @@ export default function RegisterScreen() {
     }
   };
 
-  /*
-   * Small reusable validation row
-   */
   const ValidationRow = ({
     visible,
     valid,
@@ -287,7 +292,6 @@ export default function RegisterScreen() {
             Join AquaGuide AI and manage your aquarium smarter.
           </Text>
 
-          {/* FULL NAME */}
           <TextInput
             style={[
               styles.input,
@@ -321,7 +325,6 @@ export default function RegisterScreen() {
             }
           />
 
-          {/* USERNAME */}
           <TextInput
             style={[
               styles.input,
@@ -355,7 +358,6 @@ export default function RegisterScreen() {
             }
           />
 
-          {/* EMAIL */}
           <TextInput
             style={[
               styles.input,
@@ -392,7 +394,6 @@ export default function RegisterScreen() {
             }
           />
 
-          {/* PASSWORD */}
           <View
             style={[
               styles.passwordContainer,
@@ -491,7 +492,6 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* CONFIRM PASSWORD */}
           <View
             style={[
               styles.passwordContainer,
@@ -547,7 +547,6 @@ export default function RegisterScreen() {
             }
           />
 
-          {/* CREATE ACCOUNT */}
           <TouchableOpacity
             style={[
               styles.button,
@@ -566,9 +565,8 @@ export default function RegisterScreen() {
             )}
           </TouchableOpacity>
 
-          {/* LOGIN */}
           <TouchableOpacity
-            onPress={() => router.push("/auth/login")}
+            onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
             activeOpacity={0.7}
           >
             <Text style={styles.login}>Already have an account? Sign In</Text>

@@ -39,110 +39,116 @@ export default function ScanControls({
     return null;
   }
 
-  return (
-    <View style={styles.controls}>
-      {scanState === "processing" ? (
-        <View style={styles.disabledBtn}>
+  /*
+   * PROCESSING STATE
+   * Shows a clear AI analysis indicator while the fish is being analyzed.
+   */
+  if (scanState === "processing") {
+    return (
+      <View style={styles.processingCard}>
+        <Text style={styles.processingSparkle}>✨</Text>
+
+        <Text
+          style={[
+            styles.processingTitle,
+            {
+              color: textPrimary,
+            },
+          ]}
+        >
+          Analyzing your fish...
+        </Text>
+
+        <Text
+          style={[
+            styles.processingSubtitle,
+            {
+              color: textPrimary,
+            },
+          ]}
+        >
+          Please wait
+        </Text>
+      </View>
+    );
+  }
+
+  /*
+   * DONE STATE
+   * After a fish has been scanned:
+   * - Scan Again is active
+   * - Capture remains visible but disabled
+   */
+  if (scanState === "done") {
+    return (
+      <View style={styles.controls}>
+        <Pressable
+          onPress={onReset}
+          style={({ pressed }) => [
+            styles.secondaryBtn,
+            {
+              backgroundColor: surfaceColor,
+              borderColor: borderColor,
+            },
+            pressed && styles.btnPressed,
+          ]}
+        >
+          <Ionicons name="refresh" size={19} color={textPrimary} />
+
           <Text
             style={[
-              styles.primaryBtnText,
+              styles.secondaryBtnText,
               {
                 color: textPrimary,
               },
             ]}
           >
-            Processing…
+            Scan Again
           </Text>
-        </View>
-      ) : scanState === "done" ? (
-        <>
-          <Pressable
-            onPress={onReset}
-            style={({ pressed }) => [
-              styles.secondaryBtn,
-              {
-                backgroundColor: surfaceColor,
-                borderColor: borderColor,
-              },
-              pressed && styles.btnPressed,
-            ]}
-          >
-            <Ionicons name="refresh" size={18} color={textPrimary} />
+        </Pressable>
 
-            <Text
-              style={[
-                styles.secondaryBtnText,
-                {
-                  color: textPrimary,
-                },
-              ]}
-            >
-              Scan Again
-            </Text>
-          </Pressable>
+        <Pressable
+          disabled
+          style={[
+            styles.primaryBtn,
+            {
+              backgroundColor: primaryColor,
+            },
+            styles.disabledPressable,
+          ]}
+        >
+          <Ionicons name="camera" size={19} color="#FFFFFF" />
 
-          <Pressable
-            disabled={!canScan}
-            onPress={onScan}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              {
-                backgroundColor: primaryColor,
-              },
-              pressed && styles.btnPressed,
-              !canScan && styles.disabledPressable,
-            ]}
-          >
-            <Ionicons name="camera" size={18} color="#FFFFFF" />
+          <Text style={styles.primaryBtnText}>Capture</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
-            <Text style={styles.primaryBtnText}>Capture</Text>
-          </Pressable>
-        </>
-      ) : (
-        <>
-          <Pressable
-            onPress={onReset}
-            style={({ pressed }) => [
-              styles.secondaryBtn,
-              {
-                backgroundColor: surfaceColor,
-                borderColor: borderColor,
-              },
-              pressed && styles.btnPressed,
-            ]}
-          >
-            <Ionicons name="close" size={18} color={textPrimary} />
+  /*
+   * DEFAULT STATE
+   * Before scanning:
+   * - Clear button removed
+   * - Only Capture remains
+   */
+  return (
+    <View style={styles.singleControl}>
+      <Pressable
+        disabled={!canScan}
+        onPress={onScan}
+        style={({ pressed }) => [
+          styles.captureBtn,
+          {
+            backgroundColor: primaryColor,
+          },
+          pressed && styles.btnPressed,
+          !canScan && styles.disabledPressable,
+        ]}
+      >
+        <Ionicons name="camera" size={20} color="#FFFFFF" />
 
-            <Text
-              style={[
-                styles.secondaryBtnText,
-                {
-                  color: textPrimary,
-                },
-              ]}
-            >
-              Clear
-            </Text>
-          </Pressable>
-
-          <Pressable
-            disabled={!canScan}
-            onPress={onScan}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              {
-                backgroundColor: primaryColor,
-              },
-              pressed && styles.btnPressed,
-              !canScan && styles.disabledPressable,
-            ]}
-          >
-            <Ionicons name="camera" size={18} color="#FFFFFF" />
-
-            <Text style={styles.primaryBtnText}>Scan</Text>
-          </Pressable>
-        </>
-      )}
+        <Text style={styles.captureBtnText}>Capture</Text>
+      </Pressable>
     </View>
   );
 }
@@ -153,6 +159,22 @@ const styles = StyleSheet.create({
     gap: 12,
     marginTop: 4,
     marginBottom: 8,
+  },
+
+  singleControl: {
+    width: "100%",
+    marginTop: 4,
+    marginBottom: 8,
+  },
+
+  captureBtn: {
+    width: "100%",
+    height: 52,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 8,
   },
 
   primaryBtn: {
@@ -176,29 +198,60 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  secondaryBtnText: {
-    color: "#fff",
-    fontSize: 13.5,
+  captureBtnText: {
+    color: "#FFFFFF",
+    fontSize: 14,
     fontWeight: "900",
-  },
-
-  disabledBtn: {
-    flex: 1,
-    height: 48,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.12)",
-  },
-
-  disabledPressable: {
-    opacity: 0.45,
   },
 
   primaryBtnText: {
-    color: "#fff",
+    color: "#FFFFFF",
     fontSize: 13.5,
     fontWeight: "900",
+  },
+
+  secondaryBtnText: {
+    fontSize: 13.5,
+    fontWeight: "900",
+  },
+
+  /*
+   * AI ANALYSIS INDICATOR
+   */
+  processingCard: {
+    width: "100%",
+    minHeight: 86,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    marginTop: 4,
+    marginBottom: 8,
+    backgroundColor: "rgba(255,255,255,0.96)",
+    borderWidth: 1,
+    borderColor: "rgba(0,180,210,0.18)",
+  },
+
+  processingSparkle: {
+    fontSize: 20,
+    marginBottom: 2,
+  },
+
+  processingTitle: {
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  processingSubtitle: {
+    fontSize: 12.5,
+    fontWeight: "600",
+    opacity: 0.65,
+    marginTop: 2,
+  },
+
+  disabledPressable: {
+    opacity: 0.4,
   },
 
   btnPressed: {

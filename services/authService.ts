@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   deleteUser,
   reauthenticateWithCredential,
+  reload,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -18,6 +19,7 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
+
 import { auth, db } from "../config/firebase";
 
 export const registerUser = async (
@@ -65,6 +67,32 @@ export const logoutUser = async () => {
 
 export const resetPassword = async (email: string) => {
   await sendPasswordResetEmail(auth, email);
+};
+
+export const reloadCurrentUser = async () => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("No authenticated user found.");
+  }
+
+  await reload(user);
+
+  return auth.currentUser;
+};
+
+export const resendVerificationEmail = async () => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("No authenticated user found.");
+  }
+
+  if (user.emailVerified) {
+    return;
+  }
+
+  await sendEmailVerification(user);
 };
 
 export const reauthenticateCurrentUser = async (password: string) => {

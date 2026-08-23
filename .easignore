@@ -1,0 +1,13 @@
+node_modules/
+.expo/
+.git/
+android-backup/
+dist/
+functions/node_modules/
+scan-log.txt
+old-images.txt
+.env
+.env.*
+!.env.example
+*.log
+.vscode/

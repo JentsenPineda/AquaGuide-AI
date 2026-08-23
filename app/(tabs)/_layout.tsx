@@ -32,23 +32,6 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="scan"
-        options={{
-          title: "Scan Fish",
-          tabBarIcon: ({ focused }) => (
-            <Ionicons
-              name={focused ? "scan-circle" : "scan-circle-outline"}
-              size={38}
-              color={focused ? "#00BCD4" : "#00BCD4"}
-            />
-          ),
-          tabBarLabelStyle: {
-            fontWeight: "700",
-          },
-        }}
-      />
-
-      <Tabs.Screen
         name="fish-care"
         options={{
           title: "Fish Care",

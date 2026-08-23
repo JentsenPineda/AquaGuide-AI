@@ -3,14 +3,75 @@ import {
   DefaultTheme,
   ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
+
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 
+import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 
 export default function RootNavigation() {
   const { colorScheme } = useTheme();
+  const { user, loading, emailVerified } = useAuth();
+
+  /*
+   * Wait for Firebase authentication state to initialize.
+   *
+   * This prevents the application from briefly rendering the
+   * Home screen before we know whether the user is authenticated
+   * and whether their email has been verified.
+   */
+  if (loading) {
+    return null;
+  }
+
+  /*
+   * ================================================================
+   * EMAIL VERIFICATION GATE
+   * ================================================================
+   *
+   * A Firebase account exists immediately after registration,
+   * even before the user verifies their email.
+   *
+   * While the account is unverified, ONLY the verification screen
+   * should be available.
+   *
+   * This prevents:
+   *
+   * Register
+   *    ↓
+   * Home flash
+   *    ↓
+   * Verify Email
+   *
+   * and also prevents Android Back from bypassing verification.
+   */
+  if (user && !emailVerified) {
+    return (
+      <NavigationThemeProvider
+        value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+      >
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        >
+          <Stack.Screen
+            name="auth/verify-email"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+              animation: "fade",
+            }}
+          />
+        </Stack>
+
+        <StatusBar style="auto" />
+      </NavigationThemeProvider>
+    );
+  }
 
   return (
     <NavigationThemeProvider
@@ -28,6 +89,13 @@ export default function RootNavigation() {
 
         <Stack.Screen name="auth/login" />
         <Stack.Screen name="auth/register" />
+
+        <Stack.Screen
+          name="auth/verify-email"
+          options={{
+            headerShown: false,
+          }}
+        />
 
         {/* ============================================================ */}
         {/* Main Tabs                                                     */}
@@ -197,7 +265,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* New Fish Care Terms & Conditions */}
         <Stack.Screen
           name="new-fish-care/terms"
           options={{
@@ -208,7 +275,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* New Fish Care Preparation */}
         <Stack.Screen
           name="new-fish-care/preparation"
           options={{
@@ -219,7 +285,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* New Fish Care Acclimation */}
         <Stack.Screen
           name="new-fish-care/acclimation"
           options={{
@@ -230,7 +295,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* New Fish Care Inspection */}
         <Stack.Screen
           name="new-fish-care/inspection"
           options={{
@@ -241,7 +305,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* First 24 Hours */}
         <Stack.Screen
           name="new-fish-care/first24hours"
           options={{
@@ -252,7 +315,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* First 7 Days */}
         <Stack.Screen
           name="new-fish-care/sevenDays"
           options={{
@@ -263,7 +325,6 @@ export default function RootNavigation() {
           }}
         />
 
-        {/* Success Tips */}
         <Stack.Screen
           name="new-fish-care/success"
           options={{
@@ -317,7 +378,7 @@ export default function RootNavigation() {
         />
 
         {/* ============================================================ */}
-        {/* Profile                                                         */}
+        {/* Profile                                                        */}
         {/* ============================================================ */}
 
         <Stack.Screen
@@ -328,7 +389,7 @@ export default function RootNavigation() {
         />
 
         {/* ============================================================ */}
-        {/* Modal                                                           */}
+        {/* Modal                                                          */}
         {/* ============================================================ */}
 
         <Stack.Screen

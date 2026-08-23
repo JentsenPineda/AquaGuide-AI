@@ -34,8 +34,7 @@ async function sendRequest(body: object): Promise<AIResponse> {
   // Prevent the scan from waiting indefinitely.
   const timeoutId = setTimeout(() => {
     controller.abort();
-  }, 45000);
-
+  }, 60000);
   try {
     if (!API_KEY || !BASE_URL || !MODEL) {
       console.error("AI configuration is incomplete.");
@@ -119,7 +118,7 @@ async function sendRequest(body: object): Promise<AIResponse> {
     };
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      console.error("AI request timed out after 45 seconds.");
+      console.error("AI request timed out after 60 seconds.");
 
       return {
         success: false,

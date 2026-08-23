@@ -155,7 +155,7 @@ export default function FishCareScreen() {
 
           <ModuleCard
             icon="build"
-            title="Equipment Guide"
+            title="Fishkeeping Equipment"
             subtitle="Filters, heaters, lighting and aquarium accessories"
             route="/equipment/equipment-guide"
             iconColor="#FB8C00"
@@ -173,7 +173,7 @@ export default function FishCareScreen() {
 
           <ModuleCard
             icon="water"
-            title="Tank & Care"
+            title="Tank & Care Recommendation"
             subtitle="Water quality, maintenance and aquarium care"
             route="/tank-care"
             iconColor="#1976D2"

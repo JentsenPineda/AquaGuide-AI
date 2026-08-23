@@ -47,6 +47,18 @@ export default function LoginScreen() {
     console.log("LOGIN REDIRECT PARAM:", redirect);
   }, [redirect]);
 
+  const navigateAfterKeyboardDismiss = (
+    path: "/auth/forgot-password" | "/auth/register",
+  ) => {
+    Keyboard.dismiss();
+
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        router.push(path);
+      }, 100);
+    });
+  };
+
   const handleLogin = async () => {
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -66,6 +78,35 @@ export default function LoginScreen() {
       user = await loginUser(normalizedEmail, password);
 
       console.log("LOGIN FIREBASE SUCCESS:", user.uid);
+      console.log("LOGIN EMAIL VERIFIED:", user.emailVerified);
+
+      /*
+       * ---------------------------------------------------------------
+       * EMAIL VERIFICATION CHECK
+       * ---------------------------------------------------------------
+       *
+       * Firebase authentication can succeed even when the user's
+       * email address has not yet been verified.
+       *
+       * For AquaGuide AI, unverified users are sent to the
+       * Email Verification screen instead of continuing into
+       * the application.
+       */
+
+      if (!user.emailVerified) {
+        console.log("LOGIN BLOCKED: EMAIL NOT VERIFIED");
+
+        router.replace({
+          pathname: "/auth/verify-email",
+          params: {
+            email: user.email ?? normalizedEmail,
+          },
+        });
+
+        return;
+      }
+
+      console.log("LOGIN EMAIL VERIFIED: CONTINUING");
     } catch (error: any) {
       console.log("LOGIN ERROR:", error);
       console.log("LOGIN ERROR CODE:", error?.code);
@@ -73,7 +114,7 @@ export default function LoginScreen() {
 
       let message = "Unable to login.";
 
-      switch (error.code) {
+      switch (error?.code) {
         case "auth/user-not-found":
           message = "No account found with this email.";
           break;
@@ -90,8 +131,18 @@ export default function LoginScreen() {
           message = "Invalid email or password.";
           break;
 
+        case "auth/network-request-failed":
+          message =
+            "Network connection failed. Please check your internet connection and try again.";
+          break;
+
+        case "auth/too-many-requests":
+          message =
+            "Too many login attempts. Please wait a moment and try again.";
+          break;
+
         default:
-          message = error.message || "Unable to login.";
+          message = error?.message || "Unable to login.";
       }
 
       Alert.alert("Login Failed", message);
@@ -337,13 +388,9 @@ export default function LoginScreen() {
           {/* Forgot Password */}
 
           <TouchableOpacity
-            onPress={() => {
-              Keyboard.dismiss();
-
-              requestAnimationFrame(() => {
-                router.push("/auth/forgot-password");
-              });
-            }}
+            onPress={() =>
+              navigateAfterKeyboardDismiss("/auth/forgot-password")
+            }
           >
             <Text
               style={[
@@ -359,7 +406,9 @@ export default function LoginScreen() {
 
           {/* Register */}
 
-          <TouchableOpacity onPress={() => router.push("/auth/register")}>
+          <TouchableOpacity
+            onPress={() => navigateAfterKeyboardDismiss("/auth/register")}
+          >
             <Text
               style={[
                 styles.link,

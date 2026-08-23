@@ -6,6 +6,7 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -28,6 +29,16 @@ export default function ForgotPasswordScreen() {
 
   const [emailSent, setEmailSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+
+  const navigateAfterKeyboardDismiss = (path: "/auth/login") => {
+    Keyboard.dismiss();
+
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        router.replace(path);
+      }, 100);
+    });
+  };
 
   /*
    * Real-time email validation
@@ -324,7 +335,7 @@ export default function ForgotPasswordScreen() {
           {/* LOGIN */}
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => router.replace("/auth/login")}
+            onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
             disabled={loading}
             activeOpacity={0.8}
           >
@@ -516,7 +527,7 @@ export default function ForgotPasswordScreen() {
           {/* BACK TO LOGIN */}
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.replace("/auth/login")}
+            onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
             disabled={loading}
             activeOpacity={0.7}
           >

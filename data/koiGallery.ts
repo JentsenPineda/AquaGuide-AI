@@ -5,7 +5,7 @@ export const koiGallery = [
     type: "Color Pattern",
     description:
       "A white-bodied koi featuring distinctive red coloration with black Bekko markings.",
-    image: require("../assets/images/koi/Aka Bekko.jpg"),
+    image: require("../assets/images/koi/Aka Bekko.webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const koiGallery = [
     type: "Traditional Variety",
     description:
       "One of the oldest koi varieties featuring blue net-like scales with red or orange accents.",
-    image: require("../assets/images/koi/asagi.png"),
+    image: require("../assets/images/koi/asagi.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const koiGallery = [
     type: "Color Pattern",
     description:
       "A koi variety displaying black markings over a white, red, or yellow base.",
-    image: require("../assets/images/koi/Bekko.png"),
+    image: require("../assets/images/koi/Bekko.webp"),
   },
 
   {
@@ -32,7 +32,7 @@ export const koiGallery = [
     type: "Pattern Variant",
     description:
       "A Kumonryu strain featuring dramatic red and black changing patterns.",
-    image: require("../assets/images/koi/Beni Kumonryu.jpg"),
+    image: require("../assets/images/koi/Beni Kumonryu.webp"),
   },
 
   {
@@ -41,7 +41,7 @@ export const koiGallery = [
     type: "Fin Variant",
     description:
       "Recognized for its long flowing fins and graceful swimming behavior.",
-    image: require("../assets/images/koi/butterfly.png"),
+    image: require("../assets/images/koi/butterfly.webp"),
   },
 
   {
@@ -50,7 +50,7 @@ export const koiGallery = [
     type: "Traditional Variety",
     description:
       "A friendly koi known for its fast growth and solid brown coloration.",
-    image: require("../assets/images/koi/Chagoi.jpg"),
+    image: require("../assets/images/koi/Chagoi.webp"),
   },
 
   {
@@ -59,7 +59,7 @@ export const koiGallery = [
     type: "Scale Variant",
     description:
       "A German-scaled koi recognized by its reduced or completely scaleless body.",
-    image: require("../assets/images/koi/Doitsu.jpg"),
+    image: require("../assets/images/koi/Doitsu.webp"),
   },
 
   {
@@ -67,7 +67,7 @@ export const koiGallery = [
     name: "Gin Rin Kohaku",
     type: "Scale Variant",
     description: "A Kohaku koi featuring sparkling Gin Rin reflective scales.",
-    image: require("../assets/images/koi/Gin Rin Kohaku.jpg"),
+    image: require("../assets/images/koi/Gin Rin Kohaku.webp"),
   },
 
   {
@@ -75,7 +75,7 @@ export const koiGallery = [
     name: "Gin Rin Sanke",
     type: "Scale Variant",
     description: "A Taisho Sanke with shimmering Gin Rin scales.",
-    image: require("../assets/images/koi/Gin Rin Sanke.jpg"),
+    image: require("../assets/images/koi/Gin Rin Sanke.webp"),
   },
 
   {
@@ -84,7 +84,7 @@ export const koiGallery = [
     type: "Scale Variant",
     description:
       "A Showa variety displaying brilliant reflective Gin Rin scales.",
-    image: require("../assets/images/koi/Gin Rin Showa.jpg"),
+    image: require("../assets/images/koi/Gin Rin Showa.webp"),
   },
 
   {
@@ -93,7 +93,7 @@ export const koiGallery = [
     type: "Traditional Variety",
     description:
       "A beautiful five-colored koi with intricate reticulated patterns.",
-    image: require("../assets/images/koi/Goshiki.png"),
+    image: require("../assets/images/koi/Goshiki.webp"),
   },
 
   {
@@ -102,7 +102,7 @@ export const koiGallery = [
     type: "Metallic Variety",
     description:
       "A metallic white koi highlighted with yellow or orange markings.",
-    image: require("../assets/images/koi/Hariwake.jpg"),
+    image: require("../assets/images/koi/Hariwake.webp"),
   },
 
   {
@@ -110,7 +110,7 @@ export const koiGallery = [
     name: "Hi Utsuri",
     type: "Color Pattern",
     description: "An orange-red and black koi from the Utsurimono family.",
-    image: require("../assets/images/koi/Hi Utsuri.jpg"),
+    image: require("../assets/images/koi/Hi Utsuri.webp"),
   },
 
   {
@@ -118,7 +118,7 @@ export const koiGallery = [
     name: "Karasugoi",
     type: "Traditional Variety",
     description: "A solid black koi symbolizing elegance and strength.",
-    image: require("../assets/images/koi/Karasugoi.jpg"),
+    image: require("../assets/images/koi/Karasugoi.webp"),
   },
 
   {
@@ -126,7 +126,7 @@ export const koiGallery = [
     name: "Ki Bekko",
     type: "Color Pattern",
     description: "A yellow-bodied Bekko featuring bold black markings.",
-    image: require("../assets/images/koi/Ki Bekko.jpg"),
+    image: require("../assets/images/koi/Ki Bekko.webp"),
   },
 
   {
@@ -134,7 +134,7 @@ export const koiGallery = [
     name: "Ki Utsuri",
     type: "Color Pattern",
     description: "A rare yellow and black koi from the Utsurimono group.",
-    image: require("../assets/images/koi/Ki Utsuri.jpg"),
+    image: require("../assets/images/koi/Ki Utsuri.webp"),
   },
 
   {
@@ -143,7 +143,7 @@ export const koiGallery = [
     type: "Metallic Variety",
     description:
       "A metallic black-and-white koi with changing seasonal coloration.",
-    image: require("../assets/images/koi/Kikokuryu.jpg"),
+    image: require("../assets/images/koi/Kikokuryu.webp"),
   },
 
   {
@@ -151,7 +151,7 @@ export const koiGallery = [
     name: "Kin Ki Utsuri",
     type: "Metallic Variety",
     description: "A metallic yellow and black Utsuri variety.",
-    image: require("../assets/images/koi/Kin Ki Utsuri.jpg"),
+    image: require("../assets/images/koi/Kin Ki Utsuri.webp"),
   },
 
   {
@@ -160,7 +160,7 @@ export const koiGallery = [
     type: "Metallic Variety",
     description:
       "A metallic version of the classic Showa featuring brilliant reflective scales.",
-    image: require("../assets/images/koi/Kin Showa.jpg"),
+    image: require("../assets/images/koi/Kin Showa.webp"),
   },
 
   {
@@ -169,7 +169,7 @@ export const koiGallery = [
     type: "Color Pattern",
     description:
       "A classic koi variety featuring a white body with bold red markings.",
-    image: require("../assets/images/koi/kohaku.png"),
+    image: require("../assets/images/koi/kohaku.webp"),
   },
 
   {
@@ -178,7 +178,7 @@ export const koiGallery = [
     type: "Metallic Variety",
     description:
       "A metallic koi displaying reticulated scales with orange or red patterning.",
-    image: require("../assets/images/koi/Kujaku.jpg"),
+    image: require("../assets/images/koi/Kujaku.webp"),
   },
 
   {
@@ -187,7 +187,7 @@ export const koiGallery = [
     type: "Pattern Variant",
     description:
       "A black and white koi famous for its seasonally changing patterns.",
-    image: require("../assets/images/koi/Kumonryu.jpg"),
+    image: require("../assets/images/koi/Kumonryu.webp"),
   },
 
   {
@@ -195,7 +195,7 @@ export const koiGallery = [
     name: "Matsuba",
     type: "Scale Pattern",
     description: "Recognized for its pinecone-like reticulated scale pattern.",
-    image: require("../assets/images/koi/Matsuba.jpg"),
+    image: require("../assets/images/koi/Matsuba.webp"),
   },
 
   {
@@ -203,7 +203,7 @@ export const koiGallery = [
     name: "Midorigoi",
     type: "Color Variant",
     description: "A rare green koi highly prized by collectors.",
-    image: require("../assets/images/koi/Midorigoi.jpg"),
+    image: require("../assets/images/koi/Midorigoi.webp"),
   },
 
   {
@@ -212,7 +212,7 @@ export const koiGallery = [
     type: "Traditional Variety",
     description:
       "A gray koi with brown leaf-like markings resembling autumn leaves on water.",
-    image: require("../assets/images/koi/Ochiba Shigure.jpg"),
+    image: require("../assets/images/koi/Ochiba Shigure.webp"),
   },
 
   {
@@ -221,7 +221,7 @@ export const koiGallery = [
     type: "Metallic Variety",
     description:
       "A single-colored metallic koi available in gold, platinum, and other shades.",
-    image: require("../assets/images/koi/Ogon.jpg"),
+    image: require("../assets/images/koi/Ogon.webp"),
   },
 
   {
@@ -230,7 +230,7 @@ export const koiGallery = [
     type: "Color Pattern",
     description:
       "Displays a white body with red and black markings distributed across the fish.",
-    image: require("../assets/images/koi/sanke.jpg"),
+    image: require("../assets/images/koi/sanke.webp"),
   },
 
   {
@@ -238,7 +238,7 @@ export const koiGallery = [
     name: "Shiro Bekko",
     type: "Color Pattern",
     description: "A white koi decorated with bold black Bekko markings.",
-    image: require("../assets/images/koi/Shiro Bekko.jpg"),
+    image: require("../assets/images/koi/Shiro Bekko.webp"),
   },
 
   {
@@ -246,7 +246,7 @@ export const koiGallery = [
     name: "Shiro Utsuri",
     type: "Color Pattern",
     description: "A striking black-and-white koi from the Utsurimono family.",
-    image: require("../assets/images/koi/Shiro Utsuri.jpg"),
+    image: require("../assets/images/koi/Shiro Utsuri.webp"),
   },
 
   {
@@ -255,7 +255,7 @@ export const koiGallery = [
     type: "Color Pattern",
     description:
       "Known for its striking combination of black, red, and white coloration.",
-    image: require("../assets/images/koi/showa.jpg"),
+    image: require("../assets/images/koi/showa.webp"),
   },
 
   {
@@ -264,7 +264,7 @@ export const koiGallery = [
     type: "Doitsu Variety",
     description:
       "A scaleless blue koi with a neat row of dorsal scales and red side markings.",
-    image: require("../assets/images/koi/Shusui.png"),
+    image: require("../assets/images/koi/Shusui.webp"),
   },
 
   {
@@ -273,7 +273,7 @@ export const koiGallery = [
     type: "Color Variant",
     description:
       "A solid gray koi appreciated for its calm temperament and rapid growth.",
-    image: require("../assets/images/koi/Soragoi.jpg"),
+    image: require("../assets/images/koi/Soragoi.webp"),
   },
 
   {
@@ -281,7 +281,7 @@ export const koiGallery = [
     name: "Tancho",
     type: "Pattern Variant",
     description: "Distinguished by a single red circular marking on the head.",
-    image: require("../assets/images/koi/Tancho.png"),
+    image: require("../assets/images/koi/Tancho.webp"),
   },
 
   {
@@ -290,7 +290,7 @@ export const koiGallery = [
     type: "Color Pattern",
     description:
       "A family of koi featuring black as the base color with contrasting secondary colors.",
-    image: require("../assets/images/koi/Utsurimono (Utsuri).png"),
+    image: require("../assets/images/koi/Utsurimono (Utsuri).webp"),
   },
 
   {
@@ -299,6 +299,6 @@ export const koiGallery = [
     type: "Metallic Variety",
     description:
       "A metallic version of Taisho Sanke featuring brilliant reflective scales.",
-    image: require("../assets/images/koi/Yamatonishiki.jpg"),
+    image: require("../assets/images/koi/Yamatonishiki.webp"),
   },
 ];

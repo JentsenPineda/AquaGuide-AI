@@ -21,7 +21,7 @@ export const beginnerFish: Fish[] = [
 
     pondCompatible: true,
 
-    image: require("../assets/images/common-goldfish/Chocolate-Comet-Goldfish.png"),
+    image: require("../assets/images/common-goldfish/Chocolate-Comet-Goldfish.webp"),
   },
 
   {
@@ -47,7 +47,7 @@ export const beginnerFish: Fish[] = [
     description:
       "Betta fish are colorful freshwater fish known for their flowing fins.",
 
-    image: require("../assets/images/betta/halfmoon.png"),
+    image: require("../assets/images/betta/halfmoon.webp"),
   },
 
   {
@@ -72,7 +72,7 @@ export const beginnerFish: Fish[] = [
 
     description: "Guppies are small colorful fish that reproduce easily.",
 
-    image: require("../assets/images/guppy/mosaic.png"),
+    image: require("../assets/images/guppy/mosaic.webp"),
   },
 
   {
@@ -98,7 +98,7 @@ export const beginnerFish: Fish[] = [
     description:
       "Platies are hardy livebearers available in many attractive colors and patterns.",
 
-    image: require("../assets/images/platy/hi-fin.png"),
+    image: require("../assets/images/platy/hi-fin.webp"),
   },
 
   {
@@ -124,6 +124,6 @@ export const beginnerFish: Fish[] = [
     description:
       "Zebra Danios are active schooling fish suitable for beginner aquarists.",
 
-    image: require("../assets/images/danio/longfin_zebra.png"),
+    image: require("../assets/images/danio/longfin_zebra.webp"),
   },
 ];

@@ -11,30 +11,30 @@ export const onboardingData: OnboardingItem[] = [
     title: "Welcome to AquaGuide AI",
     description:
       "Your smart companion for ornamental fish care, aquarium management, and fishkeeping education.",
-    image: require("../assets/images/onboarding/welcome.png"),
+    image: require("../assets/images/onboarding/1.webp"),
   },
 
   {
     id: "2",
-    title: "Learn Fish Care",
+    title: "Identify Your Fish",
     description:
-      "Browse ornamental fish species, diseases, breeding guides, aquatic plants, aquarium equipment, and complete care recommendations.",
-    image: require("../assets/images/onboarding/library1.jpg"),
+      "Use AI Fish Scan to instantly identify fish species and learn more about their variants.",
+    image: require("../assets/images/onboarding/2.webp"),
   },
 
   {
     id: "3",
-    title: "Stay Organized",
+    title: "Learn & Care With Confidence",
     description:
-      "Create reminders and maintain a digital logbook to monitor your aquarium and fish health.",
-    image: require("../assets/images/onboarding/reminder.jpg"),
+      "Explore fish care guides, disease information, compatible plants, equipment, and everything your fish need.",
+    image: require("../assets/images/onboarding/3.webp"),
   },
 
   {
     id: "4",
-    title: "Let's Get Started",
+    title: "Stay Organized",
     description:
-      "Everything you need for successful ornamental fishkeeping is now in one place.",
-    image: require("../assets/images/onboarding/get-started.jpg"),
+      "Create reminders, manage aquarium tasks, and keep a digital logbook of your fishkeeping activities.",
+    image: require("../assets/images/onboarding/4.png"),
   },
 ];

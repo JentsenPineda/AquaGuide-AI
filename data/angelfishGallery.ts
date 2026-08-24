@@ -5,7 +5,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A striking angelfish variety with deep black coloration covering most of the body.",
-    image: require("../assets/images/angel fish/black.png"),
+    image: require("../assets/images/angel fish/black.webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "Features a bright golden-yellow body coloration with elegant finnage.",
-    image: require("../assets/images/angel fish/gold.png"),
+    image: require("../assets/images/angel fish/gold.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const angelfishGallery = [
     type: "Pattern Variant",
     description:
       "Displays orange, white, and black markings similar to traditional koi fish.",
-    image: require("../assets/images/angel fish/koi.png"),
+    image: require("../assets/images/angel fish/koi.webp"),
   },
 
   {
@@ -32,7 +32,7 @@ export const angelfishGallery = [
     type: "Pattern Variant",
     description:
       "Recognized by its irregular black and white marbled body pattern.",
-    image: require("../assets/images/angel fish/marble.png"),
+    image: require("../assets/images/angel fish/marble.webp"),
   },
 
   {
@@ -41,7 +41,7 @@ export const angelfishGallery = [
     type: "Wild Type",
     description:
       "The classic angelfish variety featuring silver coloration with vertical black bands.",
-    image: require("../assets/images/angel fish/silver.png"),
+    image: require("../assets/images/angel fish/silver.webp"),
   },
 
   {
@@ -50,7 +50,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "An albino koi variety displaying white, orange, and red coloration with ruby-red eyes.",
-    image: require("../assets/images/angel fish/Albino Koi Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Albino Koi Angelfish.webp"),
   },
 
   {
@@ -59,7 +59,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A brilliant platinum-white angelfish with albino genetics and elegant finnage.",
-    image: require("../assets/images/angel fish/Albino Platinum Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Albino Platinum Angelfish.webp"),
   },
 
   {
@@ -68,7 +68,7 @@ export const angelfishGallery = [
     type: "Wild Type",
     description:
       "The largest naturally occurring angelfish species known for its tall body and graceful fins.",
-    image: require("../assets/images/angel fish/Altum Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Altum Angelfish.webp"),
   },
 
   {
@@ -77,7 +77,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "Displays shimmering blue coloration across the body with graceful flowing fins.",
-    image: require("../assets/images/angel fish/Blue Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Blue Angelfish.webp"),
   },
 
   {
@@ -86,7 +86,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A translucent variety with visible pink gill covers that give a blushing appearance.",
-    image: require("../assets/images/angel fish/Blushing Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Blushing Angelfish.webp"),
   },
 
   {
@@ -95,7 +95,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "Features rich brown coloration that resembles dark chocolate shades.",
-    image: require("../assets/images/angel fish/Chocolate Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Chocolate Angelfish.webp"),
   },
 
   {
@@ -104,7 +104,7 @@ export const angelfishGallery = [
     type: "Pattern Variant",
     description:
       "Recognized by irregular dark spots scattered across a lighter-colored body.",
-    image: require("../assets/images/angel fish/Clown Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Clown Angelfish.webp"),
   },
 
   {
@@ -113,7 +113,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "An intense black strain with deeper pigmentation than the standard Black Angelfish.",
-    image: require("../assets/images/angel fish/Double Dark Black.jpg"),
+    image: require("../assets/images/angel fish/Double Dark Black.webp"),
   },
 
   {
@@ -122,7 +122,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A lightly patterned angelfish with reduced striping and a soft silvery appearance.",
-    image: require("../assets/images/angel fish/Ghost Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Ghost Angelfish.webp"),
   },
 
   {
@@ -131,7 +131,7 @@ export const angelfishGallery = [
     type: "Pattern Variant",
     description:
       "A beautiful combination of golden coloration and marbled black markings.",
-    image: require("../assets/images/angel fish/Gold Marble.jpg"),
+    image: require("../assets/images/angel fish/Gold Marble.webp"),
   },
 
   {
@@ -140,7 +140,7 @@ export const angelfishGallery = [
     type: "Pattern Variant",
     description:
       "Displays numerous dark spots across the body resembling a leopard pattern.",
-    image: require("../assets/images/angel fish/Leopard Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Leopard Angelfish.webp"),
   },
 
   {
@@ -149,7 +149,7 @@ export const angelfishGallery = [
     type: "Wild Variant",
     description:
       "A wild Brazilian angelfish famous for its brilliant red shoulder coloration.",
-    image: require("../assets/images/angel fish/Manacapuru Red Shoulder Angelfish.png"),
+    image: require("../assets/images/angel fish/Manacapuru Red Shoulder Angelfish.webp"),
   },
 
   {
@@ -158,7 +158,7 @@ export const angelfishGallery = [
     type: "Wild Variant",
     description:
       "A rare wild angelfish collected from the Paraiba region, admired for its elegant body shape.",
-    image: require("../assets/images/angel fish/Paraiba Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Paraiba Angelfish.webp"),
   },
 
   {
@@ -167,7 +167,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A selectively bred strain featuring metallic blue coloration across the body.",
-    image: require("../assets/images/angel fish/Philippine Blue Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Philippine Blue Angelfish.webp"),
   },
 
   {
@@ -176,7 +176,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "Combines the Ghost gene with the Philippine Blue trait for a shimmering appearance.",
-    image: require("../assets/images/angel fish/Philippine Blue Ghost Angelfish.png"),
+    image: require("../assets/images/angel fish/Philippine Blue Ghost Angelfish.webp"),
   },
 
   {
@@ -185,7 +185,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A dark-bodied angelfish developed from Philippine Blue genetics with intense blue highlights.",
-    image: require("../assets/images/angel fish/Pinoy Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Pinoy Angelfish.webp"),
   },
 
   {
@@ -194,7 +194,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "A bright platinum-white strain with reflective scales and graceful fins.",
-    image: require("../assets/images/angel fish/Platinum Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Platinum Angelfish.webp"),
   },
 
   {
@@ -203,7 +203,7 @@ export const angelfishGallery = [
     type: "Wild Variant",
     description:
       "A naturally occurring angelfish from Peru known for its distinctive red shoulder coloration.",
-    image: require("../assets/images/angel fish/Rio Nanay Angelfish.png"),
+    image: require("../assets/images/angel fish/Rio Nanay Angelfish.webp"),
   },
 
   {
@@ -212,7 +212,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "Features a smoky gray to black rear body with lighter coloration toward the head.",
-    image: require("../assets/images/angel fish/Smokey Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Smokey Angelfish.webp"),
   },
 
   {
@@ -221,7 +221,7 @@ export const angelfishGallery = [
     type: "Color Variant",
     description:
       "Displays bright golden-orange coloration across the upper body, resembling a sunset.",
-    image: require("../assets/images/angel fish/Sunset Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Sunset Angelfish.webp"),
   },
 
   {
@@ -230,7 +230,7 @@ export const angelfishGallery = [
     type: "Fin Variant",
     description:
       "An angelfish with extremely elongated veil fins that create a graceful appearance.",
-    image: require("../assets/images/angel fish/Super Veil Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Super Veil Angelfish.webp"),
   },
 
   {
@@ -239,7 +239,7 @@ export const angelfishGallery = [
     type: "Fin Variant",
     description:
       "A graceful angelfish with long flowing veil fins that enhance its elegant appearance.",
-    image: require("../assets/images/angel fish/Veil Angelfish.jpg"),
+    image: require("../assets/images/angel fish/Veil Angelfish.webp"),
   },
 
   {
@@ -248,6 +248,6 @@ export const angelfishGallery = [
     type: "Pattern Variant",
     description:
       "Features additional bold vertical black stripes compared to the standard Silver Angelfish.",
-    image: require("../assets/images/angel fish/zebra-angelfish.jpg"),
+    image: require("../assets/images/angel fish/zebra-angelfish.webp"),
   },
 ];

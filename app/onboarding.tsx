@@ -60,6 +60,8 @@ export default function OnboardingScreen() {
 
       <FlatList
         ref={flatListRef}
+        style={styles.slideList}
+        contentContainerStyle={styles.slideListContent}
         data={onboardingData}
         renderItem={({ item }) => (
           <View style={{ width }}>
@@ -128,5 +130,13 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: 16,
     fontWeight: "600",
+  },
+
+  slideList: {
+    flex: 1,
+  },
+
+  slideListContent: {
+    flexGrow: 1,
   },
 });

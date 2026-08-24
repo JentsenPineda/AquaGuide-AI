@@ -5,7 +5,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "A unique African species recognized for its elongated body and surface-feeding behavior.",
-    image: require("../assets/images/arowana/african arowana.png"),
+    image: require("../assets/images/arowana/african arowana.webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const arowanaGallery = [
     type: "Color Variant",
     description:
       "An albino form of the Silver Arowana featuring a pale body and bright red eyes.",
-    image: require("../assets/images/arowana/Albino Silver Arowana.png"),
+    image: require("../assets/images/arowana/Albino Silver Arowana.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "A large South American arowana admired for its metallic silver coloration and graceful swimming.",
-    image: require("../assets/images/arowana/arowana silver.png"),
+    image: require("../assets/images/arowana/arowana silver.webp"),
   },
 
   {
@@ -32,7 +32,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "A highly prized arowana variety known for its metallic scales and cultural significance.",
-    image: require("../assets/images/arowana/asian.png"),
+    image: require("../assets/images/arowana/asian.webp"),
   },
 
   {
@@ -41,7 +41,7 @@ export const arowanaGallery = [
     type: "Color Variant",
     description:
       "A red-based Asian Arowana appreciated for its orange-red coloration.",
-    image: require("../assets/images/arowana/Banjar Red arowana.png"),
+    image: require("../assets/images/arowana/Banjar Red arowana.webp"),
   },
 
   {
@@ -50,7 +50,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "A South American species displaying dark coloration during its juvenile stage.",
-    image: require("../assets/images/arowana/black arowana.png"),
+    image: require("../assets/images/arowana/black arowana.webp"),
   },
 
   {
@@ -58,7 +58,7 @@ export const arowanaGallery = [
     name: "Blood Red Arowana",
     type: "Premium Variant",
     description: "A premium red Asian Arowana with deep crimson coloration.",
-    image: require("../assets/images/arowana/blood red.png"),
+    image: require("../assets/images/arowana/blood red.webp"),
   },
 
   {
@@ -67,7 +67,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A Crossback Golden strain with a distinctive blue base beneath its scales.",
-    image: require("../assets/images/arowana/Blue-Base Crossback.png"),
+    image: require("../assets/images/arowana/Blue-Base Crossback.webp"),
   },
 
   {
@@ -75,7 +75,7 @@ export const arowanaGallery = [
     name: "Chili Red Arowana",
     type: "Premium Variant",
     description: "An elite red variety displaying bright chili-red coloration.",
-    image: require("../assets/images/arowana/chili red.png"),
+    image: require("../assets/images/arowana/chili red.webp"),
   },
 
   {
@@ -84,7 +84,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "One of the most valuable golden arowanas with scales crossing over the back.",
-    image: require("../assets/images/arowana/Crossback Golden.png"),
+    image: require("../assets/images/arowana/Crossback Golden.webp"),
   },
 
   {
@@ -93,7 +93,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A Crossback strain featuring metallic gold extending onto the head.",
-    image: require("../assets/images/arowana/golden head crossback.png"),
+    image: require("../assets/images/arowana/golden head crossback.webp"),
   },
 
   {
@@ -102,7 +102,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "A naturally green-colored Asian Arowana with subtle metallic scales.",
-    image: require("../assets/images/arowana/green arowona.png"),
+    image: require("../assets/images/arowana/green arowona.webp"),
   },
 
   {
@@ -111,7 +111,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A golden strain with metallic coloration extending high along the body.",
-    image: require("../assets/images/arowana/high back golden arowana.png"),
+    image: require("../assets/images/arowana/high back golden arowana.webp"),
   },
 
   {
@@ -120,7 +120,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "An Australian arowana known for its attractive pearl-like spotting.",
-    image: require("../assets/images/arowana/Jardini Arowana.png"),
+    image: require("../assets/images/arowana/Jardini Arowana.webp"),
   },
 
   {
@@ -128,7 +128,7 @@ export const arowanaGallery = [
     name: "Leichardti Arowana",
     type: "Species Variant",
     description: "Also known as the Spotted Barramundi, native to Australia.",
-    image: require("../assets/images/arowana/Leichardti Arowana.png"),
+    image: require("../assets/images/arowana/Leichardti Arowana.webp"),
   },
 
   {
@@ -137,7 +137,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A famous golden Asian Arowana prized for its brilliant metallic scales.",
-    image: require("../assets/images/arowana/malaysian golden.png"),
+    image: require("../assets/images/arowana/malaysian golden.webp"),
   },
 
   {
@@ -146,7 +146,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A golden strain distinguished by its orange-colored tail fins.",
-    image: require("../assets/images/arowana/orange tail golden arowana.png"),
+    image: require("../assets/images/arowana/orange tail golden arowana.webp"),
   },
 
   {
@@ -155,7 +155,7 @@ export const arowanaGallery = [
     type: "Color Variant",
     description:
       "An extremely rare pure white arowana highly valued by collectors.",
-    image: require("../assets/images/arowana/platinum arowana.png"),
+    image: require("../assets/images/arowana/platinum arowana.webp"),
   },
 
   {
@@ -164,7 +164,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A Crossback Golden variety with a distinctive purple-toned base.",
-    image: require("../assets/images/arowana/purple base crossback.png"),
+    image: require("../assets/images/arowana/purple base crossback.webp"),
   },
 
   {
@@ -173,7 +173,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A Red Tail Golden Asian Arowana with brilliant gold scales and a reddish tail.",
-    image: require("../assets/images/arowana/red tail golden rtg.png"),
+    image: require("../assets/images/arowana/red tail golden rtg.webp"),
   },
 
   {
@@ -182,7 +182,7 @@ export const arowanaGallery = [
     type: "Color Variant",
     description:
       "Distinguished by its reddish tail coloration and elongated body structure.",
-    image: require("../assets/images/arowana/redtail.png"),
+    image: require("../assets/images/arowana/redtail.webp"),
   },
 
   {
@@ -191,7 +191,7 @@ export const arowanaGallery = [
     type: "Species Variant",
     description:
       "A classic South American species recognized for its bright silver body.",
-    image: require("../assets/images/arowana/silver.png"),
+    image: require("../assets/images/arowana/silver.webp"),
   },
 
   {
@@ -200,7 +200,7 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "One of the most sought-after arowana varieties due to its intense red coloration.",
-    image: require("../assets/images/arowana/superred.png"),
+    image: require("../assets/images/arowana/superred.webp"),
   },
 
   {
@@ -209,6 +209,6 @@ export const arowanaGallery = [
     type: "Premium Variant",
     description:
       "A rare Super Red strain featuring unique violet-toned metallic highlights.",
-    image: require("../assets/images/arowana/violet fusion super red arowama.png"),
+    image: require("../assets/images/arowana/violet fusion super red arowama.webp"),
   },
 ];

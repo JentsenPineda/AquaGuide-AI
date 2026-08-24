@@ -16,7 +16,7 @@ export const expertFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Discus fish require pristine water conditions and advanced care.",
-    image: require("../assets/images/discus/pigeon.png"),
+    image: require("../assets/images/discus/pigeon.webp"),
   },
 
   {
@@ -34,7 +34,7 @@ export const expertFish: Fish[] = [
     diet: "Carnivore",
     description:
       "Arowanas are large predatory fish requiring spacious aquariums.",
-    image: require("../assets/images/arowana/redtail.png"),
+    image: require("../assets/images/arowana/redtail.webp"),
   },
 
   {
@@ -52,7 +52,7 @@ export const expertFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Flowerhorns are hybrid cichlids known for their vibrant colors and head hump.",
-    image: require("../assets/images/flowerhorn/zhenzhu.png"),
+    image: require("../assets/images/flowerhorn/zhenzhu.webp"),
   },
 
   {
@@ -69,7 +69,7 @@ export const expertFish: Fish[] = [
     temperament: "Aggressive",
     diet: "Omnivore",
     description: "Oscars are intelligent cichlids with strong personalities.",
-    image: require("../assets/images/oscar/tiger.png"),
+    image: require("../assets/images/oscar/tiger.webp"),
   },
 
   {
@@ -87,6 +87,6 @@ export const expertFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Koi are ornamental carp prized for their beautiful color patterns.",
-    image: require("../assets/images/koi/kohaku.png"),
+    image: require("../assets/images/koi/kohaku.webp"),
   },
 ];

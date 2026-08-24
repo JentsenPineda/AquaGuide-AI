@@ -5,7 +5,7 @@ export const platyGallery = [
     type: "Color Variant",
     description:
       "A vibrant blue-colored platy admired for its peaceful temperament and adaptability.",
-    image: require("../assets/images/platy/blue.png"),
+    image: require("../assets/images/platy/blue.webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const platyGallery = [
     type: "Fin Variant",
     description:
       "Distinguished by its enlarged dorsal fin, giving it a unique and elegant appearance.",
-    image: require("../assets/images/platy/hi-fin.png"),
+    image: require("../assets/images/platy/hi-fin.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const platyGallery = [
     type: "Pattern Variant",
     description:
       "Named after the Mickey Mouse-shaped marking near the tail region.",
-    image: require("../assets/images/platy/mickeymouse.png"),
+    image: require("../assets/images/platy/mickeymouse.webp"),
   },
 
   {
@@ -32,7 +32,7 @@ export const platyGallery = [
     type: "Color Variant",
     description:
       "Features a bright red body with contrasting black fins and tail.",
-    image: require("../assets/images/platy/redwag.png"),
+    image: require("../assets/images/platy/redwag.webp"),
   },
 
   {
@@ -41,7 +41,7 @@ export const platyGallery = [
     type: "Color Variant",
     description:
       "Displays a striking combination of yellow, orange, and red coloration.",
-    image: require("../assets/images/platy/sunburst.png"),
+    image: require("../assets/images/platy/sunburst.webp"),
   },
 
   {
@@ -50,7 +50,7 @@ export const platyGallery = [
     type: "Color Variant",
     description:
       "A colorful platy featuring attractive coral-orange body coloration.",
-    image: require("../assets/images/platy/Coral Platy.jpg"),
+    image: require("../assets/images/platy/Coral Platy.webp"),
   },
 
   {
@@ -58,7 +58,7 @@ export const platyGallery = [
     name: "Gold Wagtail Platy",
     type: "Color Variant",
     description: "A golden-bodied platy with contrasting black fins and tail.",
-    image: require("../assets/images/platy/Gold Wagtail.jpg"),
+    image: require("../assets/images/platy/Gold Wagtail.webp"),
   },
 
   {
@@ -66,7 +66,7 @@ export const platyGallery = [
     name: "Hi-Fin Mickey Mouse Platy",
     type: "Fin Variant",
     description: "A Mickey Mouse Platy featuring an enlarged dorsal fin.",
-    image: require("../assets/images/platy/Hi-Fin Mickey Mouse.jpg"),
+    image: require("../assets/images/platy/Hi-Fin Mickey Mouse.webp"),
   },
 
   {
@@ -75,7 +75,7 @@ export const platyGallery = [
     type: "Fin Variant",
     description:
       "A selectively bred platy with an extended dorsal fin for a graceful appearance.",
-    image: require("../assets/images/platy/Hifin Platy.jpg"),
+    image: require("../assets/images/platy/Hifin Platy.webp"),
   },
 
   {
@@ -83,7 +83,7 @@ export const platyGallery = [
     name: "Neon Blue Platy",
     type: "Color Variant",
     description: "A brilliant blue platy with shimmering metallic coloration.",
-    image: require("../assets/images/platy/Neon Blue platy.jpg"),
+    image: require("../assets/images/platy/Neon Blue platy.webp"),
   },
 
   {
@@ -92,7 +92,7 @@ export const platyGallery = [
     type: "Pattern Variant",
     description:
       "Features contrasting black-and-white coloration resembling a panda.",
-    image: require("../assets/images/platy/Panda Platy.jpg"),
+    image: require("../assets/images/platy/Panda Platy.webp"),
   },
 
   {
@@ -100,7 +100,7 @@ export const platyGallery = [
     name: "Pineapple Platy",
     type: "Color Variant",
     description: "A bright yellow-orange platy with pineapple-like coloration.",
-    image: require("../assets/images/platy/Pineapple Platy.jpg"),
+    image: require("../assets/images/platy/Pineapple Platy.webp"),
   },
 
   {
@@ -109,7 +109,7 @@ export const platyGallery = [
     type: "Tail Variant",
     description:
       "A platy variety with elongated upper and lower tail rays forming a pintail shape.",
-    image: require("../assets/images/platy/Pintail Platy.jpg"),
+    image: require("../assets/images/platy/Pintail Platy.webp"),
   },
 
   {
@@ -118,7 +118,7 @@ export const platyGallery = [
     type: "Color Variant",
     description:
       "Displays multiple vibrant colors across the body, creating a rainbow-like appearance.",
-    image: require("../assets/images/platy/Rainbow Platy.jpg"),
+    image: require("../assets/images/platy/Rainbow Platy.webp"),
   },
 
   {
@@ -127,7 +127,7 @@ export const platyGallery = [
     type: "Pattern Variant",
     description:
       "Recognized by its fine black speckling over a light-colored body.",
-    image: require("../assets/images/platy/Salt & Pepper Platy.jpg"),
+    image: require("../assets/images/platy/Salt & Pepper Platy.webp"),
   },
 
   {
@@ -135,7 +135,7 @@ export const platyGallery = [
     name: "Sunset Wagtail Platy",
     type: "Color Variant",
     description: "A beautiful sunset-colored platy with dark wagtail fins.",
-    image: require("../assets/images/platy/Sunset Wagtail.jpg"),
+    image: require("../assets/images/platy/Sunset Wagtail.webp"),
   },
 
   {
@@ -144,7 +144,7 @@ export const platyGallery = [
     type: "Pattern Variant",
     description:
       "Features a dark rear half contrasting with a brightly colored front body.",
-    image: require("../assets/images/platy/Tuxedo Platy.png"),
+    image: require("../assets/images/platy/Tuxedo Platy.webp"),
   },
 
   {
@@ -153,7 +153,7 @@ export const platyGallery = [
     type: "Pattern Variant",
     description:
       "Characterized by two distinct dark vertical bars along the body.",
-    image: require("../assets/images/platy/Twinbar platy.jpg"),
+    image: require("../assets/images/platy/Twinbar platy.webp"),
   },
 
   {
@@ -162,7 +162,7 @@ export const platyGallery = [
     type: "Wild Species",
     description:
       "A hardy platy species known for its colorful body and adaptability.",
-    image: require("../assets/images/platy/Variatus Platy.jpg"),
+    image: require("../assets/images/platy/Variatus Platy.webp"),
   },
 
   {
@@ -171,6 +171,6 @@ export const platyGallery = [
     type: "Color Variant",
     description:
       "A pure white platy prized for its clean and elegant appearance.",
-    image: require("../assets/images/platy/White Platy.jpg"),
+    image: require("../assets/images/platy/White Platy.webp"),
   },
 ];

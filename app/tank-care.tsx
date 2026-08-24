@@ -255,7 +255,7 @@ export default function TankCareScreen() {
           <ThemeCard style={[styles.hero, dynamicStyles.hero]}>
             <View style={styles.heroHeader}>
               <Image
-                source={require("@/assets/images/image-library-UI/aquaguide-icon.png")}
+                source={require("@/assets/images/image-library-UI/aquaguide-icon.webp")}
                 style={styles.heroIcon}
               />
 

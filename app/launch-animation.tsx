@@ -383,7 +383,7 @@ export default function LaunchAnimationScreen() {
         ]}
       >
         <Image
-          source={require("../assets/images/aquaguide-icon.png")}
+          source={require("../assets/images/aquaguide-icon.webp")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -424,7 +424,7 @@ export default function LaunchAnimationScreen() {
         ]}
       >
         <Image
-          source={require("../assets/images/aquaguide-fish.png")}
+          source={require("../assets/images/aquaguide-fish.webp")}
           style={styles.fish}
           resizeMode="contain"
         />

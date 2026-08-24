@@ -16,7 +16,7 @@ export const intermediateFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Angelfish are elegant freshwater fish popular in community aquariums.",
-    image: require("../assets/images/angel fish/marble.png"),
+    image: require("../assets/images/angel fish/marble.webp"),
   },
 
   {
@@ -34,7 +34,7 @@ export const intermediateFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Gouramis are colorful labyrinth fish known for their unique breathing ability.",
-    image: require("../assets/images/gourami/pearl.png"),
+    image: require("../assets/images/gourami/pearl.webp"),
   },
 
   {
@@ -52,7 +52,7 @@ export const intermediateFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Mollies are adaptable livebearers suitable for community aquariums.",
-    image: require("../assets/images/molly/lyretail.png"),
+    image: require("../assets/images/molly/lyretail.webp"),
   },
 
   {
@@ -70,7 +70,7 @@ export const intermediateFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Swordtails are active fish recognized by the elongated lower tail fin of males.",
-    image: require("../assets/images/swordtail/lyretail.png"),
+    image: require("../assets/images/swordtail/lyretail.webp"),
   },
 
   {
@@ -88,6 +88,6 @@ export const intermediateFish: Fish[] = [
     diet: "Omnivore",
     description:
       "Tiger Barbs are energetic schooling fish with bold striped patterns.",
-    image: require("../assets/images/tiger barb/albino.png"),
+    image: require("../assets/images/tiger barb/albino.webp"),
   },
 ];

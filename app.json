@@ -2,7 +2,7 @@
   "expo": {
     "name": "AquaGuide AI",
     "slug": "GoldfishCareAI",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./Icon/icon.png",
     "scheme": "aquaguide-ai",
@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./Icon/iconnn.png",
         "backgroundColor": "#E6F4FE"
@@ -22,7 +23,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.webp"
     },
     "plugins": [
       "expo-router",

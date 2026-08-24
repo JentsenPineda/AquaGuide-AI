@@ -5,7 +5,7 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "A rare tiger barb variety combining the pale albino coloration with a subtle green metallic sheen.",
-    image: require("../assets/images/tiger barb/Albino Green Tiger Barb.jpeg"),
+    image: require("../assets/images/tiger barb/Albino Green Tiger Barb.webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "A lighter-colored tiger barb variety featuring pale yellow tones with reduced dark pigmentation.",
-    image: require("../assets/images/tiger barb/albino.png"),
+    image: require("../assets/images/tiger barb/albino.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "Displays a bright golden body coloration while retaining the characteristic tiger barb pattern.",
-    image: require("../assets/images/tiger barb/gold.png"),
+    image: require("../assets/images/tiger barb/gold.webp"),
   },
 
   {
@@ -32,7 +32,7 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "Known for its metallic green sheen and active schooling behavior.",
-    image: require("../assets/images/tiger barb/green.png"),
+    image: require("../assets/images/tiger barb/green.webp"),
   },
 
   {
@@ -41,7 +41,7 @@ export const tigerBarbGallery = [
     type: "Fin Variant",
     description:
       "Features elongated flowing fins while maintaining the classic tiger barb markings.",
-    image: require("../assets/images/tiger barb/longfin.png"),
+    image: require("../assets/images/tiger barb/longfin.webp"),
   },
 
   {
@@ -50,7 +50,7 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "A striking platinum-white tiger barb prized for its bright metallic appearance.",
-    image: require("../assets/images/tiger barb/Platinum Tiger Barb.png"),
+    image: require("../assets/images/tiger barb/Platinum Tiger Barb.webp"),
   },
 
   {
@@ -59,7 +59,7 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "A vibrant red tiger barb that intensifies in color under excellent aquarium conditions.",
-    image: require("../assets/images/tiger barb/Red Tiger Barb.jpg"),
+    image: require("../assets/images/tiger barb/Red Tiger Barb.webp"),
   },
 
   {
@@ -68,7 +68,7 @@ export const tigerBarbGallery = [
     type: "Wild Type",
     description:
       "The classic tiger barb variety recognized by its orange body and bold black vertical stripes.",
-    image: require("../assets/images/tiger barb/standard.png"),
+    image: require("../assets/images/tiger barb/standard.webp"),
   },
 
   {
@@ -77,6 +77,6 @@ export const tigerBarbGallery = [
     type: "Color Variant",
     description:
       "An enhanced red strain selectively bred for its intense crimson coloration.",
-    image: require("../assets/images/tiger barb/Super Red Tiger Barb.jpg"),
+    image: require("../assets/images/tiger barb/Super Red Tiger Barb.webp"),
   },
 ];

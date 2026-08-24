@@ -37,7 +37,7 @@ export const equipmentData = {
     {
       id: "sponge-filter",
       name: "Sponge Filter",
-      image: require("../assets/images/equipments/filters/sponge.png"),
+      image: require("../assets/images/equipments/filters/sponge.webp"),
 
       description:
         "A biological filter powered by an air pump. Excellent for breeding tanks and fry tanks.",
@@ -53,7 +53,7 @@ export const equipmentData = {
     {
       id: "hob-filter",
       name: "Hang-On-Back Filter",
-      image: require("../assets/images/equipments/filters/hang-on-back.png"),
+      image: require("../assets/images/equipments/filters/hang-on-back.webp"),
 
       description:
         "External filter mounted on the aquarium rim. Easy maintenance and beginner friendly.",
@@ -68,7 +68,7 @@ export const equipmentData = {
     {
       id: "internal-filter",
       name: "Internal Filter",
-      image: require("../assets/images/equipments/filters/internal.png"),
+      image: require("../assets/images/equipments/filters/internal.webp"),
 
       description: "Compact filter installed inside the aquarium.",
 
@@ -82,7 +82,7 @@ export const equipmentData = {
     {
       id: "canister-filter",
       name: "Canister Filter",
-      image: require("../assets/images/equipments/filters/canister.png"),
+      image: require("../assets/images/equipments/filters/canister.webp"),
 
       description:
         "High-performance external filter suitable for medium to large aquariums.",
@@ -93,7 +93,7 @@ export const equipmentData = {
     {
       id: "sump-filter",
       name: "Sump Filter",
-      image: require("../assets/images/equipments/filters/sump.png"),
+      image: require("../assets/images/equipments/filters/sump.webp"),
 
       description:
         "Advanced filtration system used in large aquariums and ponds.",
@@ -106,7 +106,7 @@ export const equipmentData = {
     {
       id: "single-pump",
       name: "Single Outlet Air Pump",
-      image: require("../assets/images/equipments/airpumps/single-pump.png"),
+      image: require("../assets/images/equipments/airpumps/single-pump.webp"),
 
       description: "Provides oxygen to small aquariums through an air stone.",
 
@@ -116,7 +116,7 @@ export const equipmentData = {
     {
       id: "dual-pump",
       name: "Dual Outlet Air Pump",
-      image: require("../assets/images/equipments/airpumps/dual-pump.png"),
+      image: require("../assets/images/equipments/airpumps/dual-pump.webp"),
 
       description: "Powers multiple air stones or sponge filters.",
 
@@ -126,7 +126,7 @@ export const equipmentData = {
     {
       id: "air-stone",
       name: "Air Stone",
-      image: require("../assets/images/equipments/airpumps/air-stone.png"),
+      image: require("../assets/images/equipments/airpumps/air-stone.webp"),
 
       description: "Creates fine bubbles for oxygen distribution.",
 
@@ -136,7 +136,7 @@ export const equipmentData = {
     {
       id: "air-curtain",
       name: "Air Curtain",
-      image: require("../assets/images/equipments/airpumps/air-curtain.png"),
+      image: require("../assets/images/equipments/airpumps/air-curtain.webp"),
 
       description: "Produces decorative bubble walls while adding oxygen.",
 
@@ -148,7 +148,7 @@ export const equipmentData = {
     {
       id: "adjustable-heater",
       name: "Adjustable Heater",
-      image: require("../assets/images/equipments/heaters/adjustable.png"),
+      image: require("../assets/images/equipments/heaters/adjustable.webp"),
 
       description: "Allows precise temperature adjustment for tropical fish.",
 
@@ -158,7 +158,7 @@ export const equipmentData = {
     {
       id: "preset-heater",
       name: "Preset Heater",
-      image: require("../assets/images/equipments/heaters/preset.png"),
+      image: require("../assets/images/equipments/heaters/preset.webp"),
 
       description: "Maintains a fixed temperature automatically.",
 
@@ -168,7 +168,7 @@ export const equipmentData = {
     {
       id: "submersible-heater",
       name: "Submersible Heater",
-      image: require("../assets/images/equipments/heaters/submersible.png"),
+      image: require("../assets/images/equipments/heaters/submersible.webp"),
 
       description: "Fully submerged heater with efficient heat distribution.",
 
@@ -180,7 +180,7 @@ export const equipmentData = {
     {
       id: "digital-thermometer",
       name: "Digital Thermometer",
-      image: require("../assets/images/equipments/temperature-monitoring/digital.png"),
+      image: require("../assets/images/equipments/temperature-monitoring/digital.webp"),
 
       description: "Displays aquarium temperature digitally.",
 
@@ -190,7 +190,7 @@ export const equipmentData = {
     {
       id: "glass-thermometer",
       name: "Glass Thermometer",
-      image: require("../assets/images/equipments/temperature-monitoring/glass.png"),
+      image: require("../assets/images/equipments/temperature-monitoring/glass.webp"),
 
       description: "Traditional aquarium thermometer.",
 
@@ -200,7 +200,7 @@ export const equipmentData = {
     {
       id: "lcd-thermometer",
       name: "LCD Thermometer",
-      image: require("../assets/images/equipments/temperature-monitoring/lcd.png"),
+      image: require("../assets/images/equipments/temperature-monitoring/lcd.webp"),
 
       description: "Stick-on thermometer placed outside the tank.",
 

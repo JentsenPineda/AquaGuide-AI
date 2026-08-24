@@ -5,7 +5,7 @@ export const danioGallery = [
     type: "Color Variant",
     description:
       "A genetically enhanced zebra danio known for its bright fluorescent coloration.",
-    image: require("../assets/images/danio/glofish_danio.png"),
+    image: require("../assets/images/danio/glofish_danio.webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const danioGallery = [
     type: "Color Variant",
     description:
       "A golden-colored variation of the zebra danio with lighter body pigmentation.",
-    image: require("../assets/images/danio/golden_zebra.png"),
+    image: require("../assets/images/danio/golden_zebra.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const danioGallery = [
     type: "Pattern Variant",
     description:
       "Characterized by numerous dark spots replacing the traditional zebra stripes.",
-    image: require("../assets/images/danio/leopard_danio.png"),
+    image: require("../assets/images/danio/leopard_danio.webp"),
   },
 
   {
@@ -31,7 +31,7 @@ export const danioGallery = [
     name: "Longfin Zebra Danio",
     type: "Fin Variant",
     description: "A zebra danio variety featuring elongated flowing fins.",
-    image: require("../assets/images/danio/longfin_zebra.png"),
+    image: require("../assets/images/danio/longfin_zebra.webp"),
   },
 
   {
@@ -40,7 +40,7 @@ export const danioGallery = [
     type: "Wild Type",
     description:
       "The classic zebra danio recognized by its distinctive horizontal blue stripes.",
-    image: require("../assets/images/danio/standard_zebra.png"),
+    image: require("../assets/images/danio/standard_zebra.webp"),
   },
 
   {
@@ -49,7 +49,7 @@ export const danioGallery = [
     type: "Color Variant",
     description:
       "An albino form of the Zebra Danio featuring a pale body and red eyes.",
-    image: require("../assets/images/danio/Albino Zebra Danio.jpg"),
+    image: require("../assets/images/danio/Albino Zebra Danio.webp"),
   },
 
   {
@@ -58,7 +58,7 @@ export const danioGallery = [
     type: "Color Variant",
     description:
       "A brilliant blue danio admired for its metallic blue coloration.",
-    image: require("../assets/images/danio/Blue Danio.jpg"),
+    image: require("../assets/images/danio/Blue Danio.webp"),
   },
 
   {
@@ -67,7 +67,7 @@ export const danioGallery = [
     type: "Wild Species",
     description:
       "Also known as the Galaxy Rasbora, famous for its pearl-like spots and vibrant colors.",
-    image: require("../assets/images/danio/Celestial Pearl Danio (Galaxy Rasbora).jpg"),
+    image: require("../assets/images/danio/Celestial Pearl Danio (Galaxy Rasbora).webp"),
   },
 
   {
@@ -75,7 +75,7 @@ export const danioGallery = [
     name: "Emerald Danio",
     type: "Color Variant",
     description: "A shimmering green-blue danio with an iridescent body.",
-    image: require("../assets/images/danio/Emerald Danio.jpg"),
+    image: require("../assets/images/danio/Emerald Danio.webp"),
   },
 
   {
@@ -84,7 +84,7 @@ export const danioGallery = [
     type: "Wild Species",
     description:
       "A larger danio species known for its active swimming behavior and striking blue markings.",
-    image: require("../assets/images/danio/Giant Danio.jpg"),
+    image: require("../assets/images/danio/Giant Danio.webp"),
   },
 
   {
@@ -92,7 +92,7 @@ export const danioGallery = [
     name: "GloFish Cosmic Blue",
     type: "GloFish Variant",
     description: "A fluorescent blue genetically modified danio.",
-    image: require("../assets/images/danio/GloFish Cosmic Blue.jpg"),
+    image: require("../assets/images/danio/GloFish Cosmic Blue.webp"),
   },
 
   {
@@ -100,7 +100,7 @@ export const danioGallery = [
     name: "GloFish Electric Green",
     type: "GloFish Variant",
     description: "A vivid electric green fluorescent danio.",
-    image: require("../assets/images/danio/GloFish Electric Green.jpg"),
+    image: require("../assets/images/danio/GloFish Electric Green.webp"),
   },
 
   {
@@ -109,7 +109,7 @@ export const danioGallery = [
     type: "GloFish Variant",
     description:
       "A genetically modified danio displaying vibrant fluorescent purple coloration.",
-    image: require("../assets/images/danio/GloFish Galactic Purple.jpg"),
+    image: require("../assets/images/danio/GloFish Galactic Purple.webp"),
   },
 
   {
@@ -118,7 +118,7 @@ export const danioGallery = [
     type: "GloFish Variant",
     description:
       "A bright fluorescent red danio developed through selective genetic enhancement.",
-    image: require("../assets/images/danio/GloFish Starfire Red.jpg"),
+    image: require("../assets/images/danio/GloFish Starfire Red.webp"),
   },
 
   {
@@ -126,7 +126,7 @@ export const danioGallery = [
     name: "GloFish Sunburst Orange",
     type: "GloFish Variant",
     description: "A striking fluorescent orange danio with vivid coloration.",
-    image: require("../assets/images/danio/GloFish Sunburst Orange.png"),
+    image: require("../assets/images/danio/GloFish Sunburst Orange.webp"),
   },
 
   {
@@ -135,7 +135,7 @@ export const danioGallery = [
     type: "Color Variant",
     description:
       "A peaceful danio featuring an iridescent body with glowing highlights.",
-    image: require("../assets/images/danio/Glowlight Danio.jpg"),
+    image: require("../assets/images/danio/Glowlight Danio.webp"),
   },
 
   {
@@ -144,7 +144,7 @@ export const danioGallery = [
     type: "Selective Breed",
     description:
       "A selectively bred danio appreciated for its brilliant coloration and active behavior.",
-    image: require("../assets/images/danio/Hikari Danio.jpg"),
+    image: require("../assets/images/danio/Hikari Danio.webp"),
   },
 
   {
@@ -153,7 +153,7 @@ export const danioGallery = [
     type: "Fin Variant",
     description:
       "A Leopard Danio variety with elongated flowing fins and spotted markings.",
-    image: require("../assets/images/danio/Longfin Leopard Danio.jpg"),
+    image: require("../assets/images/danio/Longfin Leopard Danio.webp"),
   },
 
   {
@@ -162,7 +162,7 @@ export const danioGallery = [
     type: "Wild Species",
     description:
       "A peaceful danio species displaying shimmering pearl-like scales.",
-    image: require("../assets/images/danio/Pearl Danio.jpg"),
+    image: require("../assets/images/danio/Pearl Danio.webp"),
   },
 
   {
@@ -171,6 +171,6 @@ export const danioGallery = [
     type: "Color Variant",
     description:
       "A colorful danio known for its attractive pinkish-red body coloration.",
-    image: require("../assets/images/danio/Rose Danio.jpg"),
+    image: require("../assets/images/danio/Rose Danio.webp"),
   },
 ];

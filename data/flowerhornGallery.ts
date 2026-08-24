@@ -5,7 +5,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "A premium Zhen Zhu strain featuring brilliant blue pearling and excellent head growth.",
-    image: require("../assets/images/flowerhorn/Blue Dragon (Zhen Zhu).png"),
+    image: require("../assets/images/flowerhorn/Blue Dragon (Zhen Zhu).webp"),
   },
 
   {
@@ -14,7 +14,7 @@ export const flowerhornGallery = [
     type: "Body Variant",
     description:
       "A compact Flowerhorn selectively bred to retain its miniature size while developing a pronounced kok.",
-    image: require("../assets/images/flowerhorn/Bonsai Flowerhorn.png"),
+    image: require("../assets/images/flowerhorn/Bonsai Flowerhorn.webp"),
   },
 
   {
@@ -23,7 +23,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "A traditional Kamfa strain admired for its square body, heavy pearling, and thick lips.",
-    image: require("../assets/images/flowerhorn/classic kamfa.png"),
+    image: require("../assets/images/flowerhorn/classic kamfa.webp"),
   },
 
   {
@@ -32,7 +32,7 @@ export const flowerhornGallery = [
     type: "Color Variant",
     description:
       "A Flowerhorn that undergoes the famous fading process before developing brilliant golden coloration.",
-    image: require("../assets/images/flowerhorn/Golden Base (Fader).png"),
+    image: require("../assets/images/flowerhorn/Golden Base (Fader).webp"),
   },
 
   {
@@ -41,7 +41,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "One of the most sought-after Flowerhorn strains with exceptional kok, coloration, and pearling.",
-    image: require("../assets/images/flowerhorn/Golden Monkey (Kamalau).png"),
+    image: require("../assets/images/flowerhorn/Golden Monkey (Kamalau).webp"),
   },
 
   {
@@ -50,7 +50,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "An elite Golden Monkey line known for intense coloration and impressive body shape.",
-    image: require("../assets/images/flowerhorn/golden monkey king.png"),
+    image: require("../assets/images/flowerhorn/golden monkey king.webp"),
   },
 
   {
@@ -59,7 +59,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "An Indonesian Kamfa strain recognized for its vivid pearling and thick body structure.",
-    image: require("../assets/images/flowerhorn/indo kamfa.png"),
+    image: require("../assets/images/flowerhorn/indo kamfa.webp"),
   },
 
   {
@@ -68,7 +68,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "A famous Flowerhorn bloodline combining strong coloration with excellent head development.",
-    image: require("../assets/images/flowerhorn/Kamalau.png"),
+    image: require("../assets/images/flowerhorn/Kamalau.webp"),
   },
 
   {
@@ -77,7 +77,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "A highly valued Flowerhorn strain recognized for exceptional coloration, pearling, and head growth.",
-    image: require("../assets/images/flowerhorn/kingkamfa.png"),
+    image: require("../assets/images/flowerhorn/kingkamfa.webp"),
   },
 
   {
@@ -86,7 +86,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "A selectively bred Flowerhorn appreciated for its balanced body proportions and vivid colors.",
-    image: require("../assets/images/flowerhorn/Malau.png"),
+    image: require("../assets/images/flowerhorn/Malau.webp"),
   },
 
   {
@@ -95,7 +95,7 @@ export const flowerhornGallery = [
     type: "Pattern Variant",
     description:
       "A fiery Zhen Zhu strain displaying intense red coloration and heavy pearling.",
-    image: require("../assets/images/flowerhorn/Red Magma (Zhen Zhu).png"),
+    image: require("../assets/images/flowerhorn/Red Magma (Zhen Zhu).webp"),
   },
 
   {
@@ -104,7 +104,7 @@ export const flowerhornGallery = [
     type: "Hybrid Variant",
     description:
       "A hybrid Flowerhorn combining Red Texas genetics with attractive coloration and pearling.",
-    image: require("../assets/images/flowerhorn/red texas.png"),
+    image: require("../assets/images/flowerhorn/red texas.webp"),
   },
 
   {
@@ -113,7 +113,7 @@ export const flowerhornGallery = [
     type: "Premium Variant",
     description:
       "A brilliant red Flowerhorn strain prized for its intense coloration and large kok.",
-    image: require("../assets/images/flowerhorn/suoer red dragon.png"),
+    image: require("../assets/images/flowerhorn/suoer red dragon.webp"),
   },
 
   {
@@ -122,7 +122,7 @@ export const flowerhornGallery = [
     type: "Color Variant",
     description:
       "Features a metallic blue or silver body with a smooth shimmering appearance.",
-    image: require("../assets/images/flowerhorn/thaisilk.png"),
+    image: require("../assets/images/flowerhorn/thaisilk.webp"),
   },
 
   {
@@ -131,6 +131,6 @@ export const flowerhornGallery = [
     type: "Pattern Variant",
     description:
       "Popular for its vivid red coloration, heavy pearling, and prominent kok development.",
-    image: require("../assets/images/flowerhorn/zhenzhu.png"),
+    image: require("../assets/images/flowerhorn/zhenzhu.webp"),
   },
 ];

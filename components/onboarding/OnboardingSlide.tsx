@@ -33,10 +33,9 @@ export default function OnboardingSlide({ item }: Props) {
             color: colors.textSecondary,
           },
         ]}
+        numberOfLines={3}
       >
-        <Text style={styles.description} numberOfLines={3}>
-          {item.description}
-        </Text>
+        {item.description}
       </Text>
     </View>
   );
@@ -45,27 +44,29 @@ export default function OnboardingSlide({ item }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 28,
   },
 
   image: {
     width: "100%",
-    height: 220,
-    resizeMode: "contain",
+    flex: 1,
+    minHeight: 0,
   },
+
   title: {
     fontSize: 30,
     fontWeight: "700",
     textAlign: "center",
+    marginTop: 8,
   },
 
   description: {
-    marginTop: 16,
+    marginTop: 12,
+    marginBottom: 12,
     fontSize: 17,
     textAlign: "center",
-    lineHeight: 28,
+    lineHeight: 26,
     maxWidth: 340,
   },
 });

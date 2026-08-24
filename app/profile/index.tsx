@@ -386,7 +386,7 @@ export default function ProfileScreen() {
                 source={
                   hasSavedAvatar
                     ? getAvatarSource(selectedAvatar)
-                    : require("@/assets/images/Avatar Image/blank-avatar.png")
+                    : require("@/assets/images/Avatar Image/blank-avatar.webp")
                 }
                 style={styles.avatar}
                 resizeMode="cover"

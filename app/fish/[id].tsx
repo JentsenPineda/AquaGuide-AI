@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -18,8 +19,15 @@ import { fishImages } from "../../data/fishImages";
 import { fishProfiles } from "../../data/fishProfiles";
 
 export default function FishDetailsScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
   const params = useLocalSearchParams();
+
+  const isDark = colorScheme === "dark";
+
+  const moduleBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
   const router = useRouter();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -28,14 +36,25 @@ export default function FishDetailsScreen() {
 
   if (!fish) {
     return (
-      <View
-        style={[
-          styles.safe,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.safe}>
+        <Image
+          source={moduleBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFillObject,
+            {
+              backgroundColor: isDark
+                ? "rgba(3, 15, 25, 0.08)"
+                : "rgba(255, 255, 255, 0.04)",
+            },
+          ]}
+        />
+
         <AppHeader title="Fish Details" />
         <View style={styles.center}>
           <Text
@@ -56,14 +75,25 @@ export default function FishDetailsScreen() {
   const profile = fishProfiles[fish.id as keyof typeof fishProfiles];
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={moduleBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            backgroundColor: isDark
+              ? "rgba(3, 15, 25, 0.08)"
+              : "rgba(255, 255, 255, 0.04)",
+          },
+        ]}
+      />
+
       <AppHeader title="Fish Details" showBack />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -81,7 +111,11 @@ export default function FishDetailsScreen() {
           style={[
             styles.header,
             {
-              backgroundColor: colors.background,
+              backgroundColor: isDark
+                ? "rgba(10, 29, 43, 0.72)"
+                : "rgba(255, 255, 255, 0.62)",
+              borderColor: colors.border,
+              borderWidth: 1,
             },
           ]}
         >
@@ -179,7 +213,9 @@ export default function FishDetailsScreen() {
             style={[
               styles.guideButton,
               {
-                backgroundColor: colors.card,
+                backgroundColor: isDark
+                  ? "rgba(16,35,49,0.72)"
+                  : "rgba(255,255,255,0.62)",
                 borderColor: colors.border,
               },
             ]}
@@ -219,7 +255,9 @@ export default function FishDetailsScreen() {
             style={[
               styles.guideButton,
               {
-                backgroundColor: colors.card,
+                backgroundColor: isDark
+                  ? "rgba(16,35,49,0.72)"
+                  : "rgba(255,255,255,0.62)",
                 borderColor: colors.border,
               },
             ]}
@@ -259,7 +297,9 @@ export default function FishDetailsScreen() {
             style={[
               styles.guideButton,
               {
-                backgroundColor: colors.card,
+                backgroundColor: isDark
+                  ? "rgba(16,35,49,0.72)"
+                  : "rgba(255,255,255,0.62)",
                 borderColor: colors.border,
               },
             ]}
@@ -310,7 +350,12 @@ export default function FishDetailsScreen() {
           </Text>
 
           <Pressable
-            style={styles.variantButton}
+            style={[
+              styles.variantButton,
+              {
+                backgroundColor: colors.primary,
+              },
+            ]}
             onPress={() =>
               router.push({
                 pathname: "/variants/[species]",
@@ -340,8 +385,29 @@ export default function FishDetailsScreen() {
 
           <View style={styles.chipsContainer}>
             {profile?.diseases?.map((disease) => (
-              <View key={disease} style={styles.chip}>
-                <Text style={styles.chipText}>{disease}</Text>
+              <View
+                key={disease}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: isDark
+                      ? "rgba(16,35,49,0.72)"
+                      : "rgba(255,255,255,0.62)",
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {disease}
+                </Text>
               </View>
             ))}
           </View>
@@ -360,10 +426,35 @@ export default function FishDetailsScreen() {
           </Text>
 
           {profile?.equipment?.map((item) => (
-            <View key={item} style={styles.card}>
-              <Ionicons name="checkmark-circle" size={18} color="#00BCD4" />
+            <View
+              key={item}
+              style={[
+                styles.card,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(16,35,49,0.72)"
+                    : "rgba(255,255,255,0.62)",
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={18}
+                color={colors.primary}
+              />
 
-              <Text style={styles.cardText}>{item}</Text>
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                {item}
+              </Text>
             </View>
           ))}
         </View>
@@ -380,8 +471,28 @@ export default function FishDetailsScreen() {
             Breeding Guide
           </Text>
 
-          <View style={styles.infoCard}>
-            <Text style={styles.infoText}>{profile?.breedingGuide}</Text>
+          <View
+            style={[
+              styles.infoCard,
+              {
+                backgroundColor: isDark
+                  ? "rgba(16,35,49,0.72)"
+                  : "rgba(255,255,255,0.62)",
+                borderColor: colors.border,
+                borderWidth: 1,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.infoText,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              {profile?.breedingGuide}
+            </Text>
           </View>
         </View>
         {/* AI Recommendation */}
@@ -425,14 +536,18 @@ function StatCard({
   title: string;
   value: string;
 }) {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+  const isDark = colorScheme === "dark";
 
   return (
     <View
       style={[
         styles.statCard,
         {
-          backgroundColor: colors.card,
+          backgroundColor: isDark
+            ? "rgba(16,35,49,0.72)"
+            : "rgba(255,255,255,0.62)",
           borderColor: colors.border,
           borderWidth: 1,
         },
@@ -468,7 +583,10 @@ function StatCard({
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   center: {
@@ -478,8 +596,8 @@ const styles = StyleSheet.create({
   },
 
   notFound: {
-    color: "#FFFFFF",
     fontSize: 18,
+    fontWeight: "700",
   },
 
   heroImage: {
@@ -489,10 +607,11 @@ const styles = StyleSheet.create({
 
   header: {
     padding: 20,
+    margin: 12,
+    borderRadius: 22,
   },
 
   badge: {
-    backgroundColor: "#00BCD4",
     alignSelf: "flex-start",
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -506,19 +625,16 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: "#FFFFFF",
     fontSize: 30,
     fontWeight: "bold",
   },
 
   scientificName: {
-    color: "#90CAF9",
     fontStyle: "italic",
     marginTop: 4,
   },
 
   description: {
-    color: "#CFD8DC",
     marginTop: 12,
     lineHeight: 22,
   },
@@ -529,7 +645,6 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 15,
@@ -543,20 +658,17 @@ const styles = StyleSheet.create({
 
   statCard: {
     width: "48%",
-    backgroundColor: "#102331",
     borderRadius: 18,
     padding: 16,
     marginBottom: 12,
   },
 
   statTitle: {
-    color: "#90CAF9",
     marginTop: 8,
     fontSize: 12,
   },
 
   statValue: {
-    color: "#FFFFFF",
     fontWeight: "bold",
     marginTop: 4,
   },
@@ -596,7 +708,6 @@ const styles = StyleSheet.create({
   },
 
   variantButton: {
-    backgroundColor: "#00BCD4",
     borderRadius: 16,
     paddingVertical: 15,
     justifyContent: "center",
@@ -617,7 +728,7 @@ const styles = StyleSheet.create({
   },
 
   chip: {
-    backgroundColor: "#102331",
+    backgroundColor: "transparent",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -626,12 +737,11 @@ const styles = StyleSheet.create({
   },
 
   chipText: {
-    color: "#FFFFFF",
     fontSize: 12,
   },
 
   card: {
-    backgroundColor: "#102331",
+    backgroundColor: "transparent",
     borderRadius: 14,
     padding: 14,
     flexDirection: "row",
@@ -640,23 +750,20 @@ const styles = StyleSheet.create({
   },
 
   cardText: {
-    color: "#FFFFFF",
     marginLeft: 10,
   },
 
   infoCard: {
-    backgroundColor: "#102331",
+    backgroundColor: "transparent",
     borderRadius: 16,
     padding: 16,
   },
 
   infoText: {
-    color: "#CFD8DC",
     lineHeight: 24,
   },
 
   aiCard: {
-    backgroundColor: "#00BCD4",
     borderRadius: 18,
     padding: 18,
   },

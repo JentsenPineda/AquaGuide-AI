@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -17,7 +18,18 @@ import {
 import { allFish } from "../data/allFish";
 
 export default function BreedingGuide() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../assets/images/dark-mode-bg3.png")
+    : require("../assets/images/light-mode-bg3.png");
+
+  const panelBackground = isDark
+    ? "rgba(16,35,49,0.72)"
+    : "rgba(255,255,255,0.62)";
 
   const [selectedFish, setSelectedFish] = useState("");
   const [showFishModal, setShowFishModal] = useState(false);
@@ -72,14 +84,13 @@ export default function BreedingGuide() {
   };
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Breeding Guide" showBack />
 
       <FlatList
@@ -100,7 +111,7 @@ export default function BreedingGuide() {
               style={[
                 styles.heroCard,
                 {
-                  backgroundColor: colors.card,
+                  backgroundColor: panelBackground,
                   borderColor: colors.border,
                 },
               ]}
@@ -258,7 +269,9 @@ export default function BreedingGuide() {
                   style={[
                     styles.clearButton,
                     {
-                      backgroundColor: colors.background,
+                      backgroundColor: isDark
+                        ? "rgba(255,255,255,0.05)"
+                        : "rgba(255,255,255,0.45)",
                       borderColor: colors.border,
                     },
                   ]}
@@ -477,7 +490,7 @@ export default function BreedingGuide() {
               style={[
                 styles.searchContainer,
                 {
-                  backgroundColor: colors.card,
+                  backgroundColor: panelBackground,
                   borderColor: colors.border,
                 },
               ]}
@@ -626,7 +639,7 @@ export default function BreedingGuide() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: colors.card,
+                backgroundColor: panelBackground,
               },
             ]}
           >
@@ -662,7 +675,9 @@ export default function BreedingGuide() {
                 style={[
                   styles.modalClose,
                   {
-                    backgroundColor: colors.background,
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(255,255,255,0.45)",
                     borderColor: colors.border,
                   },
                 ]}
@@ -730,7 +745,9 @@ export default function BreedingGuide() {
                       {
                         backgroundColor: isSelected
                           ? colors.primary + "10"
-                          : colors.background,
+                          : isDark
+                            ? "rgba(16,35,49,0.72)"
+                            : "rgba(255,255,255,0.62)",
                         borderColor: isSelected
                           ? colors.primary
                           : colors.border,
@@ -843,6 +860,10 @@ export default function BreedingGuide() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   listContent: {

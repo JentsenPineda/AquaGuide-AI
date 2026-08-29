@@ -17,7 +17,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-let auth;
+let auth: FirebaseAuth.Auth;
 
 if (Platform.OS === "web") {
   // Web Firebase Auth
@@ -26,7 +26,9 @@ if (Platform.OS === "web") {
   // React Native Firebase Auth
   const { initializeAuth, getReactNativePersistence } =
     FirebaseAuth as typeof FirebaseAuth & {
-      getReactNativePersistence: (storage: typeof AsyncStorage) => any;
+      getReactNativePersistence: (
+        storage: typeof AsyncStorage,
+      ) => FirebaseAuth.Persistence;
     };
 
   auth = initializeAuth(app, {

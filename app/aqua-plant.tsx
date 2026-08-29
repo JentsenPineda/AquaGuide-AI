@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -17,7 +18,18 @@ import { allFish } from "../data/allFish";
 import { fishImages } from "../data/fishImages";
 
 export default function AquaPlantScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../assets/images/dark-mode-bg3.png")
+    : require("../assets/images/light-mode-bg3.png");
+
+  const panelBackground = isDark
+    ? "rgba(16,35,49,0.72)"
+    : "rgba(255,255,255,0.62)";
 
   const [search, setSearch] = useState("");
   const [selectedFish, setSelectedFish] = useState("goldfish");
@@ -39,14 +51,13 @@ export default function AquaPlantScreen() {
   }, [selectedFish]);
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.container}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Aqua Plants" showBack />
 
       <FlatList
@@ -69,7 +80,7 @@ export default function AquaPlantScreen() {
               style={[
                 styles.heroCard,
                 {
-                  backgroundColor: colors.card,
+                  backgroundColor: panelBackground,
                   borderColor: colors.border,
                 },
               ]}
@@ -116,7 +127,7 @@ export default function AquaPlantScreen() {
               style={[
                 styles.searchContainer,
                 {
-                  backgroundColor: colors.card,
+                  backgroundColor: panelBackground,
                   borderColor: colors.border,
                 },
               ]}
@@ -260,7 +271,9 @@ export default function AquaPlantScreen() {
                     {
                       backgroundColor: isSelected
                         ? colors.primary + "15"
-                        : colors.surface,
+                        : isDark
+                          ? "rgba(255,255,255,0.05)"
+                          : "rgba(255,255,255,0.45)",
                     },
                   ]}
                 >
@@ -334,7 +347,9 @@ export default function AquaPlantScreen() {
         style={[
           styles.bottomContainer,
           {
-            backgroundColor: colors.background,
+            backgroundColor: isDark
+              ? "rgba(8,20,31,0.70)"
+              : "rgba(255,255,255,0.58)",
             borderTopColor: colors.border,
           },
         ]}
@@ -343,7 +358,7 @@ export default function AquaPlantScreen() {
           style={[
             styles.selectedFishCard,
             {
-              backgroundColor: colors.card,
+              backgroundColor: panelBackground,
               borderColor: colors.border,
             },
           ]}
@@ -418,6 +433,10 @@ export default function AquaPlantScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   listContent: {

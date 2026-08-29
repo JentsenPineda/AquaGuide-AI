@@ -1,3 +1,4 @@
+import AppBackground from "@/components/layout/AppBackground";
 import AppHeader from "@/components/layout/AppHeader";
 import ScanLimitBanner from "@/components/scan/ScanLimitBanner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +10,7 @@ import { addScan } from "@/services/scanService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -257,6 +259,40 @@ export default function ScanScreen() {
     }
   };
 
+  const prepareImageForAI = async (uri: string) => {
+    const result = await ImageManipulator.manipulateAsync(
+      uri,
+      [
+        {
+          resize: {
+            width: 1024,
+          },
+        },
+      ],
+      {
+        compress: 0.65,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true,
+      },
+    );
+
+    if (!result.base64 || !result.uri) {
+      throw new Error("Failed to prepare image for AI analysis.");
+    }
+
+    console.log("SCAN: processed image:", {
+      width: result.width,
+      height: result.height,
+      base64Length: result.base64.length,
+      approximateMB: ((result.base64.length * 3) / 4 / 1024 / 1024).toFixed(2),
+    });
+
+    return {
+      uri: result.uri,
+      base64: result.base64,
+    };
+  };
+
   const onUploadImage = async () => {
     if (scanInProgressRef.current) return;
 
@@ -275,13 +311,14 @@ export default function ScanScreen() {
       mediaTypes: ["images"],
       allowsEditing: false,
       quality: 0.7,
-      base64: true,
+      base64: false,
     });
 
     if (pickerResult.canceled) return;
 
     const asset = pickerResult.assets?.[0];
-    if (!asset?.uri || !asset.base64) {
+
+    if (!asset?.uri) {
       Alert.alert(
         "Image Error",
         "The selected image could not be prepared for analysis. Please choose another photo.",
@@ -289,13 +326,25 @@ export default function ScanScreen() {
       return;
     }
 
-    // Do not reserve or consume a scan yet. The scan is reserved only
-    // after the user confirms the image with Analyze Fish.
-    setSelectedUploadUri(asset.uri);
-    setSelectedUploadBase64(asset.base64);
-    setCapturedUri(asset.uri);
-    setResult(null);
-    setScanState("ready");
+    try {
+      const processedImage = await prepareImageForAI(asset.uri);
+
+      // Do not reserve or consume a scan yet.
+      // The scan is reserved only after the user confirms
+      // the image with Analyze Fish.
+      setSelectedUploadUri(processedImage.uri);
+      setSelectedUploadBase64(processedImage.base64);
+      setCapturedUri(processedImage.uri);
+      setResult(null);
+      setScanState("ready");
+    } catch (error) {
+      console.error("SCAN: image preparation failed:", error);
+
+      Alert.alert(
+        "Image Error",
+        "The selected image could not be prepared for analysis. Please choose another photo.",
+      );
+    }
   };
 
   const analyzeImage = async (base64: string, uri: string) => {
@@ -693,20 +742,21 @@ Use exactly this structure:
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.7,
         skipProcessing: true,
-        base64: true,
       });
 
-      if (!photo?.base64 || !photo?.uri) {
+      if (!photo?.uri) {
         throw new Error("Failed to capture image.");
       }
 
+      const processedImage = await prepareImageForAI(photo.uri);
+
       // The reservation was already made for this camera capture, so analyze
       // directly without reserving a second scan.
-      setCapturedUri(photo.uri);
+      setCapturedUri(processedImage.uri);
       setScanState("processing");
 
       const response = await askVisionAI(
-        photo.base64,
+        processedImage.base64,
         `You are AquaGuide AI, an expert ornamental fish identification assistant.
 
 Your primary task is to identify the actual fish shown in the image as accurately as possible.
@@ -1137,23 +1187,11 @@ Use exactly this structure:
     ? fishCareDatabase[matchedFish.id as keyof typeof fishCareDatabase]
     : undefined;
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <AppBackground>
       <AppHeader title="Ornamental Fish Identifier" showBack />
 
       <ScrollView
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
+        style={styles.container}
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
@@ -2324,7 +2362,7 @@ Use exactly this structure:
           )}
         </View>
       </ScrollView>
-    </View>
+    </AppBackground>
   );
 }
 const styles = StyleSheet.create({

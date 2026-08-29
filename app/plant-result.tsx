@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
@@ -191,7 +192,18 @@ const PlantCard = memo(PlantCardComponent, (previous, next) => {
 });
 
 export default function PlantResult() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../assets/images/dark-mode-bg.png")
+    : require("../assets/images/light-mode-bg.png");
+
+  const panelBackground = isDark
+    ? "rgba(16,35,49,0.72)"
+    : "rgba(255,255,255,0.62)";
 
   const { fish } = useLocalSearchParams<{
     fish?: string;
@@ -278,14 +290,13 @@ export default function PlantResult() {
   );
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Compatible Plants" showBack />
 
       {/* INTRO */}
@@ -370,7 +381,7 @@ export default function PlantResult() {
               style={[
                 styles.counter,
                 {
-                  backgroundColor: colors.card,
+                  backgroundColor: panelBackground,
                   borderColor: colors.border,
                 },
               ]}
@@ -422,9 +433,12 @@ export default function PlantResult() {
               snapEnabled
               mode="parallax"
               modeConfig={{
-                parallaxScrollingScale: 0.95,
-                parallaxScrollingOffset: 44,
-                parallaxAdjacentItemScale: 0.9,
+                // Keep the carousel's native positioning intact.
+                // These values create a stronger "coverflow" feel
+                // without custom animations that can hurt performance.
+                parallaxScrollingScale: 0.92,
+                parallaxScrollingOffset: 32,
+                parallaxAdjacentItemScale: 0.82,
               }}
               scrollAnimationDuration={300}
               onProgressChange={handleProgressChange}
@@ -464,7 +478,7 @@ export default function PlantResult() {
                 style={[
                   styles.swipeHint,
                   {
-                    backgroundColor: colors.card,
+                    backgroundColor: panelBackground,
                     borderColor: colors.border,
                   },
                 ]}
@@ -496,7 +510,7 @@ export default function PlantResult() {
           style={[
             styles.emptyCard,
             {
-              backgroundColor: colors.card,
+              backgroundColor: panelBackground,
               borderColor: colors.border,
             },
           ]}
@@ -598,6 +612,10 @@ function PlantDetail({
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   /* =====================================================

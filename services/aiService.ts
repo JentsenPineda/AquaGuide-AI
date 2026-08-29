@@ -28,119 +28,281 @@ export interface FishScanAIResult {
   introduction: string;
 }
 
+/**
+ * Maximum number of additional attempts after the first request.
+ *
+ * Total possible requests:
+ * 1 initial request + 2 retries = 3 attempts
+ */
+const MAX_RETRIES = 2;
+
+/**
+ * Timeout for each individual request.
+ */
+const REQUEST_TIMEOUT = 60000;
+
+/**
+ * Delay before retrying.
+ *
+ * Attempt 1 -> wait 2 seconds
+ * Attempt 2 -> wait 4 seconds
+ */
+const getRetryDelay = (retryNumber: number) => {
+  return retryNumber === 1 ? 2000 : 4000;
+};
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Determines whether an HTTP status is likely temporary.
+ *
+ * These errors can happen when the upstream AI provider,
+ * gateway, or router is temporarily unavailable/exhausted.
+ */
+const isRetryableStatus = (status: number) => {
+  return status === 502 || status === 503 || status === 504;
+};
+
 async function sendRequest(body: object): Promise<AIResponse> {
-  const controller = new AbortController();
+  if (!API_KEY || !BASE_URL || !MODEL) {
+    console.error("AI configuration is incomplete.");
 
-  // Prevent the scan from waiting indefinitely.
-  const timeoutId = setTimeout(() => {
-    controller.abort();
-  }, 60000);
-  try {
-    if (!API_KEY || !BASE_URL || !MODEL) {
-      console.error("AI configuration is incomplete.");
+    return {
+      success: false,
+      message: "",
+      error: "AI service configuration is incomplete.",
+    };
+  }
 
-      return {
-        success: false,
-        message: "",
-        error: "AI service configuration is incomplete.",
-      };
-    }
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
 
-    console.log("AI request started:", {
-      baseUrl: BASE_URL,
-      model: MODEL,
-    });
-
-    const response = await fetch(`${BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...body,
-        model: MODEL,
-      }),
-      signal: controller.signal,
-    });
-
-    console.log("AI response received:", response.status);
-
-    let json: any;
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, REQUEST_TIMEOUT);
 
     try {
-      json = await response.json();
-    } catch (error) {
-      console.error("Failed to parse AI response:", error);
+      console.log("AI request started:", {
+        attempt: attempt + 1,
+        maxAttempts: MAX_RETRIES + 1,
+        baseUrl: BASE_URL,
+        model: MODEL,
+      });
 
-      return {
-        success: false,
-        message: "",
-        error: "The AI service returned an invalid response.",
-      };
-    }
+      const response = await fetch(`${BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...body,
+          model: MODEL,
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const errorMessage =
-        json?.error?.message ??
-        json?.message ??
-        `AI service error (${response.status}).`;
-
-      console.error("AI service HTTP error:", {
+      console.log("AI response received:", {
         status: response.status,
-        error: errorMessage,
+        attempt: attempt + 1,
+      });
+
+      let json: any = null;
+
+      try {
+        json = await response.json();
+      } catch (parseError) {
+        console.error("Failed to parse AI response:", parseError);
+
+        if (isRetryableStatus(response.status) && attempt < MAX_RETRIES) {
+          const delay = getRetryDelay(attempt + 1);
+
+          console.warn(
+            `AI response could not be parsed. Retrying in ${delay}ms...`,
+          );
+
+          await sleep(delay);
+          continue;
+        }
+
+        return {
+          success: false,
+          message: "",
+          error: "The AI service returned an invalid response.",
+        };
+      }
+
+      /**
+       * Handle HTTP errors.
+       */
+      if (!response.ok) {
+        const errorMessage =
+          json?.error?.message ??
+          json?.error?.error?.message ??
+          json?.message ??
+          `AI service error (${response.status}).`;
+
+        console.error("AI service HTTP error:", {
+          status: response.status,
+          error: errorMessage,
+          attempt: attempt + 1,
+        });
+
+        /**
+         * Retry temporary gateway/provider errors.
+         *
+         * 502 = Bad Gateway
+         * 503 = Service Unavailable
+         * 504 = Gateway Timeout
+         */
+        if (isRetryableStatus(response.status) && attempt < MAX_RETRIES) {
+          const delay = getRetryDelay(attempt + 1);
+
+          console.warn(
+            `Temporary AI service error (${response.status}). ` +
+              `Retrying in ${delay}ms...`,
+          );
+
+          await sleep(delay);
+          continue;
+        }
+
+        /**
+         * Authentication errors should not be retried.
+         */
+        if (response.status === 401) {
+          return {
+            success: false,
+            message: "",
+            error:
+              "The AI service authentication failed. Please check the API configuration.",
+          };
+        }
+
+        if (response.status === 403) {
+          return {
+            success: false,
+            message: "",
+            error:
+              "The AI service rejected the request. Please check the API access configuration.",
+          };
+        }
+
+        /**
+         * Rate limit / quota response.
+         */
+        if (response.status === 429) {
+          return {
+            success: false,
+            message: "",
+            error:
+              "The AI service is temporarily rate-limited. Please try again later.",
+          };
+        }
+
+        return {
+          success: false,
+          message: "",
+          error: errorMessage,
+        };
+      }
+
+      /**
+       * Extract the assistant response.
+       */
+      const message = json?.choices?.[0]?.message?.content;
+
+      if (typeof message !== "string" || !message.trim()) {
+        console.error("AI service returned an empty response:", json);
+
+        if (attempt < MAX_RETRIES) {
+          const delay = getRetryDelay(attempt + 1);
+
+          console.warn(
+            `AI returned an empty response. Retrying in ${delay}ms...`,
+          );
+
+          await sleep(delay);
+          continue;
+        }
+
+        return {
+          success: false,
+          message: "",
+          error: "The AI service returned an empty response.",
+        };
+      }
+
+      console.log("AI request completed successfully.", {
+        attempt: attempt + 1,
       });
 
       return {
-        success: false,
-        message: "",
-        error: errorMessage,
+        success: true,
+        message,
       };
-    }
+    } catch (error) {
+      /**
+       * Timeout.
+       */
+      if (error instanceof Error && error.name === "AbortError") {
+        console.error(
+          `AI request timed out after ${REQUEST_TIMEOUT / 1000} seconds.`,
+        );
 
-    const message = json?.choices?.[0]?.message?.content;
+        if (attempt < MAX_RETRIES) {
+          const delay = getRetryDelay(attempt + 1);
 
-    if (typeof message !== "string" || !message.trim()) {
-      console.error("AI service returned an empty response:", json);
+          console.warn(`Request timed out. Retrying in ${delay}ms...`);
 
-      return {
-        success: false,
-        message: "",
-        error: "The AI service returned an empty response.",
-      };
-    }
+          await sleep(delay);
+          continue;
+        }
 
-    console.log("AI request completed successfully.");
+        return {
+          success: false,
+          message: "",
+          error:
+            "The AI request timed out. Please check your internet connection and try again.",
+        };
+      }
 
-    return {
-      success: true,
-      message,
-    };
-  } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      console.error("AI request timed out after 60 seconds.");
+      /**
+       * Network / connection error.
+       */
+      console.error("AI request failed:", error);
+
+      if (attempt < MAX_RETRIES) {
+        const delay = getRetryDelay(attempt + 1);
+
+        console.warn(`Network error. Retrying in ${delay}ms...`);
+
+        await sleep(delay);
+        continue;
+      }
 
       return {
         success: false,
         message: "",
         error:
-          "The AI request timed out. Please check your internet connection and try again.",
+          error instanceof Error
+            ? error.message
+            : "Unable to connect to the AI service.",
       };
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    console.error("AI request failed:", error);
-
-    return {
-      success: false,
-      message: "",
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unable to connect to the AI service.",
-    };
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  /**
+   * Fallback return.
+   */
+  return {
+    success: false,
+    message: "",
+    error: "The AI service could not complete the request.",
+  };
 }
 
 export async function askAI(prompt: string): Promise<AIResponse> {
@@ -158,6 +320,19 @@ export async function askVisionAI(
   base64Image: string,
   prompt: string,
 ): Promise<AIResponse> {
+  /**
+   * Temporary debugging information.
+   *
+   * This lets us determine how large the image being
+   * sent to NaraRouter actually is.
+   *
+   * Do NOT log the Base64 image itself.
+   */
+  console.log("VISION IMAGE DEBUG:", {
+    base64Length: base64Image.length,
+    approximateMB: ((base64Image.length * 3) / 4 / 1024 / 1024).toFixed(2),
+  });
+
   return sendRequest({
     messages: [
       {

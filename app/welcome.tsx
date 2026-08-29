@@ -1,15 +1,16 @@
-import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
 import {
   Image,
-  ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -38,11 +39,11 @@ function FeatureCard({
         style={[
           styles.featureIcon,
           {
-            backgroundColor: colors.primary + "18",
+            backgroundColor: colors.primary + "20",
           },
         ]}
       >
-        <Ionicons name={icon} size={21} color={colors.primary} />
+        <Ionicons name={icon} size={20} color={colors.primary} />
       </View>
 
       <Text
@@ -52,6 +53,7 @@ function FeatureCard({
             color: colors.textPrimary,
           },
         ]}
+        numberOfLines={1}
       >
         {title}
       </Text>
@@ -73,7 +75,32 @@ function FeatureCard({
 
 export default function WelcomeScreen() {
   const colors = useAppColors();
+  const { colorScheme } = useTheme();
   const { user, loading } = useAuth();
+
+  const { width, height } = useWindowDimensions();
+
+  const isDark = colorScheme === "dark";
+
+  /*
+   * Responsive sizing.
+   *
+   * Short phones use a more compact layout so that
+   * the complete Welcome screen fits without scrolling.
+   */
+  const isSmallScreen = height < 700;
+  const isVerySmallScreen = height < 640;
+
+  /*
+   * Exact card width calculation.
+   *
+   * This keeps the four feature cards in a fixed
+   * 2 x 2 layout across different Android widths.
+   */
+  const horizontalPadding = width < 360 ? 14 : 20;
+  const contentWidth = width - horizontalPadding * 2;
+  const cardGap = width < 360 ? 7 : 9;
+  const cardWidth = (contentWidth - cardGap) / 2;
 
   useEffect(() => {
     if (!loading && user) {
@@ -95,35 +122,110 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
-      <AppHeader title="" showBack={false} />
+    <View style={styles.container}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle={isDark ? "light-content" : "dark-content"}
+      />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
+      {/* =====================================================
+          FULL SCREEN UNDERWATER BACKGROUND
+          ===================================================== */}
+
+      <Image
+        source={require("../assets/images/welcome-screen-background.png")}
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            /*
+             * Keep Light Mode bright.
+             *
+             * Dark Mode uses the dark application palette
+             * underneath the image so the underwater scene
+             * remains visible without overpowering the text.
+             */
+            opacity: isDark ? 0.42 : 1,
+          },
+        ]}
+        resizeMode="cover"
+      />
+
+      {/* =====================================================
+          READABILITY OVERLAY
+          ===================================================== */}
+
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            backgroundColor: isDark
+              ? "rgba(8, 20, 31, 0.10)"
+              : "rgba(244, 247, 250, 0.04)",
+          },
+        ]}
+      />
+
+      {/* =====================================================
+          CONTENT
+          ===================================================== */}
+
+      <View
+        style={[
+          styles.content,
+          {
+            paddingHorizontal: horizontalPadding,
+          },
+        ]}
       >
-        {/* HERO */}
+        {/* ===================================================
+            HERO
+            =================================================== */}
+
         <View style={styles.hero}>
-          <View style={styles.logoOuter}>
+          <View
+            style={[
+              styles.logoOuter,
+              {
+                width: isVerySmallScreen ? 72 : isSmallScreen ? 82 : 92,
+
+                height: isVerySmallScreen ? 72 : isSmallScreen ? 82 : 92,
+
+                borderRadius: isVerySmallScreen ? 36 : isSmallScreen ? 41 : 46,
+
+                backgroundColor: colors.card,
+              },
+            ]}
+          >
             <View
               style={[
                 styles.logoWrapper,
                 {
+                  width: isVerySmallScreen ? 62 : isSmallScreen ? 70 : 78,
+
+                  height: isVerySmallScreen ? 62 : isSmallScreen ? 70 : 78,
+
+                  borderRadius: isVerySmallScreen
+                    ? 31
+                    : isSmallScreen
+                      ? 35
+                      : 39,
+
                   backgroundColor: colors.card,
                 },
               ]}
             >
               <Image
                 source={require("../Icon/iconnn.png")}
-                style={styles.logo}
+                style={[
+                  styles.logo,
+                  {
+                    width: isVerySmallScreen ? 50 : isSmallScreen ? 57 : 64,
+
+                    height: isVerySmallScreen ? 50 : isSmallScreen ? 57 : 64,
+                  },
+                ]}
                 resizeMode="contain"
               />
             </View>
@@ -134,21 +236,27 @@ export default function WelcomeScreen() {
               styles.title,
               {
                 color: colors.textPrimary,
+
+                fontSize: isVerySmallScreen ? 24 : isSmallScreen ? 26 : 29,
+
+                marginTop: isVerySmallScreen ? 5 : isSmallScreen ? 7 : 9,
               },
             ]}
           >
-            AquaGuide AI
+            AquaGuide <Text style={{ color: colors.primary }}>AI</Text>
           </Text>
 
           <View
             style={[
               styles.badge,
               {
-                backgroundColor: colors.primary + "15",
+                backgroundColor: colors.primary + "20",
+
+                marginTop: isVerySmallScreen ? 3 : isSmallScreen ? 4 : 6,
               },
             ]}
           >
-            <Ionicons name="sparkles" size={14} color={colors.primary} />
+            <Ionicons name="sparkles" size={11} color={colors.primary} />
 
             <Text
               style={[
@@ -166,7 +274,13 @@ export default function WelcomeScreen() {
             style={[
               styles.subtitle,
               {
-                color: colors.textSecondary,
+                /*
+                 * Dark Mode needs brighter text because
+                 * the background is still visible behind it.
+                 */
+                color: isDark ? "#E6F7FA" : colors.textSecondary,
+
+                marginTop: isVerySmallScreen ? 3 : isSmallScreen ? 4 : 6,
               },
             ]}
           >
@@ -174,13 +288,25 @@ export default function WelcomeScreen() {
           </Text>
         </View>
 
-        {/* FEATURES */}
-        <View style={styles.featureSection}>
+        {/* ===================================================
+            FEATURES
+            =================================================== */}
+
+        <View
+          style={[
+            styles.featureSection,
+            {
+              marginTop: isVerySmallScreen ? 8 : isSmallScreen ? 11 : 15,
+            },
+          ]}
+        >
           <Text
             style={[
               styles.sectionTitle,
               {
                 color: colors.textPrimary,
+
+                fontSize: isVerySmallScreen ? 16 : isSmallScreen ? 17 : 18,
               },
             ]}
           >
@@ -191,64 +317,104 @@ export default function WelcomeScreen() {
             style={[
               styles.sectionSubtitle,
               {
-                color: colors.textSecondary,
+                color: isDark ? "#D5EEF2" : colors.textSecondary,
+
+                marginTop: isVerySmallScreen ? 1 : 3,
               },
             ]}
           >
-            Explore tools and guides designed to help you care for your
-            ornamental fish.
+            Tools and guides designed for better fish care.
           </Text>
 
-          <View style={styles.features}>
-            <FeatureCard
-              icon="scan-outline"
-              title="AI Identification"
-              subtitle="Identify ornamental fish with AI"
-            />
+          <View
+            style={[
+              styles.features,
+              {
+                columnGap: cardGap,
 
-            <FeatureCard
-              icon="water-outline"
-              title="Tank & Care"
-              subtitle="Water, tank and maintenance guidance"
-            />
+                rowGap: isVerySmallScreen ? 5 : isSmallScreen ? 6 : 8,
 
-            <FeatureCard
-              icon="library-outline"
-              title="Species Library"
-              subtitle="Explore ornamental fish species"
-            />
+                marginTop: isVerySmallScreen ? 6 : isSmallScreen ? 8 : 10,
+              },
+            ]}
+          >
+            <View style={{ width: cardWidth }}>
+              <FeatureCard
+                icon="scan-outline"
+                title="AI Identification"
+                subtitle="Identify ornamental fish with AI"
+              />
+            </View>
 
-            <FeatureCard
-              icon="medkit-outline"
-              title="Disease Guide"
-              subtitle="Learn about common fish diseases"
-            />
+            <View style={{ width: cardWidth }}>
+              <FeatureCard
+                icon="water-outline"
+                title="Tank & Care"
+                subtitle="Water, tank and maintenance guidance"
+              />
+            </View>
+
+            <View style={{ width: cardWidth }}>
+              <FeatureCard
+                icon="library-outline"
+                title="Species Library"
+                subtitle="Explore ornamental fish species"
+              />
+            </View>
+
+            <View style={{ width: cardWidth }}>
+              <FeatureCard
+                icon="medkit-outline"
+                title="Disease Guide"
+                subtitle="Learn about common fish diseases"
+              />
+            </View>
           </View>
         </View>
 
-        {/* ACTIONS */}
-        <View style={styles.actions}>
+        {/* ===================================================
+            ACTION BUTTONS
+            =================================================== */}
+
+        <View
+          style={[
+            styles.actions,
+            {
+              marginTop: isVerySmallScreen ? 7 : isSmallScreen ? 9 : 13,
+            },
+          ]}
+        >
+          {/* SIGN IN */}
+
           <TouchableOpacity
             style={[
               styles.primaryButton,
               {
+                height: isVerySmallScreen ? 42 : isSmallScreen ? 45 : 48,
+
                 backgroundColor: colors.primary,
               },
             ]}
             activeOpacity={0.85}
             onPress={() => router.push("/auth/login")}
           >
-            <Ionicons name="log-in-outline" size={21} color="#FFFFFF" />
+            <Ionicons name="log-in-outline" size={19} color="#FFFFFF" />
 
             <Text style={styles.primaryButtonText}>Sign In</Text>
           </TouchableOpacity>
+
+          {/* CREATE ACCOUNT */}
 
           <TouchableOpacity
             style={[
               styles.secondaryButton,
               {
+                height: isVerySmallScreen ? 42 : isSmallScreen ? 45 : 48,
+
                 backgroundColor: colors.card,
                 borderColor: colors.primary,
+
+                marginTop: isVerySmallScreen ? 5 : 7,
               },
             ]}
             activeOpacity={0.85}
@@ -256,7 +422,7 @@ export default function WelcomeScreen() {
           >
             <Ionicons
               name="person-add-outline"
-              size={21}
+              size={18}
               color={colors.primary}
             />
 
@@ -272,8 +438,15 @@ export default function WelcomeScreen() {
             </Text>
           </TouchableOpacity>
 
+          {/* GUEST */}
+
           <TouchableOpacity
-            style={styles.guestButton}
+            style={[
+              styles.guestButton,
+              {
+                height: isVerySmallScreen ? 32 : isSmallScreen ? 35 : 38,
+              },
+            ]}
             activeOpacity={0.7}
             onPress={() => router.replace("/(tabs)")}
           >
@@ -281,7 +454,10 @@ export default function WelcomeScreen() {
               style={[
                 styles.guestText,
                 {
-                  color: colors.textSecondary,
+                  /*
+                   * White in Dark Mode for strong contrast.
+                   */
+                  color: isDark ? "#FFFFFF" : colors.textSecondary,
                 },
               ]}
             >
@@ -290,25 +466,35 @@ export default function WelcomeScreen() {
 
             <Ionicons
               name="arrow-forward"
-              size={16}
-              color={colors.textSecondary}
+              size={14}
+              color={isDark ? "#FFFFFF" : colors.textSecondary}
             />
           </TouchableOpacity>
         </View>
 
-        {/* FOOTER */}
-        <View style={styles.footer}>
+        {/* ===================================================
+            FOOTER
+            =================================================== */}
+
+        <View
+          style={[
+            styles.footer,
+            {
+              marginTop: isVerySmallScreen ? 1 : isSmallScreen ? 2 : 4,
+            },
+          ]}
+        >
           <Ionicons
             name="shield-checkmark-outline"
-            size={14}
-            color={colors.textSecondary}
+            size={11}
+            color={isDark ? "#C8E2E6" : colors.textSecondary}
           />
 
           <Text
             style={[
               styles.footerText,
               {
-                color: colors.textSecondary,
+                color: isDark ? "#C8E2E6" : colors.textSecondary,
               },
             ]}
           >
@@ -320,13 +506,13 @@ export default function WelcomeScreen() {
           style={[
             styles.version,
             {
-              color: colors.textSecondary,
+              color: isDark ? "#B8D5DA" : colors.textSecondary,
             },
           ]}
         >
           AquaGuide AI • Version 1.0
         </Text>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -340,185 +526,171 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 24,
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: 18,
   },
 
-  /* HERO */
+  /* =====================================================
+     HERO
+     ===================================================== */
 
   hero: {
     alignItems: "center",
-    paddingTop: 10,
   },
 
   logoOuter: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
-
-    backgroundColor: "#FFFFFF",
-
     justifyContent: "center",
     alignItems: "center",
 
-    elevation: 5,
+    elevation: 6,
 
-    shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
+    shadowColor: "#000000",
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 4,
     },
   },
 
   logoWrapper: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-
     justifyContent: "center",
     alignItems: "center",
 
-    elevation: 5,
+    elevation: 2,
 
-    shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
+    shadowColor: "#000000",
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 2,
     },
   },
 
   logo: {
-    width: 84,
-    height: 84,
-    borderRadius: 24,
+    borderRadius: 18,
   },
 
   title: {
-    marginTop: 16,
-    fontSize: 32,
     fontWeight: "900",
     textAlign: "center",
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
   },
 
   badge: {
     flexDirection: "row",
     alignItems: "center",
 
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
 
     borderRadius: 20,
-
-    marginTop: 10,
   },
 
   badgeText: {
-    marginLeft: 6,
-    fontSize: 10,
+    marginLeft: 5,
+    fontSize: 8,
     fontWeight: "800",
-    letterSpacing: 0.7,
+    letterSpacing: 0.45,
   },
 
   subtitle: {
-    marginTop: 10,
-    fontSize: 15,
-    lineHeight: 21,
+    fontSize: 12,
+    lineHeight: 16,
     textAlign: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
 
-  /* FEATURES */
+  /* =====================================================
+     FEATURES
+     ===================================================== */
 
   featureSection: {
-    marginTop: 30,
+    width: "100%",
   },
 
   sectionTitle: {
-    fontSize: 20,
     fontWeight: "800",
     textAlign: "center",
+    lineHeight: 22,
+    paddingHorizontal: 3,
   },
 
   sectionSubtitle: {
-    marginTop: 6,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 10.5,
+    lineHeight: 14,
     textAlign: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 5,
   },
 
   features: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginTop: 18,
-    gap: 10,
   },
 
   featureCard: {
-    width: "48.5%",
-    minHeight: 132,
+    width: "100%",
+    minHeight: 94,
 
-    borderRadius: 18,
+    borderRadius: 15,
     borderWidth: 1,
 
-    paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingHorizontal: 6,
+    paddingVertical: 7,
 
     alignItems: "center",
     justifyContent: "center",
   },
 
   featureIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 35,
+    height: 35,
+    borderRadius: 18,
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginBottom: 9,
+    marginBottom: 4,
   },
 
   featureTitle: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: "800",
     textAlign: "center",
   },
 
   featureSubtitle: {
-    marginTop: 4,
-    fontSize: 10.5,
-    lineHeight: 15,
+    marginTop: 2,
+    fontSize: 8.5,
+    lineHeight: 11,
     textAlign: "center",
+    paddingHorizontal: 2,
   },
 
-  /* ACTIONS */
+  /* =====================================================
+     ACTIONS
+     ===================================================== */
 
   actions: {
-    marginTop: 26,
+    width: "100%",
   },
 
   primaryButton: {
-    height: 56,
-    borderRadius: 17,
+    borderRadius: 15,
 
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
 
-    elevation: 4,
+    elevation: 3,
 
-    shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
+    shadowColor: "#000000",
+    shadowOpacity: 0.16,
+    shadowRadius: 7,
     shadowOffset: {
       width: 0,
       height: 3,
@@ -527,16 +699,13 @@ const styles = StyleSheet.create({
 
   primaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "800",
-    marginLeft: 8,
+    marginLeft: 7,
   },
 
   secondaryButton: {
-    height: 56,
-    borderRadius: 17,
-
-    marginTop: 10,
+    borderRadius: 15,
 
     borderWidth: 1.5,
 
@@ -546,45 +715,41 @@ const styles = StyleSheet.create({
   },
 
   secondaryButtonText: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "800",
-    marginLeft: 8,
+    marginLeft: 7,
   },
 
   guestButton: {
-    height: 46,
-
-    marginTop: 7,
-
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
 
   guestText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "700",
     marginRight: 5,
   },
 
-  /* FOOTER */
+  /* =====================================================
+     FOOTER
+     ===================================================== */
 
   footer: {
-    marginTop: 16,
-
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
 
   footerText: {
-    fontSize: 11,
-    marginLeft: 5,
+    fontSize: 9,
+    marginLeft: 4,
   },
 
   version: {
     textAlign: "center",
-    fontSize: 10,
-    marginTop: 6,
+    fontSize: 8,
+    marginTop: 1,
   },
 });

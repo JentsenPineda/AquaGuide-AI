@@ -1,4 +1,5 @@
 import ModuleCard from "@/components/cards/ModuleCard";
+import AppBackground from "@/components/layout/AppBackground";
 import AppHeader from "@/components/layout/AppHeader";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,7 +36,7 @@ export default function MenuScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <AppBackground>
       <AppHeader title="Menu" />
 
       <ScrollView
@@ -165,15 +166,11 @@ export default function MenuScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-    </View>
+    </AppBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
   scrollView: {
     flex: 1,
   },

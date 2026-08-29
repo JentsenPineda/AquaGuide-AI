@@ -1,4 +1,5 @@
 import ModuleCard from "@/components/cards/ModuleCard";
+import AppBackground from "@/components/layout/AppBackground";
 import AppHeader from "@/components/layout/AppHeader";
 import ThemeText from "@/components/text/ThemeText";
 import { useAppColors } from "@/theme/useAppColors";
@@ -10,14 +11,7 @@ export default function FishCareScreen() {
   const colors = useAppColors();
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <AppBackground>
       <AppHeader title="Fish Care" showBack={false} />
 
       <ScrollView
@@ -33,82 +27,65 @@ export default function FishCareScreen() {
         {/* PAGE HEADER                                                      */}
         {/* ---------------------------------------------------------------- */}
 
-        <View style={styles.header}>
-          <View style={styles.headerText}>
-            <ThemeText
+        <View
+          style={[
+            styles.headerPanel,
+            {
+              backgroundColor:
+                colors.card.toLowerCase() === "#ffffff"
+                  ? "rgba(255,255,255,0.62)"
+                  : "rgba(16,35,49,0.72)",
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <View style={styles.header}>
+            <View style={styles.headerText}>
+              <ThemeText
+                style={[
+                  styles.title,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                AquaGuide AI Modules
+              </ThemeText>
+
+              <ThemeText
+                style={[
+                  styles.subtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Everything you need to manage, understand, and care for your
+                ornamental fish.
+              </ThemeText>
+            </View>
+
+            <View
               style={[
-                styles.title,
+                styles.countBadge,
                 {
-                  color: colors.textPrimary,
+                  backgroundColor: colors.primary + "14",
                 },
               ]}
             >
-              AquaGuide AI Modules
-            </ThemeText>
+              <Ionicons name="grid-outline" size={19} color={colors.primary} />
 
-            <ThemeText
-              style={[
-                styles.subtitle,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              Everything you need to manage, understand, and care for your
-              ornamental fish.
-            </ThemeText>
-          </View>
-
-          <View
-            style={[
-              styles.countBadge,
-              {
-                backgroundColor: colors.primary + "14",
-              },
-            ]}
-          >
-            <Ionicons name="grid-outline" size={19} color={colors.primary} />
-
-            <ThemeText
-              style={[
-                styles.countText,
-                {
-                  color: colors.primary,
-                },
-              ]}
-            >
-              7
-            </ThemeText>
-          </View>
-        </View>
-
-        {/* ---------------------------------------------------------------- */}
-        {/* FEATURES                                                         */}
-        {/* ---------------------------------------------------------------- */}
-
-        <View style={styles.sectionHeader}>
-          <View>
-            <ThemeText
-              style={[
-                styles.sectionTitle,
-                {
-                  color: colors.textPrimary,
-                },
-              ]}
-            >
-              Features
-            </ThemeText>
-
-            <ThemeText
-              style={[
-                styles.sectionSubtitle,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              Select a module to get started.
-            </ThemeText>
+              <ThemeText
+                style={[
+                  styles.countText,
+                  {
+                    color: colors.primary,
+                  },
+                ]}
+              >
+                7
+              </ThemeText>
+            </View>
           </View>
         </View>
 
@@ -187,39 +164,41 @@ export default function FishCareScreen() {
 
         <View
           style={[
-            styles.footer,
+            styles.footerPanel,
             {
-              borderTopColor: colors.border,
+              backgroundColor:
+                colors.card.toLowerCase() === "#ffffff"
+                  ? "rgba(255,255,255,0.62)"
+                  : "rgba(16,35,49,0.72)",
+              borderColor: colors.border,
             },
           ]}
         >
-          <Ionicons
-            name="information-circle-outline"
-            size={17}
-            color={colors.textSecondary}
-          />
+          <View style={styles.footer}>
+            <Ionicons
+              name="information-circle-outline"
+              size={17}
+              color={colors.textSecondary}
+            />
 
-          <ThemeText
-            style={[
-              styles.footerText,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Use these modules to make informed decisions about your aquarium.
-          </ThemeText>
+            <ThemeText
+              style={[
+                styles.footerText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              Use these modules to make informed decisions about your aquarium.
+            </ThemeText>
+          </View>
         </View>
       </ScrollView>
-    </View>
+    </AppBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
   content: {
     paddingHorizontal: 18,
     paddingTop: 18,
@@ -229,11 +208,18 @@ const styles = StyleSheet.create({
   /* HEADER                                                               */
   /* -------------------------------------------------------------------- */
 
+  headerPanel: {
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginBottom: 14,
+  },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 28,
   },
 
   headerText: {
@@ -270,24 +256,6 @@ const styles = StyleSheet.create({
   },
 
   /* -------------------------------------------------------------------- */
-  /* FEATURES                                                             */
-  /* -------------------------------------------------------------------- */
-
-  sectionHeader: {
-    marginBottom: 14,
-  },
-
-  sectionTitle: {
-    fontSize: 19,
-    fontWeight: "800",
-  },
-
-  sectionSubtitle: {
-    fontSize: 12.5,
-    marginTop: 3,
-  },
-
-  /* -------------------------------------------------------------------- */
   /* MODULE CARDS                                                         */
   /* -------------------------------------------------------------------- */
 
@@ -300,10 +268,15 @@ const styles = StyleSheet.create({
   /* FOOTER                                                               */
   /* -------------------------------------------------------------------- */
 
+  footerPanel: {
+    marginTop: 22,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+  },
+
   footer: {
-    marginTop: 26,
-    paddingTop: 16,
-    borderTopWidth: 1,
     flexDirection: "row",
     alignItems: "flex-start",
   },

@@ -1,14 +1,26 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { breedingDatabase } from "../data/breedingDatabase";
 
 export default function BreedingResult() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../assets/images/dark-mode-bg3.png")
+    : require("../assets/images/light-mode-bg3.png");
+
+  const panelBackground = isDark
+    ? "rgba(16,35,49,0.72)"
+    : "rgba(255,255,255,0.62)";
 
   const { fish } = useLocalSearchParams<{
     fish?: string;
@@ -22,14 +34,13 @@ export default function BreedingResult() {
 
   if (!guide) {
     return (
-      <View
-        style={[
-          styles.safe,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.safe}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <AppHeader title="Breeding Guide" showBack />
 
         <View style={styles.errorContainer}>
@@ -75,14 +86,13 @@ export default function BreedingResult() {
   }
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Breeding Guide" showBack />
 
       <ScrollView
@@ -100,7 +110,7 @@ export default function BreedingResult() {
           style={[
             styles.headerCard,
             {
-              backgroundColor: colors.card,
+              backgroundColor: panelBackground,
               borderColor: colors.border,
             },
           ]}
@@ -147,7 +157,7 @@ export default function BreedingResult() {
           style={[
             styles.introCard,
             {
-              backgroundColor: colors.card,
+              backgroundColor: panelBackground,
               borderColor: colors.border,
             },
           ]}
@@ -225,7 +235,7 @@ export default function BreedingResult() {
             style={[
               styles.stepCard,
               {
-                backgroundColor: colors.card,
+                backgroundColor: panelBackground,
                 borderColor: colors.border,
               },
             ]}
@@ -284,7 +294,7 @@ export default function BreedingResult() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.card,
+              backgroundColor: panelBackground,
               borderColor: colors.border,
             },
           ]}
@@ -366,7 +376,7 @@ export default function BreedingResult() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.card,
+              backgroundColor: panelBackground,
               borderColor: colors.border,
             },
           ]}
@@ -492,6 +502,10 @@ export default function BreedingResult() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

@@ -2,50 +2,40 @@ import { router } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, Image, StyleSheet, Text, View } from "react-native";
 
-export default function LaunchAnimationScreen() {
-  // ==================================================
-  // FISH MOVEMENT
-  // ==================================================
+import { useAppColors } from "@/theme/useAppColors";
 
+export default function LaunchAnimationScreen() {
+  const colors = useAppColors();
+
+  // Fish animation
   const fishX = useRef(new Animated.Value(-300)).current;
   const fishY = useRef(new Animated.Value(0)).current;
   const fishRotate = useRef(new Animated.Value(0)).current;
   const fishScale = useRef(new Animated.Value(0.9)).current;
   const fishWiggle = useRef(new Animated.Value(0)).current;
 
-  // ==================================================
-  // BUBBLES
-  // ==================================================
-
+  // Bubbles
   const bubble1 = useRef(new Animated.Value(0)).current;
   const bubble2 = useRef(new Animated.Value(0)).current;
   const bubble3 = useRef(new Animated.Value(0)).current;
 
-  // ==================================================
-  // LOGO
-  // ==================================================
-
+  // Logo
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const logoScale = useRef(new Animated.Value(0.92)).current;
+  const outroLogoScale = useRef(new Animated.Value(1)).current;
 
-  // ==================================================
-  // TEXT
-  // ==================================================
-
+  // Text
   const textOpacity = useRef(new Animated.Value(0)).current;
   const textTranslateY = useRef(new Animated.Value(15)).current;
+  const outroTextY = useRef(new Animated.Value(0)).current;
 
-  // ==================================================
-  // FINAL FADE
-  // ==================================================
-
+  // Screen
   const fadeOut = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // ==================================================
-    // 1. FISH SWIMS INTO THE SCREEN
-    // ==================================================
+    let isMounted = true;
 
+    // Fish entrance
     Animated.parallel([
       Animated.timing(fishX, {
         toValue: -10,
@@ -61,7 +51,6 @@ export default function LaunchAnimationScreen() {
         useNativeDriver: true,
       }),
 
-      // Gentle up/down swimming movement
       Animated.sequence([
         Animated.timing(fishY, {
           toValue: -14,
@@ -93,10 +82,7 @@ export default function LaunchAnimationScreen() {
       ]),
     ]).start();
 
-    // ==================================================
-    // 2. NATURAL SWIMMING BODY MOVEMENT
-    // ==================================================
-
+    // Natural fish movement
     Animated.loop(
       Animated.sequence([
         Animated.timing(fishRotate, {
@@ -129,10 +115,7 @@ export default function LaunchAnimationScreen() {
       ]),
     ).start();
 
-    // ==================================================
-    // 3. SUBTLE BODY MOVEMENT
-    // ==================================================
-
+    // Subtle fish body movement
     Animated.loop(
       Animated.sequence([
         Animated.timing(fishWiggle, {
@@ -158,58 +141,39 @@ export default function LaunchAnimationScreen() {
       ]),
     ).start();
 
-    // ==================================================
-    // 4. BUBBLE 1
-    // ==================================================
+    // Bubble animations
+    const animateBubble = (
+      bubble: Animated.Value,
+      delay: number,
+      duration: number,
+    ) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
 
-    Animated.sequence([
-      Animated.delay(650),
+          Animated.timing(bubble, {
+            toValue: 1,
+            duration,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
 
-      Animated.timing(bubble1, {
-        toValue: 1,
-        duration: 900,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start();
+          Animated.delay(100),
 
-    // ==================================================
-    // 5. BUBBLE 2
-    // ==================================================
+          Animated.timing(bubble, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    };
 
-    Animated.sequence([
-      Animated.delay(850),
+    animateBubble(bubble1, 650, 900);
+    animateBubble(bubble2, 850, 850);
+    animateBubble(bubble3, 1050, 800);
 
-      Animated.timing(bubble2, {
-        toValue: 1,
-        duration: 850,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // ==================================================
-    // 6. BUBBLE 3
-    // ==================================================
-
-    Animated.sequence([
-      Animated.delay(1050),
-
-      Animated.timing(bubble3, {
-        toValue: 1,
-        duration: 800,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // ==================================================
-    // 7. LOGO APPEARS
-    //
-    // IMPORTANT:
-    // THE FISH STAYS VISIBLE.
-    // ==================================================
-
+    // Logo entrance
     Animated.sequence([
       Animated.delay(1550),
 
@@ -230,10 +194,7 @@ export default function LaunchAnimationScreen() {
       ]),
     ]).start();
 
-    // ==================================================
-    // 8. AQUAGUIDE AI TEXT
-    // ==================================================
-
+    // Text entrance
     Animated.sequence([
       Animated.delay(2050),
 
@@ -254,22 +215,73 @@ export default function LaunchAnimationScreen() {
       ]),
     ]).start();
 
-    // ==================================================
-    // 9. HOLD THEN FADE OUT
-    // ==================================================
-
+    // Outro
     const timer = setTimeout(() => {
-      Animated.timing(fadeOut, {
-        toValue: 0,
-        duration: 650,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }).start(() => {
-        router.replace("/welcome");
+      if (!isMounted) return;
+
+      Animated.parallel([
+        // Text moves upward and fades
+        Animated.timing(textOpacity, {
+          toValue: 0,
+          duration: 350,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+
+        Animated.timing(outroTextY, {
+          toValue: -12,
+          duration: 350,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+
+        // Logo shrinks and fades
+        Animated.timing(logoOpacity, {
+          toValue: 0,
+          duration: 500,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+
+        Animated.timing(outroLogoScale, {
+          toValue: 0.88,
+          duration: 500,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+
+        // Fish swims away
+        Animated.timing(fishX, {
+          toValue: 350,
+          duration: 750,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+
+        Animated.timing(fishY, {
+          toValue: -25,
+          duration: 750,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+
+        // Final fade
+        Animated.timing(fadeOut, {
+          toValue: 0,
+          duration: 500,
+          delay: 180,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start(({ finished }) => {
+        if (finished && isMounted) {
+          router.replace("/welcome");
+        }
       });
-    }, 3600);
+    }, 3200);
 
     return () => {
+      isMounted = false;
       clearTimeout(timer);
     };
   }, []);
@@ -279,25 +291,28 @@ export default function LaunchAnimationScreen() {
       style={[
         styles.container,
         {
+          backgroundColor: colors.background,
           opacity: fadeOut,
         },
       ]}
     >
-      {/* ==================================================
-          BACKGROUND
-      ================================================== */}
+      {/* Soft theme-aware glow */}
+      <View
+        style={[
+          styles.glow,
+          {
+            backgroundColor: colors.surface,
+          },
+        ]}
+      />
 
-      <View style={styles.glow} />
-
-      {/* ==================================================
-          BUBBLES
-      ================================================== */}
-
+      {/* Bubbles */}
       <Animated.View
         style={[
           styles.bubble,
           styles.bubbleOne,
           {
+            backgroundColor: colors.primary,
             opacity: bubble1,
             transform: [
               {
@@ -322,6 +337,7 @@ export default function LaunchAnimationScreen() {
           styles.bubble,
           styles.bubbleTwo,
           {
+            backgroundColor: colors.primaryLight,
             opacity: bubble2,
             transform: [
               {
@@ -346,6 +362,7 @@ export default function LaunchAnimationScreen() {
           styles.bubble,
           styles.bubbleThree,
           {
+            backgroundColor: colors.primary,
             opacity: bubble3,
             transform: [
               {
@@ -365,10 +382,7 @@ export default function LaunchAnimationScreen() {
         ]}
       />
 
-      {/* ==================================================
-          COMPLETE AQUAGUIDE LOGO
-      ================================================== */}
-
+      {/* Logo */}
       <Animated.View
         style={[
           styles.logoContainer,
@@ -376,7 +390,7 @@ export default function LaunchAnimationScreen() {
             opacity: logoOpacity,
             transform: [
               {
-                scale: logoScale,
+                scale: Animated.multiply(logoScale, outroLogoScale),
               },
             ],
           },
@@ -389,10 +403,7 @@ export default function LaunchAnimationScreen() {
         />
       </Animated.View>
 
-      {/* ==================================================
-          SWIMMING FISH
-      ================================================== */}
-
+      {/* Swimming fish */}
       <Animated.View
         style={[
           styles.fishContainer,
@@ -430,10 +441,7 @@ export default function LaunchAnimationScreen() {
         />
       </Animated.View>
 
-      {/* ==================================================
-          APP NAME
-      ================================================== */}
-
+      {/* App name */}
       <Animated.View
         style={[
           styles.textContainer,
@@ -441,26 +449,64 @@ export default function LaunchAnimationScreen() {
             opacity: textOpacity,
             transform: [
               {
-                translateY: textTranslateY,
+                translateY: Animated.add(textTranslateY, outroTextY),
               },
             ],
           },
         ]}
       >
-        <Text style={styles.appName}>
-          AquaGuide <Text style={styles.ai}>AI</Text>
+        <Text
+          style={[
+            styles.appName,
+            {
+              color: colors.textPrimary,
+            },
+          ]}
+        >
+          AquaGuide{" "}
+          <Text
+            style={[
+              styles.ai,
+              {
+                color: colors.primary,
+              },
+            ]}
+          >
+            AI
+          </Text>
         </Text>
 
-        <Text style={styles.tagline}>Smart care for ornamental fish</Text>
+        <Text
+          style={[
+            styles.tagline,
+            {
+              color: colors.textSecondary,
+            },
+          ]}
+        >
+          Smart care for ornamental fish
+        </Text>
       </Animated.View>
 
-      {/* ==================================================
-          WATER WAVES
-      ================================================== */}
-
+      {/* Water */}
       <View style={styles.bottomWater}>
-        <View style={styles.waveOne} />
-        <View style={styles.waveTwo} />
+        <View
+          style={[
+            styles.waveOne,
+            {
+              backgroundColor: colors.card,
+            },
+          ]}
+        />
+
+        <View
+          style={[
+            styles.waveTwo,
+            {
+              backgroundColor: colors.surface,
+            },
+          ]}
+        />
       </View>
     </Animated.View>
   );
@@ -469,7 +515,6 @@ export default function LaunchAnimationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EAFBFE",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -480,13 +525,8 @@ const styles = StyleSheet.create({
     width: 420,
     height: 420,
     borderRadius: 210,
-    backgroundColor: "#D6F7FA",
     opacity: 0.8,
   },
-
-  // ==================================================
-  // FISH
-  // ==================================================
 
   fishContainer: {
     position: "absolute",
@@ -494,8 +534,6 @@ const styles = StyleSheet.create({
     height: 190,
     justifyContent: "center",
     alignItems: "center",
-
-    // Current alignment with the logo
     marginLeft: -10,
     marginTop: 18,
   },
@@ -504,10 +542,6 @@ const styles = StyleSheet.create({
     width: 82,
     height: 82,
   },
-
-  // ==================================================
-  // LOGO
-  // ==================================================
 
   logoContainer: {
     position: "absolute",
@@ -522,42 +556,33 @@ const styles = StyleSheet.create({
     height: 190,
   },
 
-  // ==================================================
-  // BUBBLES
-  // ==================================================
-
   bubble: {
     position: "absolute",
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: "#00BCD4",
   },
 
   bubbleOne: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
     marginLeft: -120,
     marginTop: -90,
   },
 
   bubbleTwo: {
-    marginLeft: -90,
-    marginTop: -115,
     width: 7,
     height: 7,
     borderRadius: 4,
+    marginLeft: -90,
+    marginTop: -115,
   },
 
   bubbleThree: {
-    marginLeft: -65,
-    marginTop: -75,
     width: 6,
     height: 6,
     borderRadius: 3,
+    marginLeft: -65,
+    marginTop: -75,
   },
-
-  // ==================================================
-  // TEXT
-  // ==================================================
 
   textContainer: {
     position: "absolute",
@@ -568,24 +593,18 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: "900",
-    color: "#006B87",
     letterSpacing: 0.5,
   },
 
   ai: {
-    color: "#00BCD4",
+    fontWeight: "900",
   },
 
   tagline: {
     marginTop: 8,
     fontSize: 14,
     fontWeight: "600",
-    color: "#607D8B",
   },
-
-  // ==================================================
-  // WATER
-  // ==================================================
 
   bottomWater: {
     position: "absolute",
@@ -599,7 +618,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 120,
     borderRadius: 80,
-    backgroundColor: "#BDEFF5",
     top: 25,
   },
 
@@ -608,7 +626,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 100,
     borderRadius: 70,
-    backgroundColor: "#A8E8F0",
     top: 70,
     opacity: 0.65,
   },

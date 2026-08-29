@@ -25,12 +25,24 @@ export default function ModuleCard({
 }: ModuleCardProps) {
   const colors = useAppColors();
 
+  /*
+   * Keep each module as ONE card.
+   *
+   * The aquarium background is provided by AppBackground.
+   * This card is intentionally translucent so the background
+   * remains visible without sacrificing text readability.
+   */
+  const translucentCardBackground =
+    colors.card.toLowerCase() === "#ffffff"
+      ? "rgba(255,255,255,0.72)"
+      : "rgba(16,35,49,0.78)";
+
   return (
     <Pressable
       style={({ pressed }) => [
         styles.moduleCard,
         {
-          backgroundColor: colors.card,
+          backgroundColor: translucentCardBackground,
           borderColor: colors.border,
         },
         pressed && styles.pressed,
@@ -83,8 +95,6 @@ export default function ModuleCard({
           {subtitle}
         </Text>
       </View>
-
-      {/* Arrow */}
     </Pressable>
   );
 }

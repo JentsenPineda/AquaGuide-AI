@@ -1,3 +1,4 @@
+import AppBackground from "@/components/layout/AppBackground";
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAuth } from "@/contexts/AuthContext";
@@ -118,9 +119,6 @@ export default function HomeScreen() {
 
   /* ------------------------------------------------------------------------ */
   /* Daily Scan Usage                                                         */
-  /*                                                                          */
-  /* IMPORTANT: This is now the source of truth for the Home scan statistic.  */
-  /* It uses the exact same Firestore scanUsage document as the Scan module.  */
   /* ------------------------------------------------------------------------ */
 
   const loadDailyScanUsage = useCallback(async () => {
@@ -151,16 +149,6 @@ export default function HomeScreen() {
     }
   }, [user]);
 
-  /*
-   * Refresh whenever Home becomes active.
-   *
-   * Example:
-   *
-   * Home → Scan → use 5th scan → Back
-   *
-   * Home will immediately request the current Firestore usage
-   * and display 0 / 5.
-   */
   useFocusEffect(
     useCallback(() => {
       loadDailyScanUsage();
@@ -193,14 +181,6 @@ export default function HomeScreen() {
   /* Scan history                                                             */
   /* ------------------------------------------------------------------------ */
 
-  /*
-   * This remains available for scan history-related functionality.
-   *
-   * IMPORTANT:
-   * This value is NO LONGER used for the Home scan limit.
-   *
-   * The actual daily limit comes from dailyScanUsage above.
-   */
   const scansToday = useMemo(() => {
     const now = new Date();
 
@@ -255,14 +235,7 @@ export default function HomeScreen() {
     : `${dailyScanUsage.remaining} remaining`;
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <AppBackground>
       <AppHeader title="AquaGuide AI" showBack={false} showLogo />
 
       <ScrollView
@@ -288,7 +261,7 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              Ornamental Fish Management
+              ORNAMENTAL FISH MANAGEMENT
             </Text>
 
             <Text
@@ -303,17 +276,6 @@ export default function HomeScreen() {
               {"\n"}Everything you need for better fishkeeping.
             </Text>
           </View>
-
-          <View
-            style={[
-              styles.statusIcon,
-              {
-                backgroundColor: colors.primary + "14",
-              },
-            ]}
-          >
-            <Ionicons name="water-outline" size={25} color={colors.primary} />
-          </View>
         </View>
 
         {/* ------------------------------------------------------------------ */}
@@ -326,7 +288,7 @@ export default function HomeScreen() {
             styles.scanCard,
             {
               backgroundColor: colors.primary,
-              opacity: pressed ? 0.9 : 1,
+              opacity: pressed ? 0.92 : 1,
               transform: [
                 {
                   scale: pressed ? 0.985 : 1,
@@ -336,7 +298,7 @@ export default function HomeScreen() {
           ]}
         >
           <View style={styles.scanIconContainer}>
-            <Ionicons name="scan-outline" size={28} color="#FFFFFF" />
+            <Ionicons name="scan-outline" size={25} color="#FFFFFF" />
           </View>
 
           <View style={styles.scanContent}>
@@ -345,8 +307,7 @@ export default function HomeScreen() {
             <Text style={styles.scanTitle}>Identify a fish</Text>
 
             <Text style={styles.scanDescription}>
-              Scan an ornamental fish to identify its species and view care
-              recommendations.
+              Scan a fish to identify its species and get care recommendations.
             </Text>
           </View>
 
@@ -359,29 +320,39 @@ export default function HomeScreen() {
         {/* Overview                                                           */}
         {/* ------------------------------------------------------------------ */}
 
-        <View style={styles.sectionHeader}>
-          <View>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: colors.textPrimary,
-                },
-              ]}
-            >
-              Overview
-            </Text>
+        <View
+          style={[
+            styles.sectionPanel,
+            {
+              backgroundColor: colors.card + "8C",
+              borderColor: colors.border + "B8",
+            },
+          ]}
+        >
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Overview
+              </Text>
 
-            <Text
-              style={[
-                styles.sectionSubtitle,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              Your aquarium activity
-            </Text>
+              <Text
+                style={[
+                  styles.sectionSubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Your aquarium activity
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -620,29 +591,39 @@ export default function HomeScreen() {
         {/* Fish Care                                                         */}
         {/* ------------------------------------------------------------------ */}
 
-        <View style={styles.sectionHeader}>
-          <View>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: colors.textPrimary,
-                },
-              ]}
-            >
-              Fish Care
-            </Text>
+        <View
+          style={[
+            styles.sectionPanel,
+            {
+              backgroundColor: colors.card + "8C",
+              borderColor: colors.border + "B8",
+            },
+          ]}
+        >
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                Fish Care
+              </Text>
 
-            <Text
-              style={[
-                styles.sectionSubtitle,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              Continue where you left off
-            </Text>
+              <Text
+                style={[
+                  styles.sectionSubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Continue where you left off
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -793,32 +774,35 @@ export default function HomeScreen() {
 
         <View
           style={[
-            styles.summary,
+            styles.summaryPanel,
             {
-              borderTopColor: colors.border,
+              backgroundColor: colors.card + "8C",
+              borderColor: colors.border + "B8",
             },
           ]}
         >
-          <Ionicons
-            name="information-circle-outline"
-            size={18}
-            color={colors.textSecondary}
-          />
+          <View style={styles.summary}>
+            <Ionicons
+              name="information-circle-outline"
+              size={18}
+              color={colors.textSecondary}
+            />
 
-          <Text
-            style={[
-              styles.summaryText,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            AquaGuide AI helps you identify, understand, and care for your
-            ornamental fish.
-          </Text>
+            <Text
+              style={[
+                styles.summaryText,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              AquaGuide AI helps you identify, understand, and care for your
+              ornamental fish.
+            </Text>
+          </View>
         </View>
       </ScrollView>
-    </View>
+    </AppBackground>
   );
 }
 
@@ -828,19 +812,19 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    paddingHorizontal: 18,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 14,
   },
 
   /* ---------------------------------------------------------------------- */
-  /* Greeting                                                               */
+  /* Hero                                                                   */
   /* ---------------------------------------------------------------------- */
 
   greetingRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   greetingContent: {
@@ -848,25 +832,17 @@ const styles = StyleSheet.create({
   },
 
   greeting: {
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 1.4,
-    marginBottom: 5,
+    fontSize: 9.5,
+    fontWeight: "900",
+    letterSpacing: 1.45,
+    marginBottom: 6,
   },
 
   title: {
     fontSize: 27,
     fontWeight: "900",
-    lineHeight: 32,
-  },
-
-  statusIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
+    lineHeight: 31,
+    letterSpacing: -0.35,
   },
 
   /* ---------------------------------------------------------------------- */
@@ -874,75 +850,93 @@ const styles = StyleSheet.create({
   /* ---------------------------------------------------------------------- */
 
   scanCard: {
-    minHeight: 150,
-    borderRadius: 22,
-    padding: 18,
+    minHeight: 132,
+    borderRadius: 24,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 27,
+    marginBottom: 22,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
   },
 
   scanIconContainer: {
-    width: 54,
-    height: 54,
-    borderRadius: 17,
-    backgroundColor: "rgba(255,255,255,0.16)",
+    width: 50,
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.18)",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
+    marginRight: 12,
   },
 
   scanContent: {
     flex: 1,
+    minWidth: 0,
   },
 
   scanLabel: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 9,
-    fontWeight: "800",
-    letterSpacing: 1.3,
+    color: "#FFFFFF",
+    fontSize: 8.5,
+    fontWeight: "900",
+    letterSpacing: 1.35,
     marginBottom: 3,
   },
 
   scanTitle: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "900",
+    letterSpacing: -0.15,
   },
 
   scanDescription: {
-    color: "rgba(255,255,255,0.82)",
-    fontSize: 12,
-    lineHeight: 17,
+    color: "#FFFFFF",
+    fontSize: 11.5,
+    lineHeight: 16,
     marginTop: 5,
+    maxWidth: 230,
   },
 
   scanArrow: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "rgba(255,255,255,0.14)",
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    backgroundColor: "rgba(255,255,255,0.17)",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
+    marginLeft: 7,
   },
 
   /* ---------------------------------------------------------------------- */
   /* Sections                                                               */
   /* ---------------------------------------------------------------------- */
 
+  sectionPanel: {
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    marginBottom: 11,
+  },
+
   sectionHeader: {
-    marginBottom: 13,
+    marginBottom: 0,
+    paddingHorizontal: 2,
   },
 
   sectionTitle: {
     fontSize: 19,
-    fontWeight: "800",
+    fontWeight: "900",
+    letterSpacing: -0.2,
   },
 
   sectionSubtitle: {
-    fontSize: 12.5,
-    marginTop: 3,
+    fontSize: 12,
+    marginTop: 2,
   },
 
   /* ---------------------------------------------------------------------- */
@@ -953,16 +947,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 27,
+    marginBottom: 22,
   },
 
   statCard: {
-    width: "48.2%",
-    minHeight: 108,
-    borderRadius: 18,
+    width: "48.5%",
+    minHeight: 112,
+    borderRadius: 20,
     borderWidth: 1,
-    padding: 14,
+    padding: 13,
     marginBottom: 10,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
 
   statIcon: {
@@ -971,16 +969,17 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 7,
   },
 
   statValue: {
-    fontSize: 22,
+    fontSize: 23,
     fontWeight: "900",
+    letterSpacing: -0.25,
   },
 
   statLabel: {
-    fontSize: 11.5,
+    fontSize: 11,
     marginTop: 2,
   },
 
@@ -1010,10 +1009,14 @@ const styles = StyleSheet.create({
   /* ---------------------------------------------------------------------- */
 
   careCard: {
-    borderRadius: 20,
+    borderRadius: 21,
     borderWidth: 1,
-    padding: 17,
-    marginBottom: 24,
+    padding: 16,
+    marginBottom: 22,
+    shadowOpacity: 0.08,
+    shadowRadius: 9,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
 
   careTop: {
@@ -1046,14 +1049,15 @@ const styles = StyleSheet.create({
 
   careFish: {
     fontSize: 18,
-    fontWeight: "800",
-    marginTop: 18,
+    fontWeight: "900",
+    letterSpacing: -0.15,
+    marginTop: 16,
   },
 
   careDay: {
-    fontSize: 12.5,
+    fontSize: 12,
     marginTop: 3,
-    marginBottom: 13,
+    marginBottom: 12,
   },
 
   progressTrack: {
@@ -1087,18 +1091,24 @@ const styles = StyleSheet.create({
   /* Summary                                                                */
   /* ---------------------------------------------------------------------- */
 
+  summaryPanel: {
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+
   summary: {
-    borderTopWidth: 1,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "flex-start",
   },
 
   summaryText: {
     flex: 1,
-    fontSize: 11.5,
-    lineHeight: 17,
+    fontSize: 11,
+    lineHeight: 16,
     marginLeft: 8,
   },
 });

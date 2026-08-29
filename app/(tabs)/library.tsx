@@ -1,3 +1,4 @@
+import AppBackground from "@/components/layout/AppBackground";
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAppColors } from "@/theme/useAppColors";
@@ -123,7 +124,10 @@ export default function LibraryScreen() {
         style={[
           styles.card,
           {
-            backgroundColor: colors.card,
+            backgroundColor:
+              colors.card.toLowerCase() === "#ffffff"
+                ? "rgba(255,255,255,0.78)"
+                : "rgba(16,35,49,0.86)",
             borderColor: colors.border,
           },
         ]}
@@ -295,273 +299,292 @@ export default function LibraryScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <AppBackground>
       <AppHeader title="Species Library" showBack={false} />
 
-      {/* SEARCH */}
-      <View
-        style={[
-          styles.searchContainer,
-          {
-            backgroundColor: colors.card,
-            borderColor: colors.border,
-          },
-        ]}
-      >
-        <Ionicons name="search" size={20} color={colors.textSecondary} />
-
-        <TextInput
-          placeholder="Search fish..."
-          placeholderTextColor={colors.textMuted}
-          value={search}
-          onChangeText={setSearch}
+      {/* LIBRARY CONTENT */}
+      <View style={styles.content}>
+        {/* SEARCH */}
+        <View
           style={[
-            styles.searchInput,
+            styles.searchContainer,
             {
-              color: colors.textPrimary,
+              backgroundColor:
+                colors.card.toLowerCase() === "#ffffff"
+                  ? "rgba(255,255,255,0.78)"
+                  : "rgba(16,35,49,0.86)",
+              borderColor: colors.border,
             },
           ]}
+        >
+          <Ionicons name="search" size={20} color={colors.textSecondary} />
+
+          <TextInput
+            placeholder="Search fish..."
+            placeholderTextColor={colors.textMuted}
+            value={search}
+            onChangeText={setSearch}
+            style={[
+              styles.searchInput,
+              {
+                color: colors.textPrimary,
+              },
+            ]}
+          />
+        </View>
+
+        {/* CATEGORY FILTERS */}
+        <View style={styles.categoryContainer}>
+          {categories.map((item) => {
+            const filterColors = getFilterColors(item);
+            const isSelected = selectedCategory === item;
+
+            return (
+              <TouchableOpacity
+                key={item}
+                style={[
+                  styles.categoryButton,
+                  item === "Intermediate" && styles.intermediateButton,
+                  {
+                    backgroundColor: isSelected
+                      ? filterColors.active
+                      : colors.card.toLowerCase() === "#ffffff"
+                        ? "rgba(255,255,255,0.62)"
+                        : "rgba(16,35,49,0.72)",
+                    borderColor: isSelected
+                      ? filterColors.active
+                      : colors.border,
+                  },
+                ]}
+                onPress={() => {
+                  setSelectedCategory(item);
+
+                  requestAnimationFrame(() => {
+                    listRef.current?.scrollToOffset({
+                      offset: 0,
+                      animated: true,
+                    });
+                  });
+                }}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    styles.categoryText,
+                    {
+                      color: isSelected ? "#FFFFFF" : colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* FISH LIST */}
+        <FlatList
+          ref={listRef}
+          data={filteredFish}
+          keyExtractor={(item) => item.id}
+          renderItem={renderFishCard}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <View style={styles.statsContainer}>
+              {/* TOTAL */}
+              <View
+                style={[
+                  styles.statCard,
+                  {
+                    backgroundColor:
+                      colors.card.toLowerCase() === "#ffffff"
+                        ? "rgba(255,255,255,0.78)"
+                        : "rgba(16,35,49,0.86)",
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Ionicons name="fish" size={24} color="#00BCD4" />
+
+                <Text
+                  style={[
+                    styles.statNumber,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {filteredFish.length}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.statLabel,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Species
+                </Text>
+              </View>
+
+              {/* BEGINNER */}
+              <View
+                style={[
+                  styles.statCard,
+                  {
+                    backgroundColor:
+                      colors.card.toLowerCase() === "#ffffff"
+                        ? "rgba(255,255,255,0.78)"
+                        : "rgba(16,35,49,0.86)",
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Ionicons name="leaf" size={24} color="#4CAF50" />
+
+                <Text
+                  style={[
+                    styles.statNumber,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {beginnerFish.length}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.statLabel,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Beginner
+                </Text>
+              </View>
+
+              {/* INTERMEDIATE */}
+              <View
+                style={[
+                  styles.statCard,
+                  {
+                    backgroundColor:
+                      colors.card.toLowerCase() === "#ffffff"
+                        ? "rgba(255,255,255,0.78)"
+                        : "rgba(16,35,49,0.86)",
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Ionicons name="flask" size={24} color="#FF9800" />
+
+                <Text
+                  style={[
+                    styles.statNumber,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {intermediateFish.length}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.statLabel,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Intermediate
+                </Text>
+              </View>
+
+              {/* EXPERT */}
+              <View
+                style={[
+                  styles.statCard,
+                  {
+                    backgroundColor:
+                      colors.card.toLowerCase() === "#ffffff"
+                        ? "rgba(255,255,255,0.78)"
+                        : "rgba(16,35,49,0.86)",
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Ionicons name="diamond" size={24} color="#E91E63" />
+
+                <Text
+                  style={[
+                    styles.statNumber,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  {expertFish.length}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.statLabel,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Expert
+                </Text>
+              </View>
+            </View>
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="search" size={70} color={colors.textMuted} />
+
+              <Text
+                style={[
+                  styles.emptyTitle,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+              >
+                No Fish Found
+              </Text>
+
+              <Text
+                style={[
+                  styles.emptySubtitle,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                Try searching with another keyword.
+              </Text>
+            </View>
+          }
         />
       </View>
-
-      {/* CATEGORY FILTERS */}
-      <View style={styles.categoryContainer}>
-        {categories.map((item) => {
-          const filterColors = getFilterColors(item);
-          const isSelected = selectedCategory === item;
-
-          return (
-            <TouchableOpacity
-              key={item}
-              style={[
-                styles.categoryButton,
-                item === "Intermediate" && styles.intermediateButton,
-                {
-                  backgroundColor: isSelected
-                    ? filterColors.active
-                    : colors.surface,
-                  borderColor: isSelected ? filterColors.active : colors.border,
-                },
-              ]}
-              onPress={() => {
-                setSelectedCategory(item);
-
-                requestAnimationFrame(() => {
-                  listRef.current?.scrollToOffset({
-                    offset: 0,
-                    animated: true,
-                  });
-                });
-              }}
-              activeOpacity={0.8}
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  {
-                    color: isSelected ? "#FFFFFF" : colors.textPrimary,
-                  },
-                ]}
-              >
-                {item}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* FISH LIST */}
-      <FlatList
-        ref={listRef}
-        data={filteredFish}
-        keyExtractor={(item) => item.id}
-        renderItem={renderFishCard}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        ListHeaderComponent={
-          <View style={styles.statsContainer}>
-            {/* TOTAL */}
-            <View
-              style={[
-                styles.statCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <Ionicons name="fish" size={24} color="#00BCD4" />
-
-              <Text
-                style={[
-                  styles.statNumber,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {filteredFish.length}
-              </Text>
-
-              <Text
-                style={[
-                  styles.statLabel,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Species
-              </Text>
-            </View>
-
-            {/* BEGINNER */}
-            <View
-              style={[
-                styles.statCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <Ionicons name="leaf" size={24} color="#4CAF50" />
-
-              <Text
-                style={[
-                  styles.statNumber,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {beginnerFish.length}
-              </Text>
-
-              <Text
-                style={[
-                  styles.statLabel,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Beginner
-              </Text>
-            </View>
-
-            {/* INTERMEDIATE */}
-            <View
-              style={[
-                styles.statCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <Ionicons name="flask" size={24} color="#FF9800" />
-
-              <Text
-                style={[
-                  styles.statNumber,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {intermediateFish.length}
-              </Text>
-
-              <Text
-                style={[
-                  styles.statLabel,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Intermediate
-              </Text>
-            </View>
-
-            {/* EXPERT */}
-            <View
-              style={[
-                styles.statCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <Ionicons name="diamond" size={24} color="#E91E63" />
-
-              <Text
-                style={[
-                  styles.statNumber,
-                  {
-                    color: colors.textPrimary,
-                  },
-                ]}
-              >
-                {expertFish.length}
-              </Text>
-
-              <Text
-                style={[
-                  styles.statLabel,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Expert
-              </Text>
-            </View>
-          </View>
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="search" size={70} color={colors.textMuted} />
-
-            <Text
-              style={[
-                styles.emptyTitle,
-                {
-                  color: colors.textPrimary,
-                },
-              ]}
-            >
-              No Fish Found
-            </Text>
-
-            <Text
-              style={[
-                styles.emptySubtitle,
-                {
-                  color: colors.textSecondary,
-                },
-              ]}
-            >
-              Try searching with another keyword.
-            </Text>
-          </View>
-        }
-      />
-    </View>
+    </AppBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+
+  content: {
     flex: 1,
   },
 
@@ -660,7 +683,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 20,
     paddingTop: 2,
-    paddingBottom: TAB_BAR_HEIGHT,
+    paddingBottom: TAB_BAR_HEIGHT + 20,
   },
 
   card: {

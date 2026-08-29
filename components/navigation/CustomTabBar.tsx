@@ -56,8 +56,22 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
         style={[
           styles.tabBar,
           {
-            backgroundColor: colors.card,
+            /*
+             * Translucent theme-aware surface.
+             *
+             * Light Mode:
+             * white with transparency
+             *
+             * Dark Mode:
+             * dark card with transparency
+             */
+            backgroundColor:
+              colors.card.toLowerCase() === "#ffffff"
+                ? "rgba(255,255,255,0.78)"
+                : "rgba(16,35,49,0.88)",
+
             borderColor: colors.border,
+
             shadowColor: colors.textPrimary,
           },
         ]}
@@ -262,9 +276,9 @@ export default function CustomTabBar({ state }: BottomTabBarProps) {
 
 const styles = StyleSheet.create({
   /*
-   * The wrapper itself is completely transparent.
-   * This removes the visual "black block" behind
-   * the floating navigation bar.
+   * Completely transparent wrapper.
+   * The aquarium background remains visible around
+   * and behind the navigation bar.
    */
   wrapper: {
     position: "absolute",
@@ -277,7 +291,7 @@ const styles = StyleSheet.create({
   },
 
   /*
-   * Floating navigation surface.
+   * Translucent floating navigation surface.
    */
   tabBar: {
     height: 70,
@@ -290,18 +304,13 @@ const styles = StyleSheet.create({
 
     paddingHorizontal: 5,
 
-    /*
-     * Android
-     */
     elevation: 10,
 
-    /*
-     * iOS
-     */
     shadowOffset: {
       width: 0,
       height: 5,
     },
+
     shadowOpacity: 0.12,
     shadowRadius: 14,
   },

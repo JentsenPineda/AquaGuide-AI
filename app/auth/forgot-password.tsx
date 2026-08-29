@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -6,6 +7,7 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -22,7 +24,14 @@ import { auth } from "../../config/firebase";
 const RESEND_COOLDOWN = 60;
 
 export default function ForgotPasswordScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const authenticationBackground = isDark
+    ? require("../../assets/images/authentication-background-dark.png")
+    : require("../../assets/images/authentication-background-light.png");
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -157,14 +166,25 @@ export default function ForgotPasswordScreen() {
    */
   if (emailSent) {
     return (
-      <View
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.container}>
+        <Image
+          source={authenticationBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFillObject,
+            {
+              backgroundColor: isDark
+                ? "rgba(3, 15, 25, 0.18)"
+                : "rgba(255, 255, 255, 0.08)",
+            },
+          ]}
+        />
+
         <AppHeader title="Check Your Email" showBack />
 
         <ScrollView
@@ -173,176 +193,199 @@ export default function ForgotPasswordScreen() {
         >
           <View
             style={[
-              styles.successIconContainer,
+              styles.authPanel,
               {
-                backgroundColor: colors.primary + "18",
+                backgroundColor: isDark
+                  ? "rgba(10, 29, 43, 0.78)"
+                  : "rgba(255, 255, 255, 0.66)",
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(255,255,255,0.72)",
               },
             ]}
           >
-            <Ionicons
-              name="mail-open-outline"
-              size={62}
-              color={colors.primary}
-            />
-          </View>
-
-          <Text
-            style={[
-              styles.title,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Check Your Email
-          </Text>
-
-          <Text
-            style={[
-              styles.description,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            If an AquaGuide AI account is associated with this email, we've sent
-            password reset instructions.
-          </Text>
-
-          <View
-            style={[
-              styles.emailCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Ionicons name="mail-outline" size={22} color={colors.primary} />
+            <View
+              style={[
+                styles.successIconContainer,
+                {
+                  backgroundColor: colors.primary + "18",
+                },
+              ]}
+            >
+              <Ionicons
+                name="mail-open-outline"
+                size={62}
+                color={colors.primary}
+              />
+            </View>
 
             <Text
               style={[
-                styles.emailText,
+                styles.title,
                 {
                   color: colors.textPrimary,
                 },
               ]}
-              numberOfLines={1}
             >
-              {email.trim().toLowerCase()}
+              Check Your Email
             </Text>
-          </View>
 
-          {/* CHECK EMAIL INFO */}
-          <View
-            style={[
-              styles.infoCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Ionicons
-              name="information-circle-outline"
-              size={23}
-              color={colors.primary}
-            />
+            <Text
+              style={[
+                styles.description,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              If an AquaGuide AI account is associated with this email, we've
+              sent password reset instructions.
+            </Text>
 
-            <View style={styles.infoContent}>
+            <View
+              style={[
+                styles.emailCard,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Ionicons name="mail-outline" size={22} color={colors.primary} />
+
               <Text
                 style={[
-                  styles.infoTitle,
+                  styles.emailText,
                   {
                     color: colors.textPrimary,
                   },
                 ]}
+                numberOfLines={1}
               >
-                Didn't receive the email?
-              </Text>
-
-              <Text
-                style={[
-                  styles.infoText,
-                  {
-                    color: colors.textSecondary,
-                  },
-                ]}
-              >
-                Check your Spam, Junk, or Promotions folder. Make sure you
-                entered the correct email address.
+                {email.trim().toLowerCase()}
               </Text>
             </View>
-          </View>
 
-          {/* RESEND */}
-          <TouchableOpacity
-            style={[
-              styles.resendButton,
-              {
-                borderColor: colors.primary,
-                opacity: cooldown > 0 || loading ? 0.55 : 1,
-              },
-            ]}
-            onPress={handleResend}
-            disabled={cooldown > 0 || loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color={colors.primary} />
-            ) : (
-              <>
-                <Ionicons
-                  name="refresh-outline"
-                  size={21}
-                  color={colors.primary}
-                />
-
-                <Text
-                  style={[
-                    styles.resendText,
-                    {
-                      color: colors.primary,
-                    },
-                  ]}
-                >
-                  {cooldown > 0
-                    ? `Resend available in ${cooldown}s`
-                    : "Resend Reset Email"}
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
-
-          {/* CHANGE EMAIL */}
-          <TouchableOpacity
-            style={styles.changeEmailButton}
-            onPress={handleChangeEmail}
-            disabled={loading}
-          >
-            <Text
+            {/* CHECK EMAIL INFO */}
+            <View
               style={[
-                styles.changeEmailText,
+                styles.infoCard,
                 {
-                  color: colors.primary,
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor: colors.border,
                 },
               ]}
             >
-              Use a different email
-            </Text>
-          </TouchableOpacity>
+              <Ionicons
+                name="information-circle-outline"
+                size={23}
+                color={colors.primary}
+              />
 
-          {/* LOGIN */}
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="arrow-back-outline" size={19} color="#FFFFFF" />
+              <View style={styles.infoContent}>
+                <Text
+                  style={[
+                    styles.infoTitle,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Didn't receive the email?
+                </Text>
 
-            <Text style={styles.loginButtonText}>Back to Login</Text>
-          </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.infoText,
+                    {
+                      color: colors.textSecondary,
+                    },
+                  ]}
+                >
+                  Check your Spam, Junk, or Promotions folder. Make sure you
+                  entered the correct email address.
+                </Text>
+              </View>
+            </View>
+
+            {/* RESEND */}
+            <TouchableOpacity
+              style={[
+                styles.resendButton,
+                {
+                  borderColor: colors.primary,
+                  opacity: cooldown > 0 || loading ? 0.55 : 1,
+                },
+              ]}
+              onPress={handleResend}
+              disabled={cooldown > 0 || loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <>
+                  <Ionicons
+                    name="refresh-outline"
+                    size={21}
+                    color={colors.primary}
+                  />
+
+                  <Text
+                    style={[
+                      styles.resendText,
+                      {
+                        color: colors.primary,
+                      },
+                    ]}
+                  >
+                    {cooldown > 0
+                      ? `Resend available in ${cooldown}s`
+                      : "Resend Reset Email"}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            {/* CHANGE EMAIL */}
+            <TouchableOpacity
+              style={styles.changeEmailButton}
+              onPress={handleChangeEmail}
+              disabled={loading}
+            >
+              <Text
+                style={[
+                  styles.changeEmailText,
+                  {
+                    color: colors.primary,
+                  },
+                ]}
+              >
+                Use a different email
+              </Text>
+            </TouchableOpacity>
+
+            {/* LOGIN */}
+            <TouchableOpacity
+              style={[
+                styles.loginButton,
+                {
+                  backgroundColor: colors.primary,
+                },
+              ]}
+              onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="arrow-back-outline" size={19} color="#FFFFFF" />
+
+              <Text style={styles.loginButtonText}>Back to Login</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </View>
     );
@@ -352,15 +395,26 @@ export default function ForgotPasswordScreen() {
    * FORGOT PASSWORD SCREEN
    */
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
-      <AppHeader title="Forgot Password" showBack />
+    <View style={styles.container}>
+      <Image
+        source={authenticationBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            backgroundColor: isDark
+              ? "rgba(3, 15, 25, 0.18)"
+              : "rgba(255, 255, 255, 0.08)",
+          },
+        ]}
+      />
+
+      <AppHeader title=" " showBack />
 
       <KeyboardAvoidingView
         style={styles.keyboard}
@@ -371,211 +425,229 @@ export default function ForgotPasswordScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* ICON */}
           <View
             style={[
-              styles.iconContainer,
+              styles.authPanel,
               {
-                backgroundColor: colors.primary + "18",
+                backgroundColor: isDark
+                  ? "rgba(10, 29, 43, 0.78)"
+                  : "rgba(255, 255, 255, 0.66)",
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(255,255,255,0.72)",
               },
             ]}
           >
-            <Ionicons
-              name="lock-open-outline"
-              size={58}
-              color={colors.primary}
-            />
-          </View>
-
-          {/* TITLE */}
-          <Text
-            style={[
-              styles.title,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Reset Your Password
-          </Text>
-
-          {/* DESCRIPTION */}
-          <Text
-            style={[
-              styles.description,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Enter the email address associated with your AquaGuide AI account.
-            We'll send you instructions to create a new password.
-          </Text>
-
-          {/* LABEL */}
-          <Text
-            style={[
-              styles.label,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Email Address
-          </Text>
-
-          {/* EMAIL INPUT */}
-          <View
-            style={[
-              styles.inputContainer,
-              {
-                backgroundColor: colors.card,
-                borderColor: !emailValidation.touched
-                  ? colors.border
-                  : emailValidation.valid
-                    ? "#2E7D32"
-                    : "#E53935",
-              },
-            ]}
-          >
-            <Ionicons
-              name={emailValidation.valid ? "checkmark-circle" : "mail-outline"}
-              size={22}
-              color={emailValidation.valid ? "#2E7D32" : colors.textSecondary}
-            />
-
-            <TextInput
+            {/* ICON */}
+            <View
               style={[
-                styles.input,
+                styles.iconContainer,
+                {
+                  backgroundColor: colors.primary + "18",
+                },
+              ]}
+            >
+              <Ionicons
+                name="lock-open-outline"
+                size={58}
+                color={colors.primary}
+              />
+            </View>
+
+            {/* TITLE */}
+            <Text
+              style={[
+                styles.title,
                 {
                   color: colors.textPrimary,
                 },
               ]}
-              placeholder="Enter your email"
-              placeholderTextColor={colors.textSecondary}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="email"
-              textContentType="emailAddress"
-              value={email}
-              onChangeText={(value) => {
-                setEmail(value);
-                setEmailSent(false);
-              }}
-              editable={!loading}
-              returnKeyType="done"
-              onSubmitEditing={handleResetPassword}
-              maxLength={100}
-            />
-          </View>
-
-          {/* LIVE VALIDATION */}
-          {emailValidation.touched && (
-            <View style={styles.validationRow}>
-              <Ionicons
-                name={
-                  emailValidation.valid ? "checkmark-circle" : "alert-circle"
-                }
-                size={17}
-                color={emailValidation.valid ? "#2E7D32" : "#E53935"}
-              />
-
-              <Text
-                style={[
-                  styles.validationText,
-                  {
-                    color: emailValidation.valid ? "#2E7D32" : "#E53935",
-                  },
-                ]}
-              >
-                {emailValidation.valid
-                  ? "Email address looks valid"
-                  : "Please enter a valid email address"}
-              </Text>
-            </View>
-          )}
-
-          {/* RESET BUTTON */}
-          <TouchableOpacity
-            style={[
-              styles.resetButton,
-              {
-                backgroundColor: colors.primary,
-                opacity: loading || !emailValidation.valid ? 0.55 : 1,
-              },
-            ]}
-            onPress={handleResetPassword}
-            disabled={loading || !emailValidation.valid}
-            activeOpacity={0.85}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <>
-                <Ionicons
-                  name="paper-plane-outline"
-                  size={22}
-                  color="#FFFFFF"
-                />
-
-                <Text style={styles.resetButtonText}>Send Reset Email</Text>
-              </>
-            )}
-          </TouchableOpacity>
-
-          {/* BACK TO LOGIN */}
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
-            disabled={loading}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="arrow-back-outline"
-              size={18}
-              color={colors.primary}
-            />
-
-            <Text
-              style={[
-                styles.backText,
-                {
-                  color: colors.primary,
-                },
-              ]}
             >
-              Back to Login
+              Reset Your Password
             </Text>
-          </TouchableOpacity>
 
-          {/* INFO CARD */}
-          <View
-            style={[
-              styles.infoCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={22}
-              color={colors.primary}
-            />
-
+            {/* DESCRIPTION */}
             <Text
               style={[
-                styles.infoText,
+                styles.description,
                 {
                   color: colors.textSecondary,
                 },
               ]}
             >
-              For your security, we'll only provide reset instructions if the
-              email can be processed by AquaGuide AI.
+              Enter the email address associated with your AquaGuide AI account.
+              We'll send you instructions to create a new password.
             </Text>
+
+            {/* LABEL */}
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: colors.textPrimary,
+                },
+              ]}
+            >
+              Email Address
+            </Text>
+
+            {/* EMAIL INPUT */}
+            <View
+              style={[
+                styles.inputContainer,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: !emailValidation.touched
+                    ? colors.border
+                    : emailValidation.valid
+                      ? "#2E7D32"
+                      : "#E53935",
+                },
+              ]}
+            >
+              <Ionicons
+                name={
+                  emailValidation.valid ? "checkmark-circle" : "mail-outline"
+                }
+                size={22}
+                color={emailValidation.valid ? "#2E7D32" : colors.textSecondary}
+              />
+
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+                placeholder="Enter your email"
+                placeholderTextColor={colors.textSecondary}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="emailAddress"
+                value={email}
+                onChangeText={(value) => {
+                  setEmail(value);
+                  setEmailSent(false);
+                }}
+                editable={!loading}
+                returnKeyType="done"
+                onSubmitEditing={handleResetPassword}
+                maxLength={100}
+              />
+            </View>
+
+            {/* LIVE VALIDATION */}
+            {emailValidation.touched && (
+              <View style={styles.validationRow}>
+                <Ionicons
+                  name={
+                    emailValidation.valid ? "checkmark-circle" : "alert-circle"
+                  }
+                  size={17}
+                  color={emailValidation.valid ? "#2E7D32" : "#E53935"}
+                />
+
+                <Text
+                  style={[
+                    styles.validationText,
+                    {
+                      color: emailValidation.valid ? "#2E7D32" : "#E53935",
+                    },
+                  ]}
+                >
+                  {emailValidation.valid
+                    ? "Email address looks valid"
+                    : "Please enter a valid email address"}
+                </Text>
+              </View>
+            )}
+
+            {/* RESET BUTTON */}
+            <TouchableOpacity
+              style={[
+                styles.resetButton,
+                {
+                  backgroundColor: colors.primary,
+                  opacity: loading || !emailValidation.valid ? 0.55 : 1,
+                },
+              ]}
+              onPress={handleResetPassword}
+              disabled={loading || !emailValidation.valid}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <>
+                  <Ionicons
+                    name="paper-plane-outline"
+                    size={22}
+                    color="#FFFFFF"
+                  />
+
+                  <Text style={styles.resetButtonText}>Send Reset Email</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            {/* BACK TO LOGIN */}
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
+              disabled={loading}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="arrow-back-outline"
+                size={18}
+                color={colors.primary}
+              />
+
+              <Text
+                style={[
+                  styles.backText,
+                  {
+                    color: colors.primary,
+                  },
+                ]}
+              >
+                Back to Login
+              </Text>
+            </TouchableOpacity>
+
+            {/* INFO CARD */}
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={22}
+                color={colors.primary}
+              />
+
+              <Text
+                style={[
+                  styles.infoText,
+                  {
+                    color: colors.textSecondary,
+                  },
+                ]}
+              >
+                For your security, we'll only provide reset instructions if the
+                email can be processed by AquaGuide AI.
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -586,6 +658,28 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  authPanel: {
+    width: "100%",
+    maxWidth: 440,
+    alignSelf: "center",
+    borderRadius: 28,
+    borderWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    elevation: 8,
   },
 
   keyboard: {
@@ -778,7 +872,6 @@ const styles = StyleSheet.create({
   loginButton: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: "#00BCD4",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

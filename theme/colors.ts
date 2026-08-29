@@ -14,8 +14,8 @@ export const LightColors = {
 
   // Text
   white: "#FFFFFF",
-  textPrimary: "#003B57",
-  textSecondary: "#607D8B",
+  textPrimary: "#04293aff",
+  textSecondary: "#111d22ff",
   textMuted: "#90A4AE",
 
   // Status
@@ -44,7 +44,7 @@ export const DarkColors = {
   // Text
   white: "#FFFFFF",
   textPrimary: "#FFFFFF",
-  textSecondary: "#B0BEC5",
+  textSecondary: "#ced6daff",
   textMuted: "#90A4AE",
 
   // Status

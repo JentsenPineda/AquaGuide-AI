@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -6,6 +7,7 @@ import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -20,7 +22,14 @@ import {
 import { registerUser } from "../../services/authService";
 
 export default function RegisterScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const authenticationBackground = isDark
+    ? require("../../assets/images/authentication-background-dark.png")
+    : require("../../assets/images/authentication-background-light.png");
 
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
@@ -244,15 +253,28 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
-      <AppHeader title="Create Account" showBack />
+    <View style={styles.container}>
+      {/* Theme-specific authentication background */}
+      <Image
+        source={authenticationBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* Soft overlay keeps the form readable without hiding the artwork */}
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            backgroundColor: isDark
+              ? "rgba(3, 15, 25, 0.18)"
+              : "rgba(255, 255, 255, 0.08)",
+          },
+        ]}
+      />
+
+      <AppHeader title=" " showBack />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -263,314 +285,348 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Ionicons
-            name="fish"
-            size={80}
-            color="#00BCD4"
-            style={{ alignSelf: "center" }}
-          />
-
-          <Text
-            style={[
-              styles.title,
-              {
-                color: colors.textPrimary,
-              },
-            ]}
-          >
-            Create Account
-          </Text>
-
-          <Text
-            style={[
-              styles.subtitle,
-              {
-                color: colors.textSecondary,
-              },
-            ]}
-          >
-            Join AquaGuide AI and manage your aquarium smarter.
-          </Text>
-
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.card,
-                borderColor:
-                  fullName.length > 0
-                    ? validation.fullNameValid
-                      ? "#2E7D32"
-                      : "#E53935"
-                    : colors.border,
-                color: colors.textPrimary,
-              },
-            ]}
-            placeholderTextColor={colors.textSecondary}
-            placeholder="Full Name"
-            value={fullName}
-            onChangeText={setFullName}
-            autoCapitalize="words"
-            autoCorrect={false}
-            maxLength={60}
-          />
-
-          <ValidationRow
-            visible={fullName.length > 0}
-            valid={validation.fullNameValid}
-            text={
-              validation.fullNameValid
-                ? "Full name looks good"
-                : "Enter a valid full name"
-            }
-          />
-
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.card,
-                borderColor:
-                  username.length > 0
-                    ? validation.usernameValid
-                      ? "#2E7D32"
-                      : "#E53935"
-                    : colors.border,
-                color: colors.textPrimary,
-              },
-            ]}
-            placeholderTextColor={colors.textSecondary}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            autoCorrect={false}
-            maxLength={20}
-          />
-
-          <ValidationRow
-            visible={username.length > 0}
-            valid={validation.usernameValid}
-            text={
-              validation.usernameValid
-                ? "Username is valid"
-                : "Use 3–20 letters, numbers, or underscores"
-            }
-          />
-
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.card,
-                borderColor:
-                  email.length > 0
-                    ? validation.emailValid
-                      ? "#2E7D32"
-                      : "#E53935"
-                    : colors.border,
-                color: colors.textPrimary,
-              },
-            ]}
-            placeholderTextColor={colors.textSecondary}
-            placeholder="Email Address"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="email"
-            textContentType="emailAddress"
-            value={email}
-            onChangeText={setEmail}
-            maxLength={100}
-          />
-
-          <ValidationRow
-            visible={email.length > 0}
-            valid={validation.emailValid}
-            text={
-              validation.emailValid
-                ? "Email address is valid"
-                : "Enter a valid email address"
-            }
-          />
-
+          {/* Translucent registration panel */}
           <View
             style={[
-              styles.passwordContainer,
+              styles.authPanel,
               {
-                backgroundColor: colors.card,
-                borderColor:
-                  password.length > 0
-                    ? validation.passwordValid
-                      ? "#2E7D32"
-                      : "#E53935"
-                    : colors.border,
+                backgroundColor: isDark
+                  ? "rgba(10, 29, 43, 0.78)"
+                  : "rgba(255, 255, 255, 0.66)",
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(255,255,255,0.72)",
               },
             ]}
           >
-            <TextInput
+            <View style={styles.logoCircle}>
+              <Ionicons name="fish" size={58} color={colors.primary} />
+            </View>
+
+            <Text
               style={[
-                styles.passwordInput,
+                styles.title,
                 {
                   color: colors.textPrimary,
                 },
               ]}
-              placeholderTextColor={colors.textSecondary}
-              placeholder="Password"
-              secureTextEntry={secure1}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="new-password"
-              textContentType="newPassword"
-              value={password}
-              onChangeText={setPassword}
-              maxLength={64}
-            />
-
-            <TouchableOpacity
-              onPress={() => setSecure1(!secure1)}
-              activeOpacity={0.7}
             >
-              <Ionicons
-                name={secure1 ? "eye-off-outline" : "eye-outline"}
-                size={24}
-                color={colors.textSecondary}
-              />
-            </TouchableOpacity>
-          </View>
+              Create Account
+            </Text>
 
-          {password.length > 0 && (
-            <View
+            <Text
               style={[
-                styles.requirementsBox,
+                styles.subtitle,
                 {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
+                  color: colors.textSecondary,
                 },
               ]}
             >
-              <Text
+              Join AquaGuide AI and manage your aquarium smarter.
+            </Text>
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor:
+                    fullName.length > 0
+                      ? validation.fullNameValid
+                        ? "#2E7D32"
+                        : "#E53935"
+                      : colors.border,
+                  color: colors.textPrimary,
+                },
+              ]}
+              placeholderTextColor={colors.textSecondary}
+              placeholder="Full Name"
+              value={fullName}
+              onChangeText={setFullName}
+              autoCapitalize="words"
+              autoCorrect={false}
+              maxLength={60}
+            />
+
+            <ValidationRow
+              visible={fullName.length > 0}
+              valid={validation.fullNameValid}
+              text={
+                validation.fullNameValid
+                  ? "Full name looks good"
+                  : "Enter a valid full name"
+              }
+            />
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor:
+                    username.length > 0
+                      ? validation.usernameValid
+                        ? "#2E7D32"
+                        : "#E53935"
+                      : colors.border,
+                  color: colors.textPrimary,
+                },
+              ]}
+              placeholderTextColor={colors.textSecondary}
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              autoCorrect={false}
+              maxLength={20}
+            />
+
+            <ValidationRow
+              visible={username.length > 0}
+              valid={validation.usernameValid}
+              text={
+                validation.usernameValid
+                  ? "Username is valid"
+                  : "Use 3–20 letters, numbers, or underscores"
+              }
+            />
+
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor:
+                    email.length > 0
+                      ? validation.emailValid
+                        ? "#2E7D32"
+                        : "#E53935"
+                      : colors.border,
+                  color: colors.textPrimary,
+                },
+              ]}
+              placeholderTextColor={colors.textSecondary}
+              placeholder="Email Address"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="emailAddress"
+              value={email}
+              onChangeText={setEmail}
+              maxLength={100}
+            />
+
+            <ValidationRow
+              visible={email.length > 0}
+              valid={validation.emailValid}
+              text={
+                validation.emailValid
+                  ? "Email address is valid"
+                  : "Enter a valid email address"
+              }
+            />
+
+            <View
+              style={[
+                styles.passwordContainer,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor:
+                    password.length > 0
+                      ? validation.passwordValid
+                        ? "#2E7D32"
+                        : "#E53935"
+                      : colors.border,
+                },
+              ]}
+            >
+              <TextInput
                 style={[
-                  styles.requirementsTitle,
+                  styles.passwordInput,
                   {
                     color: colors.textPrimary,
                   },
                 ]}
+                placeholderTextColor={colors.textSecondary}
+                placeholder="Password"
+                secureTextEntry={secure1}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="new-password"
+                textContentType="newPassword"
+                value={password}
+                onChangeText={setPassword}
+                maxLength={64}
+              />
+
+              <TouchableOpacity
+                onPress={() => setSecure1(!secure1)}
+                activeOpacity={0.7}
               >
-                Password requirements
-              </Text>
-
-              <ValidationRow
-                visible
-                valid={validation.passwordLength}
-                text="At least 8 characters"
-              />
-
-              <ValidationRow
-                visible
-                valid={validation.passwordUppercase}
-                text="At least one uppercase letter"
-              />
-
-              <ValidationRow
-                visible
-                valid={validation.passwordLowercase}
-                text="At least one lowercase letter"
-              />
-
-              <ValidationRow
-                visible
-                valid={validation.passwordNumber}
-                text="At least one number"
-              />
-
-              <ValidationRow
-                visible
-                valid={validation.passwordSpecial}
-                text="At least one special character"
-              />
+                <Ionicons
+                  name={secure1 ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </TouchableOpacity>
             </View>
-          )}
 
-          <View
-            style={[
-              styles.passwordContainer,
-              {
-                backgroundColor: colors.card,
-                borderColor:
-                  confirmPassword.length > 0
-                    ? validation.confirmValid
-                      ? "#2E7D32"
-                      : "#E53935"
-                    : colors.border,
-              },
-            ]}
-          >
-            <TextInput
-              placeholder="Confirm Password"
-              placeholderTextColor={colors.textSecondary}
-              secureTextEntry={secure2}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="new-password"
-              textContentType="newPassword"
+            {password.length > 0 && (
+              <View
+                style={[
+                  styles.requirementsBox,
+                  {
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.06)"
+                      : "rgba(255,255,255,0.58)",
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.requirementsTitle,
+                    {
+                      color: colors.textPrimary,
+                    },
+                  ]}
+                >
+                  Password requirements
+                </Text>
+
+                <ValidationRow
+                  visible
+                  valid={validation.passwordLength}
+                  text="At least 8 characters"
+                />
+
+                <ValidationRow
+                  visible
+                  valid={validation.passwordUppercase}
+                  text="At least one uppercase letter"
+                />
+
+                <ValidationRow
+                  visible
+                  valid={validation.passwordLowercase}
+                  text="At least one lowercase letter"
+                />
+
+                <ValidationRow
+                  visible
+                  valid={validation.passwordNumber}
+                  text="At least one number"
+                />
+
+                <ValidationRow
+                  visible
+                  valid={validation.passwordSpecial}
+                  text="At least one special character"
+                />
+              </View>
+            )}
+
+            <View
               style={[
-                styles.passwordInput,
+                styles.passwordContainer,
                 {
-                  color: colors.textPrimary,
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.58)",
+                  borderColor:
+                    confirmPassword.length > 0
+                      ? validation.confirmValid
+                        ? "#2E7D32"
+                        : "#E53935"
+                      : colors.border,
                 },
               ]}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              maxLength={64}
+            >
+              <TextInput
+                placeholder="Confirm Password"
+                placeholderTextColor={colors.textSecondary}
+                secureTextEntry={secure2}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="new-password"
+                textContentType="newPassword"
+                style={[
+                  styles.passwordInput,
+                  {
+                    color: colors.textPrimary,
+                  },
+                ]}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                maxLength={64}
+              />
+
+              <TouchableOpacity
+                onPress={() => setSecure2(!secure2)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={secure2 ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ValidationRow
+              visible={confirmPassword.length > 0}
+              valid={validation.confirmValid}
+              text={
+                validation.confirmValid
+                  ? "Passwords match"
+                  : "Passwords do not match"
+              }
             />
 
             <TouchableOpacity
-              onPress={() => setSecure2(!secure2)}
+              style={[
+                styles.button,
+                {
+                  backgroundColor: colors.primary,
+                  opacity: loading ? 0.7 : 1,
+                },
+              ]}
+              disabled={loading}
+              onPress={handleRegister}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Create Account</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name={secure2 ? "eye-off-outline" : "eye-outline"}
-                size={24}
-                color={colors.textSecondary}
-              />
+              <Text
+                style={[
+                  styles.login,
+                  {
+                    color: colors.primary,
+                  },
+                ]}
+              >
+                Already have an account? Sign In
+              </Text>
             </TouchableOpacity>
           </View>
-
-          <ValidationRow
-            visible={confirmPassword.length > 0}
-            valid={validation.confirmValid}
-            text={
-              validation.confirmValid
-                ? "Passwords match"
-                : "Passwords do not match"
-            }
-          />
-
-          <TouchableOpacity
-            style={[
-              styles.button,
-              {
-                opacity: loading ? 0.7 : 1,
-              },
-            ]}
-            disabled={loading}
-            onPress={handleRegister}
-            activeOpacity={0.85}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.buttonText}>Create Account</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigateAfterKeyboardDismiss("/auth/login")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.login}>Already have an account? Sign In</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -582,18 +638,50 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
   content: {
-    padding: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 28,
     paddingBottom: 40,
     justifyContent: "center",
     flexGrow: 1,
+  },
+
+  authPanel: {
+    width: "100%",
+    maxWidth: 440,
+    alignSelf: "center",
+    borderRadius: 28,
+    borderWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    elevation: 8,
+  },
+
+  logoCircle: {
+    width: 82,
+    height: 82,
+    borderRadius: 41,
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
 
   title: {
     fontSize: 30,
     fontWeight: "800",
     textAlign: "center",
-    marginTop: 20,
   },
 
   subtitle: {
@@ -671,7 +759,6 @@ const styles = StyleSheet.create({
 
   login: {
     textAlign: "center",
-    color: "#00BCD4",
     marginTop: 24,
     fontWeight: "700",
     fontSize: 16,

@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
@@ -9,7 +10,15 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { equipmentData } from "../../data/equipmentDatabase";
 
 export default function EquipmentDetail() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
+
   const { category, equipment } = useLocalSearchParams();
 
   const selected = equipmentData[
@@ -18,14 +27,13 @@ export default function EquipmentDetail() {
 
   if (!selected) {
     return (
-      <View
-        style={[
-          styles.safe,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.safe}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <AppHeader title="Equipment Details" showBack />
 
         <View style={styles.empty}>
@@ -51,14 +59,13 @@ export default function EquipmentDetail() {
   }
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Equipment Details" showBack />
 
       <ScrollView
@@ -237,6 +244,10 @@ export default function EquipmentDetail() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

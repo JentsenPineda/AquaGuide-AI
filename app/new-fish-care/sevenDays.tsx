@@ -4,6 +4,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import ThemeText from "@/components/text/ThemeText";
 import { auth } from "@/config/firebase";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   completeFishCareDay,
   getPrograms,
@@ -22,6 +23,7 @@ import React, {
 import {
   ActivityIndicator,
   Animated,
+  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -73,8 +75,15 @@ const weekPlan = [
 const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
 
 export default function SevenDaysScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
   const user = auth.currentUser;
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
 
   const { programId: routeProgramId, unlockEarly } = useLocalSearchParams<{
     programId?: string;
@@ -484,14 +493,13 @@ export default function SevenDaysScreen() {
 
   if (loading) {
     return (
-      <View
-        style={[
-          styles.loadingContainer,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.loadingContainer}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <View
           style={[
             styles.loadingIcon,
@@ -529,14 +537,13 @@ export default function SevenDaysScreen() {
      ============================================================ */
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.container}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="New Fish Care" showBack />
 
       <ScrollView
@@ -1393,6 +1400,10 @@ export default function SevenDaysScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   content: {

@@ -1,7 +1,6 @@
-// app/(tabs)/new-fish-care/index.tsx
-
 import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   FishCareProgram,
   subscribeToPrograms,
@@ -13,6 +12,7 @@ import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -24,8 +24,15 @@ const TERMS_KEY = "new_fish_care_terms_accepted";
 const TERMS_VERSION = "1.0";
 
 export default function NewFishCareScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
   const { user } = useAuth();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
 
   const [programs, setPrograms] = useState<FishCareProgram[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,14 +106,13 @@ export default function NewFishCareScreen() {
 
   if (checkingTerms) {
     return (
-      <View
-        style={[
-          styles.loadingScreen,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.loadingScreen}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <ActivityIndicator size="large" color={colors.primary} />
 
         <Text
@@ -129,14 +135,13 @@ export default function NewFishCareScreen() {
 
   if (!user) {
     return (
-      <View
-        style={[
-          styles.screen,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.screen}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <AppHeader title="New Fish Care" showBack />
 
         <View style={styles.centerContent}>
@@ -238,14 +243,13 @@ export default function NewFishCareScreen() {
 
   if (!termsAccepted) {
     return (
-      <View
-        style={[
-          styles.screen,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.screen}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <AppHeader title="New Fish Care" showBack />
 
         <View style={styles.centerContent}>
@@ -323,14 +327,13 @@ export default function NewFishCareScreen() {
   /* ---------------------------------------------------------------------- */
 
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="New Fish Care" showBack />
 
       <ScrollView
@@ -882,6 +885,10 @@ export default function NewFishCareScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   /* -------------------------------------------------------------------- */

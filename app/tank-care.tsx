@@ -4,6 +4,7 @@ import ThemeInput from "@/components/inputs/ThemeInput";
 import AppHeader from "@/components/layout/AppHeader";
 import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
@@ -26,7 +27,15 @@ import { allFish } from "../data/allFish";
 import { fishProfiles } from "../data/fishProfiles";
 
 export default function TankCareScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../assets/images/dark-mode-bg3.png")
+    : require("../assets/images/light-mode-bg3.png");
+
   const { fish: fishParam } = useLocalSearchParams<{
     fish?: string | string[];
   }>();
@@ -243,7 +252,13 @@ export default function TankCareScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={[styles.safe, dynamicStyles.safe]}>
+      <View style={styles.safe}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <AppHeader title="Tank & Care" showBack />
         <ScrollView
           contentContainerStyle={styles.container}
@@ -252,7 +267,16 @@ export default function TankCareScreen() {
         >
           {/* HERO */}
 
-          <ThemeCard style={[styles.hero, dynamicStyles.hero]}>
+          <ThemeCard
+            style={[
+              styles.hero,
+              dynamicStyles.hero,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
+          >
             <View style={styles.heroHeader}>
               <Image
                 source={require("@/assets/images/image-library-UI/aquaguide-icon.webp")}
@@ -298,6 +322,11 @@ export default function TankCareScreen() {
                 style={[
                   styles.selectorCard,
                   dynamicStyles.selectorCard,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor:
+                      setupType === "Aquarium" ? colors.primary : colors.border,
+                  },
                   setupType === "Aquarium" && [
                     styles.selectorActive,
                     dynamicStyles.selectorActive,
@@ -329,6 +358,11 @@ export default function TankCareScreen() {
                 style={[
                   styles.selectorCard,
                   dynamicStyles.selectorCard,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor:
+                      setupType === "Pond" ? colors.primary : colors.border,
+                  },
                   setupType === "Pond" && [
                     styles.selectorActive,
                     dynamicStyles.selectorActive,
@@ -800,7 +834,11 @@ const styles = StyleSheet.create({
   },
   safe: {
     flex: 1,
-    backgroundColor: "#08141F",
+    backgroundColor: "transparent",
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

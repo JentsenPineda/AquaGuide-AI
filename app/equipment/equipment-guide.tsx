@@ -1,10 +1,18 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { equipmentCategories } from "../../data/equipmentDatabase";
 
@@ -30,17 +38,23 @@ const getCategoryIcon = (
 };
 
 export default function EquipmentGuide() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
 
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
+
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Equipment Guide" showBack />
 
       <ScrollView
@@ -272,6 +286,10 @@ export default function EquipmentGuide() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

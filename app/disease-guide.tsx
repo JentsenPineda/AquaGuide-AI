@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -18,6 +19,7 @@ import ThemeInput from "@/components/inputs/ThemeInput";
 import AppHeader from "@/components/layout/AppHeader";
 import ThemeText from "@/components/text/ThemeText";
 
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
@@ -28,7 +30,14 @@ import { symptomDatabase } from "../data/symptomDatabase";
 import { symptomIntentDatabase } from "../data/symptomIntentDatabase";
 
 export default function DiseaseGuide() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../assets/images/dark-mode-bg3.png")
+    : require("../assets/images/light-mode-bg3.png");
 
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +73,7 @@ export default function DiseaseGuide() {
     },
 
     symptomCard: {
-      backgroundColor: colors.card,
+      backgroundColor: colors.surface,
       borderColor: colors.border,
     },
 
@@ -214,7 +223,13 @@ export default function DiseaseGuide() {
     }, 2000);
   };
   return (
-    <View style={[styles.safe, dynamicStyles.safe]}>
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Disease Guide" showBack />
       <ScrollView
         contentContainerStyle={styles.container}
@@ -662,6 +677,10 @@ export default function DiseaseGuide() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

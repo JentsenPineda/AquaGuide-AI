@@ -1,16 +1,31 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const TERMS_KEY = "new_fish_care_terms_accepted";
 const TERMS_VERSION = "1.0";
 
 export default function NewFishCareTerms() {
   const colors = useAppColors();
+
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
 
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,14 +49,13 @@ export default function NewFishCareTerms() {
   };
 
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="New Fish Care" subtitle="Important Notice" showBack />
 
       <ScrollView
@@ -322,8 +336,8 @@ export default function NewFishCareTerms() {
           style={[
             styles.finalCard,
             {
-              backgroundColor: colors.primary + "0D",
-              borderColor: colors.primary + "35",
+              backgroundColor: colors.card,
+              borderColor: colors.border,
             },
           ]}
         >
@@ -511,6 +525,10 @@ function TermsSection({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   content: {

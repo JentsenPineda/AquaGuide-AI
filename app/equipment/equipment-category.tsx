@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -16,7 +17,15 @@ import {
 import { equipmentData } from "../../data/equipmentDatabase";
 
 export default function EquipmentCategory() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
+
   const { category } = useLocalSearchParams();
 
   const categoryKey = String(category);
@@ -29,14 +38,13 @@ export default function EquipmentCategory() {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
   return (
-    <View
-      style={[
-        styles.safe,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.safe}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Equipment Categories" showBack />
 
       <ScrollView
@@ -198,6 +206,10 @@ export default function EquipmentCategory() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

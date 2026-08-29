@@ -2,6 +2,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import AvatarPicker from "@/components/profile/AvatarPicker";
 import { AvatarId, getAvatarSource } from "@/constants/avatar";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -154,8 +155,16 @@ function StatCard({
 }
 
 export default function ProfileScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
   const { user, loading, logout } = useAuth();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/module-background-dark.png")
+    : require("../../assets/images/module-background-light.png");
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [reminderCount, setReminderCount] = useState(0);
   const [showDeletePasswordModal, setShowDeletePasswordModal] = useState(false);
@@ -246,14 +255,12 @@ export default function ProfileScreen() {
 
   if (loading || !user) {
     return (
-      <View
-        style={[
-          styles.loadingScreen,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.loadingScreen}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -341,14 +348,13 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Profile" showBack />
 
       <ScrollView
@@ -940,6 +946,10 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   loadingScreen: {

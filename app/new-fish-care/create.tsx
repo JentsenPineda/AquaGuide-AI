@@ -5,6 +5,7 @@ import ReminderDatePickerModal from "@/components/reminder/ReminderDatePickerMod
 import ThemeText from "@/components/text/ThemeText";
 import { TAB_BAR_HEIGHT } from "@/constants/layout";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { createProgram } from "@/services/newFishCareService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,6 +13,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -43,8 +45,15 @@ const SPECIES = [
 const OTHER_SPECIES = "Other / Not Listed";
 
 export default function CreateFishCareProgramScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
   const { user } = useAuth();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
 
   const [fishName, setFishName] = useState("");
   const [species, setSpecies] = useState("");
@@ -156,7 +165,13 @@ export default function CreateFishCareProgramScreen() {
   };
 
   return (
-    <View style={[styles.screen, dynamicStyles.screen]}>
+    <View style={styles.screen}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader
         title="New Fish Care"
         subtitle="Start a 7-Day Care Program"
@@ -545,6 +560,10 @@ export default function CreateFishCareProgramScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   content: {

@@ -18,6 +18,7 @@ export default function ReminderTimeCard({
 
   return (
     <View style={styles.container}>
+      {/* SECTION TITLE */}
       <Text
         style={[
           styles.title,
@@ -29,28 +30,34 @@ export default function ReminderTimeCard({
         Reminder Time
       </Text>
 
+      {/* TIME CARD */}
       <Pressable
         onPress={onPress}
-        style={[
+        style={({ pressed }) => [
           styles.card,
           {
             backgroundColor: colors.card,
             borderColor: accentColor,
+            opacity: pressed ? 0.9 : 1,
+            transform: [{ scale: pressed ? 0.99 : 1 }],
           },
         ]}
       >
-        <View
-          style={[
-            styles.iconContainer,
-            {
-              backgroundColor: `${accentColor}18`,
-            },
-          ]}
-        >
-          <Ionicons name="time-outline" size={28} color={accentColor} />
-        </View>
+        {/* CENTER TIME AREA */}
+        <View style={styles.centerArea}>
+          {/* CLOCK */}
+          <View
+            style={[
+              styles.iconContainer,
+              {
+                backgroundColor: `${accentColor}18`,
+              },
+            ]}
+          >
+            <Ionicons name="time-outline" size={30} color={accentColor} />
+          </View>
 
-        <View style={styles.content}>
+          {/* TIME */}
           <Text
             style={[
               styles.time,
@@ -62,6 +69,7 @@ export default function ReminderTimeCard({
             {time}
           </Text>
 
+          {/* SUBTITLE */}
           <Text
             style={[
               styles.subtitle,
@@ -74,7 +82,17 @@ export default function ReminderTimeCard({
           </Text>
         </View>
 
-        <Ionicons name="chevron-forward" size={22} color={accentColor} />
+        {/* RIGHT ARROW */}
+        <View
+          style={[
+            styles.arrowContainer,
+            {
+              backgroundColor: `${accentColor}12`,
+            },
+          ]}
+        >
+          <Ionicons name="chevron-forward" size={20} color={accentColor} />
+        </View>
       </Pressable>
     </View>
   );
@@ -92,11 +110,17 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    flexDirection: "row",
-    alignItems: "center",
+    minHeight: 190,
     borderRadius: 22,
     borderWidth: 2,
-    padding: 20,
+
+    position: "relative",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    paddingVertical: 24,
+    paddingHorizontal: 22,
 
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -109,27 +133,47 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
+  centerArea: {
+    width: "100%",
     alignItems: "center",
-    marginRight: 18,
+    justifyContent: "center",
   },
 
-  content: {
-    flex: 1,
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    marginBottom: 12,
   },
 
   time: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: "800",
-    letterSpacing: -0.5,
+    letterSpacing: -0.6,
+    textAlign: "center",
+    lineHeight: 38,
   },
 
   subtitle: {
-    marginTop: 4,
-    fontSize: 14,
+    marginTop: 5,
+    fontSize: 13,
+    textAlign: "center",
+  },
+
+  arrowContainer: {
+    position: "absolute",
+    right: 16,
+    top: 16,
+
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

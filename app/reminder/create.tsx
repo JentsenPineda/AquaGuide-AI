@@ -11,14 +11,16 @@ import ReminderTypeTile from "@/components/reminder/ReminderTypeTile";
 import RepeatSelector from "@/components/reminder/RepeatSelector";
 import SaveReminderButton from "@/components/reminder/SaveReminderButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { addReminder } from "@/services/reminderService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, StyleSheet, Text, View } from "react-native";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 const reminderTypes: {
   title: ReminderType;
   icon: keyof typeof Ionicons.glyphMap;
@@ -42,16 +44,42 @@ const reminderAccentColors: Record<ReminderType, string> = {
 
 export default function CreateReminderScreen() {
   const colors = useAppColors();
-  const [selectedType, setSelectedType] = useState<ReminderType>("Feeding");
+  const { colorScheme } = useTheme();
   const { user } = useAuth();
+
+  const isDark = colorScheme === "dark";
+
+  /*
+   * Background images
+   *
+   * File location:
+   * app/reminder/create.tsx
+   *
+   * Therefore:
+   * ../../assets/images/
+   */
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
+
+  const [selectedType, setSelectedType] = useState<ReminderType>("Feeding");
+
   const [selectedRepeat, setSelectedRepeat] = useState<ReminderRepeat>("Daily");
+
   const [selectedWeekDay, setSelectedWeekDay] = useState("Mon");
+
   const [selectedMonthDay, setSelectedMonthDay] = useState(1);
+
   const [notes, setNotes] = useState("");
+
   const [saving, setSaving] = useState(false);
+
   const [time, setTime] = useState(new Date());
+
   const [showTimePicker, setShowTimePicker] = useState(false);
+
   const accentColor = reminderAccentColors[selectedType];
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], {
       hour: "2-digit",
@@ -100,22 +128,22 @@ export default function CreateReminderScreen() {
       setSaving(false);
     }
   };
+
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
       <AppHeader title="Create Reminder" showBack />
 
       <KeyboardAwareScrollView
         style={[
           styles.container,
           {
-            backgroundColor: colors.background,
+            backgroundColor: "transparent",
           },
         ]}
         contentContainerStyle={styles.content}
@@ -152,6 +180,8 @@ export default function CreateReminderScreen() {
             Choose a reminder type to begin.
           </Text>
         </View>
+
+        {/* REMINDER TYPES */}
 
         <View style={styles.section}>
           {reminderTypes.map((item) => (
@@ -191,17 +221,29 @@ export default function CreateReminderScreen() {
           ))}
         </View>
 
+        {/* ======================================================== */}
+        {/* REMINDER TIME                                             */}
+        {/* ======================================================== */}
+
         <ReminderTimeCard
           time={formatTime(time)}
           accentColor={accentColor}
           onPress={() => setShowTimePicker(true)}
         />
 
+        {/* ======================================================== */}
+        {/* REPEAT                                                    */}
+        {/* ======================================================== */}
+
         <RepeatSelector
           value={selectedRepeat}
           accentColor={accentColor}
           onChange={setSelectedRepeat}
         />
+
+        {/* ======================================================== */}
+        {/* SCHEDULE                                                   */}
+        {/* ======================================================== */}
 
         <ReminderScheduleSelector
           repeat={selectedRepeat}
@@ -212,7 +254,15 @@ export default function CreateReminderScreen() {
           onMonthDayChange={setSelectedMonthDay}
         />
 
+        {/* ======================================================== */}
+        {/* NOTES                                                      */}
+        {/* ======================================================== */}
+
         <ReminderNotesCard value={notes} onChangeText={setNotes} />
+
+        {/* ======================================================== */}
+        {/* SAVE                                                       */}
+        {/* ======================================================== */}
 
         <View style={styles.footer}>
           <SaveReminderButton
@@ -222,6 +272,11 @@ export default function CreateReminderScreen() {
           />
         </View>
       </KeyboardAwareScrollView>
+
+      {/* ======================================================== */}
+      {/* TIME PICKER                                                */}
+      {/* ======================================================== */}
+
       <ReminderTimePickerModal
         visible={showTimePicker}
         hours={time.getHours()}
@@ -244,6 +299,10 @@ export default function CreateReminderScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   container: {

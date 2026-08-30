@@ -1,34 +1,51 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function PrivacyPolicyScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
 
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
+
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      {/* ======================================================== */}
+      {/* LIGHT / DARK MODE BACKGROUND                             */}
+      {/* ======================================================== */}
+
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* ======================================================== */}
+      {/* APP HEADER                                                */}
+      {/* ======================================================== */}
+
       <AppHeader title="Privacy Policy" showBack />
 
+      {/* ======================================================== */}
+      {/* CONTENT                                                   */}
+      {/* ======================================================== */}
+
       <ScrollView
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
+        style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
+        {/* ====================================================== */}
+        {/* HEADER                                                   */}
+        {/* ====================================================== */}
+
         <View style={styles.header}>
           <Ionicons name="shield-checkmark" size={65} color={colors.primary} />
 
@@ -55,7 +72,10 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </View>
 
-        {/* Information We Collect */}
+        {/* ====================================================== */}
+        {/* INFORMATION WE COLLECT                                  */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -91,7 +111,10 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </View>
 
-        {/* How Your Data Is Used */}
+        {/* ====================================================== */}
+        {/* HOW YOUR DATA IS USED                                   */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -126,7 +149,10 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </View>
 
-        {/* Data Security */}
+        {/* ====================================================== */}
+        {/* DATA SECURITY                                            */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -162,7 +188,10 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </View>
 
-        {/* AI Image Recognition */}
+        {/* ====================================================== */}
+        {/* AI IMAGE RECOGNITION                                    */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -197,7 +226,10 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </View>
 
-        {/* Contact */}
+        {/* ====================================================== */}
+        {/* CONTACT                                                  */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -232,6 +264,10 @@ export default function PrivacyPolicyScreen() {
           </Text>
         </View>
 
+        {/* ====================================================== */}
+        {/* FOOTER                                                   */}
+        {/* ====================================================== */}
+
         <Text
           style={[
             styles.footer,
@@ -249,18 +285,35 @@ export default function PrivacyPolicyScreen() {
 }
 
 const styles = StyleSheet.create({
+  /* ================================================================ */
+  /* SCREEN                                                            */
+  /* ================================================================ */
+
   screen: {
     flex: 1,
   },
 
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  /* ================================================================ */
+  /* CONTENT                                                           */
+  /* ================================================================ */
+
   container: {
     flex: 1,
+    backgroundColor: "transparent",
   },
 
   content: {
     padding: 20,
     paddingBottom: 40,
   },
+
+  /* ================================================================ */
+  /* HEADER                                                            */
+  /* ================================================================ */
 
   header: {
     alignItems: "center",
@@ -278,6 +331,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
   },
+
+  /* ================================================================ */
+  /* SOLID PANELS                                                      */
+  /* ================================================================ */
 
   card: {
     borderRadius: 18,
@@ -297,6 +354,10 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontSize: 15,
   },
+
+  /* ================================================================ */
+  /* FOOTER                                                            */
+  /* ================================================================ */
 
   footer: {
     marginTop: 20,

@@ -5,6 +5,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import ReminderDatePickerModal from "@/components/reminder/ReminderDatePickerModal";
 import ReminderTimePickerModal from "@/components/reminder/ReminderTimePickerModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { addLog } from "@/services/logbookService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,6 +13,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   FlatList,
+  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -75,8 +77,15 @@ const activities = [
 
 export default function CreateLogbookScreen() {
   const { user } = useAuth();
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
   const insets = useSafeAreaInsets();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
 
   const [notes, setNotes] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -139,17 +148,21 @@ export default function CreateLogbookScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      {/* BACKGROUND */}
+
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* APP HEADER */}
+
       <AppHeader title="New Log Entry" showBack />
 
       <KeyboardAwareScrollView
+        style={styles.scrollView}
         enableOnAndroid
         extraScrollHeight={32}
         keyboardShouldPersistTaps="handled"
@@ -417,12 +430,14 @@ export default function CreateLogbookScreen() {
 
         {/* DATE & TIME */}
 
-        <LogDateTimeCard
-          date={formatDate(selectedDate)}
-          time={formatTime(selectedDate)}
-          onDatePress={() => setShowDatePicker(true)}
-          onTimePress={() => setShowTimePicker(true)}
-        />
+        <View style={styles.dateTimeWrapper}>
+          <LogDateTimeCard
+            date={formatDate(selectedDate)}
+            time={formatTime(selectedDate)}
+            onDatePress={() => setShowDatePicker(true)}
+            onTimePress={() => setShowTimePicker(true)}
+          />
+        </View>
 
         {/* NOTES */}
 
@@ -490,6 +505,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  scrollView: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+
   content: {
     padding: 22,
     paddingBottom: 140,
@@ -523,6 +547,7 @@ const styles = StyleSheet.create({
   },
 
   activitySelector: {
+    width: "100%",
     borderRadius: 18,
     borderWidth: 1,
     paddingHorizontal: 18,
@@ -557,6 +582,19 @@ const styles = StyleSheet.create({
   activityValue: {
     fontSize: 17,
     fontWeight: "700",
+  },
+
+  /*
+   * Keeps the Date & Time component centered and
+   * gives it the full available width.
+   *
+   * The internal clock layout itself belongs to
+   * LogDateTimeCard.tsx and is intentionally untouched.
+   */
+  dateTimeWrapper: {
+    width: "100%",
+    alignSelf: "center",
+    marginTop: 14,
   },
 
   modalOverlay: {

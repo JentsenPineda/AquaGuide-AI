@@ -5,6 +5,7 @@ import ReminderCard, {
   ReminderType,
 } from "@/components/reminder/ReminderCard";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   deleteReminder as deleteReminderFromFirestore,
   subscribeToReminders,
@@ -14,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -33,7 +35,14 @@ type ReminderItem = {
 
 export default function ReminderScreen() {
   const { user } = useAuth();
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
 
   const firstName = user?.displayName?.split(" ")[0] || "Aquarist";
 
@@ -80,14 +89,13 @@ export default function ReminderScreen() {
 
   if (!user) {
     return (
-      <View
-        style={[
-          styles.loginContainer,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.loginContainer}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <Ionicons name="lock-closed" size={48} color={colors.primary} />
 
         <Text
@@ -105,21 +113,31 @@ export default function ReminderScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      {/* ================================================================ */}
+      {/* LIGHT / DARK BACKGROUND                                         */}
+      {/* ================================================================ */}
+
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* ================================================================ */}
+      {/* APP HEADER                                                       */}
+      {/* ================================================================ */}
+
       <AppHeader title=" Reminder " showBack />
 
       <ScrollView
         contentContainerStyle={[styles.container, styles.content]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero */}
+        {/* ============================================================ */}
+        {/* HERO                                                         */}
+        {/* ============================================================ */}
+
         <View style={styles.heroCard}>
           <Text style={styles.heroGreeting}>{greeting}</Text>
 
@@ -129,7 +147,8 @@ export default function ReminderScreen() {
             <Text style={styles.heroCount}>{reminders.length}</Text>
 
             <Text style={styles.heroCountLabel}>
-              Active Reminder{reminders.length !== 1 ? "s" : ""}
+              Active Reminder
+              {reminders.length !== 1 ? "s" : ""}
             </Text>
           </View>
 
@@ -156,7 +175,10 @@ export default function ReminderScreen() {
           )}
         </View>
 
-        {/* Today's Schedule */}
+        {/* ============================================================ */}
+        {/* TODAY'S SCHEDULE                                              */}
+        {/* ============================================================ */}
+
         <SectionCard
           title="Today's Schedule"
           subtitle="Your scheduled fish care reminders."
@@ -209,7 +231,10 @@ export default function ReminderScreen() {
         </SectionCard>
       </ScrollView>
 
-      {/* Add Reminder */}
+      {/* ================================================================ */}
+      {/* ADD REMINDER                                                    */}
+      {/* ================================================================ */}
+
       <TouchableOpacity
         style={[
           styles.fab,
@@ -227,10 +252,24 @@ export default function ReminderScreen() {
 }
 
 const styles = StyleSheet.create({
+  /*
+   * Main screen remains transparent so the mode-specific
+   * background image can be displayed underneath the content.
+   */
   screen: {
     flex: 1,
   },
 
+  /*
+   * Full-screen light/dark background.
+   */
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  /*
+   * Login redirect state.
+   */
   loginContainer: {
     flex: 1,
     justifyContent: "center",
@@ -251,6 +290,12 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
+  /*
+   * HERO
+   *
+   * This remains a solid feature panel.
+   * It is intentionally NOT transparent.
+   */
   heroCard: {
     backgroundColor: "#0EA5E9",
     borderRadius: 24,
@@ -317,6 +362,9 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.92)",
   },
 
+  /*
+   * EMPTY STATE
+   */
   emptyState: {
     alignItems: "center",
     paddingVertical: 30,
@@ -335,6 +383,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
+  /*
+   * FLOATING ADD BUTTON
+   */
   fab: {
     position: "absolute",
     right: 24,
@@ -352,6 +403,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 8,
+
     shadowOffset: {
       width: 0,
       height: 4,

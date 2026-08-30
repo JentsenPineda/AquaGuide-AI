@@ -1,5 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { deleteLog, LogItem, subscribeToLogs } from "@/services/logbookService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,6 +8,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -65,6 +67,7 @@ const formatLogDate = (dateString: string) => {
   yesterday.setDate(today.getDate() - 1);
 
   const isToday = date.toDateString() === today.toDateString();
+
   const isYesterday = date.toDateString() === yesterday.toDateString();
 
   const time = date.toLocaleTimeString([], {
@@ -91,7 +94,21 @@ const formatLogDate = (dateString: string) => {
 
 export default function LogbookScreen() {
   const { user } = useAuth();
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
+
+  const isDark = colorScheme === "dark";
+
+  /*
+   * Background used throughout the app.
+   *
+   * IMPORTANT:
+   * This file is assumed to be inside:
+   * app/(tabs)/logbook.tsx
+   */
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg.png")
+    : require("../../assets/images/light-mode-bg.png");
 
   const [logs, setLogs] = useState<LogItem[]>([]);
 
@@ -146,16 +163,18 @@ export default function LogbookScreen() {
     }
   }, [user]);
 
+  /*
+   * LOGIN REDIRECT
+   */
   if (!user) {
     return (
-      <View
-        style={[
-          styles.loginContainer,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
+      <View style={styles.loginContainer}>
+        <Image
+          source={modeBackground}
+          resizeMode="cover"
+          style={styles.backgroundImage}
+        />
+
         <Ionicons name="lock-closed" size={48} color={colors.primary} />
 
         <Text
@@ -173,21 +192,31 @@ export default function LogbookScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      {/* ============================================================ */}
+      {/* LIGHT / DARK BACKGROUND                                      */}
+      {/* ============================================================ */}
+
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* ============================================================ */}
+      {/* APP HEADER                                                   */}
+      {/* ============================================================ */}
+
       <AppHeader title="Logbook" showBack />
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* HERO */}
+        {/* ======================================================== */}
+        {/* HERO                                                     */}
+        {/* ======================================================== */}
+
         <View style={styles.heroCard}>
           <Text style={styles.heroGreeting}>{greeting}</Text>
 
@@ -222,7 +251,10 @@ export default function LogbookScreen() {
           )}
         </View>
 
-        {/* RECENT ACTIVITY */}
+        {/* ======================================================== */}
+        {/* RECENT ACTIVITY                                          */}
+        {/* ======================================================== */}
+
         <View style={styles.section}>
           <Text
             style={[
@@ -245,6 +277,10 @@ export default function LogbookScreen() {
           >
             Your aquarium care history will appear here.
           </Text>
+
+          {/* ==================================================== */}
+          {/* EMPTY STATE                                           */}
+          {/* ==================================================== */}
 
           {logs.length === 0 ? (
             <View
@@ -292,6 +328,10 @@ export default function LogbookScreen() {
               </TouchableOpacity>
             </View>
           ) : (
+            /* ================================================== */
+            /* LOG LIST                                             */
+            /* ================================================== */
+
             <View>
               {logs.map((log) => {
                 const activity =
@@ -373,9 +413,17 @@ export default function LogbookScreen() {
         </View>
       </ScrollView>
 
-      {/* FAB */}
+      {/* ============================================================ */}
+      {/* FAB                                                            */}
+      {/* ============================================================ */}
+
       <TouchableOpacity
-        style={styles.fab}
+        style={[
+          styles.fab,
+          {
+            backgroundColor: colors.primary,
+          },
+        ]}
         activeOpacity={0.85}
         onPress={() => router.push("/logbook/create")}
       >
@@ -386,8 +434,19 @@ export default function LogbookScreen() {
 }
 
 const styles = StyleSheet.create({
+  /*
+   * Main screen is transparent so the mode background
+   * image can remain visible.
+   */
   screen: {
     flex: 1,
+  },
+
+  /*
+   * Full-screen light/dark background.
+   */
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   content: {
@@ -395,6 +454,9 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
+  /*
+   * Login redirect screen.
+   */
   loginContainer: {
     flex: 1,
     justifyContent: "center",
@@ -406,8 +468,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  /* HERO */
+  /* ================================================================ */
+  /* HERO                                                             */
+  /* ================================================================ */
 
+  /*
+   * Solid hero panel.
+   * It is intentionally NOT transparent.
+   */
   heroCard: {
     backgroundColor: "#0EA5E9",
     borderRadius: 24,
@@ -472,7 +540,9 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.92)",
   },
 
-  /* RECENT ACTIVITY */
+  /* ================================================================ */
+  /* RECENT ACTIVITY                                                  */
+  /* ================================================================ */
 
   section: {
     marginTop: 28,
@@ -488,8 +558,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
-  /* EMPTY STATE */
+  /* ================================================================ */
+  /* EMPTY STATE                                                      */
+  /* ================================================================ */
 
+  /*
+   * Solid panel using the app theme.
+   */
   emptyCard: {
     marginTop: 18,
     borderRadius: 20,
@@ -516,8 +591,13 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
-  /* LOG CARD */
+  /* ================================================================ */
+  /* LOG CARD                                                         */
+  /* ================================================================ */
 
+  /*
+   * Solid log cards.
+   */
   logCard: {
     borderRadius: 20,
     padding: 18,
@@ -559,7 +639,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
-  /* BUTTONS */
+  /* ================================================================ */
+  /* BUTTONS                                                          */
+  /* ================================================================ */
 
   createButton: {
     marginTop: 24,
@@ -579,20 +661,28 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
+  /* ================================================================ */
+  /* FAB                                                              */
+  /* ================================================================ */
+
   fab: {
     position: "absolute",
     right: 24,
     bottom: 28,
+
     width: 62,
     height: 62,
     borderRadius: 31,
-    backgroundColor: "#00BCD4",
+
     justifyContent: "center",
     alignItems: "center",
+
     elevation: 8,
+
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 8,
+
     shadowOffset: {
       width: 0,
       height: 4,

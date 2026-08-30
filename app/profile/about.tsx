@@ -1,34 +1,51 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function AboutScreen() {
+  const { colorScheme } = useTheme();
   const colors = useAppColors();
 
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
+
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      {/* ======================================================== */}
+      {/* LIGHT / DARK MODE BACKGROUND                             */}
+      {/* ======================================================== */}
+
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* ======================================================== */}
+      {/* APP HEADER                                                */}
+      {/* ======================================================== */}
+
       <AppHeader title="About AquaGuide AI" showBack />
 
+      {/* ======================================================== */}
+      {/* CONTENT                                                   */}
+      {/* ======================================================== */}
+
       <ScrollView
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
+        style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* App Header */}
+        {/* ====================================================== */}
+        {/* APP HEADER / HERO                                       */}
+        {/* ====================================================== */}
+
         <View style={styles.hero}>
           <View
             style={[
@@ -65,7 +82,10 @@ export default function AboutScreen() {
           </Text>
         </View>
 
-        {/* About */}
+        {/* ====================================================== */}
+        {/* ABOUT                                                    */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -101,7 +121,10 @@ export default function AboutScreen() {
           </Text>
         </View>
 
-        {/* Features */}
+        {/* ====================================================== */}
+        {/* FEATURES                                                 */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -123,14 +146,22 @@ export default function AboutScreen() {
           </Text>
 
           <FeatureItem title="AI Fish Identification" colors={colors} />
+
           <FeatureItem title="Species Library" colors={colors} />
+
           <FeatureItem title="Fish Care Guides" colors={colors} />
+
           <FeatureItem title="Disease Guide" colors={colors} />
+
           <FeatureItem title="Reminder System" colors={colors} />
+
           <FeatureItem title="Care Logbook" colors={colors} />
         </View>
 
-        {/* Developers */}
+        {/* ====================================================== */}
+        {/* DEVELOPMENT TEAM                                        */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -182,7 +213,10 @@ export default function AboutScreen() {
           />
         </View>
 
-        {/* School */}
+        {/* ====================================================== */}
+        {/* SCHOOL                                                   */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
@@ -243,6 +277,10 @@ export default function AboutScreen() {
           </View>
         </View>
 
+        {/* ====================================================== */}
+        {/* FOOTER                                                   */}
+        {/* ====================================================== */}
+
         <Text
           style={[
             styles.footer,
@@ -258,6 +296,10 @@ export default function AboutScreen() {
     </View>
   );
 }
+
+/* ================================================================= */
+/* FEATURE ITEM                                                      */
+/* ================================================================= */
 
 function FeatureItem({
   title,
@@ -283,6 +325,10 @@ function FeatureItem({
     </View>
   );
 }
+
+/* ================================================================= */
+/* DEVELOPER ITEM                                                    */
+/* ================================================================= */
 
 function DeveloperItem({
   role,
@@ -324,18 +370,31 @@ function DeveloperItem({
   );
 }
 
+/* ================================================================= */
+/* STYLES                                                             */
+/* ================================================================= */
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
 
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
   container: {
     flex: 1,
+    backgroundColor: "transparent",
   },
 
   content: {
     paddingBottom: 40,
   },
+
+  /* ================================================================ */
+  /* HERO                                                             */
+  /* ================================================================ */
 
   hero: {
     alignItems: "center",
@@ -367,6 +426,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
+  /* ================================================================ */
+  /* SOLID CARDS                                                      */
+  /* ================================================================ */
+
   card: {
     marginHorizontal: 18,
     marginBottom: 18,
@@ -389,6 +452,10 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
+  /* ================================================================ */
+  /* FEATURES                                                         */
+  /* ================================================================ */
+
   listItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -399,6 +466,10 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 15,
   },
+
+  /* ================================================================ */
+  /* DEVELOPERS                                                       */
+  /* ================================================================ */
 
   developerRow: {
     flexDirection: "row",
@@ -421,6 +492,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
+  /* ================================================================ */
+  /* SCHOOL                                                           */
+  /* ================================================================ */
+
   schoolRow: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -440,6 +515,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 15,
   },
+
+  /* ================================================================ */
+  /* FOOTER                                                           */
+  /* ================================================================ */
 
   footer: {
     textAlign: "center",

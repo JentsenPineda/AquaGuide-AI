@@ -1,7 +1,9 @@
 import AppHeader from "@/components/layout/AppHeader";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Switch,
@@ -10,43 +12,50 @@ import {
   View,
 } from "react-native";
 
-import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 
 export default function DarkModeScreen() {
   const { mode, colorScheme, setMode } = useTheme();
   const colors = useAppColors();
-  console.log("Theme Mode:", mode);
-  console.log("Color Scheme:", colorScheme);
+
+  const isDark = colorScheme === "dark";
+
+  const modeBackground = isDark
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
+
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: colors.background,
-        },
-      ]}
-    >
+    <View style={styles.screen}>
+      {/* ======================================================== */}
+      {/* LIGHT / DARK MODE BACKGROUND                             */}
+      {/* ======================================================== */}
+
+      <Image
+        source={modeBackground}
+        resizeMode="cover"
+        style={styles.backgroundImage}
+      />
+
+      {/* ======================================================== */}
+      {/* APP HEADER                                                */}
+      {/* ======================================================== */}
+
       <AppHeader title="Theme Settings" showBack />
 
+      {/* ======================================================== */}
+      {/* CONTENT                                                   */}
+      {/* ======================================================== */}
+
       <ScrollView
-        style={[
-          styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
+        style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View
-          style={[
-            styles.header,
-            {
-              backgroundColor: colors.background,
-            },
-          ]}
-        >
+        {/* ====================================================== */}
+        {/* APPEARANCE HEADER                                       */}
+        {/* ====================================================== */}
+
+        <View style={styles.header}>
           <Ionicons name="moon" size={60} color="#00BCD4" />
 
           <Text
@@ -59,6 +68,7 @@ export default function DarkModeScreen() {
           >
             Appearance
           </Text>
+
           <Text
             style={[
               styles.subtitle,
@@ -71,16 +81,21 @@ export default function DarkModeScreen() {
           </Text>
         </View>
 
+        {/* ====================================================== */}
+        {/* SETTINGS CARD — SOLID                                   */}
+        {/* ====================================================== */}
+
         <View
           style={[
             styles.card,
             {
               backgroundColor: colors.card,
               borderColor: colors.border,
-              borderWidth: 1,
             },
           ]}
         >
+          {/* DARK MODE */}
+
           <View style={styles.row}>
             <View style={styles.left}>
               <Ionicons name="moon-outline" size={22} color="#00BCD4" />
@@ -109,6 +124,7 @@ export default function DarkModeScreen() {
                 </Text>
               </View>
             </View>
+
             <Switch
               value={mode === "dark"}
               onValueChange={(value) => setMode(value ? "dark" : "light")}
@@ -125,6 +141,9 @@ export default function DarkModeScreen() {
               }
             />
           </View>
+
+          {/* DIVIDER */}
+
           <View
             style={[
               styles.divider,
@@ -133,6 +152,9 @@ export default function DarkModeScreen() {
               },
             ]}
           />
+
+          {/* SYSTEM THEME */}
+
           <View style={styles.row}>
             <View style={styles.left}>
               <Ionicons
@@ -152,6 +174,7 @@ export default function DarkModeScreen() {
                 >
                   Follow System Theme
                 </Text>
+
                 <Text
                   style={[
                     styles.rowSubtitle,
@@ -183,11 +206,27 @@ export default function DarkModeScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.preview}>
+        {/* ====================================================== */}
+        {/* PREVIEW BUTTON — SOLID                                  */}
+        {/* ====================================================== */}
+
+        <TouchableOpacity
+          style={[
+            styles.preview,
+            {
+              backgroundColor: colors.primary,
+            },
+          ]}
+          activeOpacity={0.85}
+        >
           <Ionicons name="color-palette-outline" size={20} color="#FFFFFF" />
 
           <Text style={styles.previewText}>Preview Theme</Text>
         </TouchableOpacity>
+
+        {/* ====================================================== */}
+        {/* FOOTER                                                   */}
+        {/* ====================================================== */}
 
         <Text
           style={[
@@ -208,12 +247,15 @@ export default function DarkModeScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F4F7FA",
   },
 
-  container: {
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  scrollView: {
     flex: 1,
-    backgroundColor: "#F4F7FA",
+    backgroundColor: "transparent",
   },
 
   content: {
@@ -230,20 +272,20 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 28,
     fontWeight: "700",
-    color: "#111827",
   },
 
   subtitle: {
     marginTop: 10,
     textAlign: "center",
-    color: "#6B7280",
     lineHeight: 22,
   },
 
+  /* SOLID PANEL */
+
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     overflow: "hidden",
+    borderWidth: 1,
     elevation: 2,
   },
 
@@ -267,26 +309,24 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#111827",
   },
 
   rowSubtitle: {
     marginTop: 4,
-    color: "#6B7280",
     fontSize: 13,
     lineHeight: 18,
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#EEF2F7",
   },
+
+  /* SOLID BUTTON */
 
   preview: {
     marginTop: 30,
     height: 56,
     borderRadius: 16,
-    backgroundColor: "#00BCD4",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -303,7 +343,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
     textAlign: "center",
-    color: "#94A3B8",
     lineHeight: 20,
   },
 });

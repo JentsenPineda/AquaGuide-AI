@@ -162,8 +162,8 @@ export default function ProfileScreen() {
   const isDark = colorScheme === "dark";
 
   const modeBackground = isDark
-    ? require("../../assets/images/module-background-dark.png")
-    : require("../../assets/images/module-background-light.png");
+    ? require("../../assets/images/dark-mode-bg3.png")
+    : require("../../assets/images/light-mode-bg3.png");
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [reminderCount, setReminderCount] = useState(0);

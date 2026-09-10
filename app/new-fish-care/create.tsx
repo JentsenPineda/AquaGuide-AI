@@ -10,7 +10,7 @@ import { createProgram } from "@/services/newFishCareService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   content: {

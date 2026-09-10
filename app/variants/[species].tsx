@@ -4,7 +4,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   FlatList,
   Image,
@@ -78,7 +78,7 @@ export default function VariantsScreen() {
       <View
         pointerEvents="none"
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             backgroundColor: isDark
               ? "rgba(3, 15, 25, 0.08)"
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
    */
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   /*

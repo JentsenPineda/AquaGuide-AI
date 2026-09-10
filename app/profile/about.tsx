@@ -2,7 +2,6 @@ import AppHeader from "@/components/layout/AppHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function AboutScreen() {
@@ -380,7 +379,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   container: {

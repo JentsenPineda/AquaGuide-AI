@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { CameraView } from "expo-camera";
 import React from "react";
 import {
-    Animated,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Animated,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 type ScanState =
@@ -93,7 +93,8 @@ export default function ScanCamera({
               },
             ]}
           >
-            Allow camera permission to scan and identify ornamental fish.
+            AquaGuide AI uses your camera to capture photos of ornamental fish
+            for AI-powered fish identification and care recommendations.
           </Text>
 
           <Pressable
@@ -111,7 +112,7 @@ export default function ScanCamera({
                 },
               ]}
             >
-              Grant Permission
+              Continue
             </Text>
           </Pressable>
         </View>
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
   },
 
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
   },

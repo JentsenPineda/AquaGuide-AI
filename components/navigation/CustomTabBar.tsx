@@ -1,12 +1,10 @@
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
-import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function CustomTabBar({ state }: BottomTabBarProps) {
+export default function CustomTabBar({ state }: any) {
   const insets = useSafeAreaInsets();
   const colors = useAppColors();
 

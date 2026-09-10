@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
    * Full-screen light/dark background.
    */
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   content: {

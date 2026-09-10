@@ -13,7 +13,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -50,6 +50,9 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [cameraReady, setCameraReady] = useState(false);
+
+  // Explicit consent before sending a user-selected image to the external AI service.
+  const [aiConsentGranted, setAiConsentGranted] = useState(false);
 
   const [scanState, setScanState] = useState<ScanState>("idle");
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
@@ -243,6 +246,32 @@ export default function ScanScreen() {
     }
   };
 
+  const requestAIConsent = async (): Promise<boolean> => {
+    if (aiConsentGranted) return true;
+
+    return new Promise((resolve) => {
+      Alert.alert(
+        "AI Fish Identification",
+        "To identify your fish, AquaGuide AI will send the selected fish photo to NaraRouter, an external AI service using the GPT-5.6 Terra model. The photo will be used to analyze your fish and provide identification and care information.",
+        [
+          {
+            text: "Not Now",
+            style: "cancel",
+            onPress: () => resolve(false),
+          },
+          {
+            text: "Accept & Enable AI Features",
+            onPress: () => {
+              setAiConsentGranted(true);
+              resolve(true);
+            },
+          },
+        ],
+        { cancelable: false },
+      );
+    });
+  };
+
   const onFlip = () =>
     setFacing((prev) => (prev === "back" ? "front" : "back"));
 
@@ -366,6 +395,12 @@ export default function ScanScreen() {
             },
           ],
         );
+        return;
+      }
+
+      const consentGranted = await requestAIConsent();
+
+      if (!consentGranted) {
         return;
       }
 
@@ -752,6 +787,17 @@ Use exactly this structure:
 
       // The reservation was already made for this camera capture, so analyze
       // directly without reserving a second scan.
+      const consentGranted = await requestAIConsent();
+
+      if (!consentGranted) {
+        if (scanReserved) {
+          await releaseScan();
+          scanReserved = false;
+        }
+        setScanState("ready");
+        return;
+      }
+
       setCapturedUri(processedImage.uri);
       setScanState("processing");
 
@@ -1260,7 +1306,9 @@ Use exactly this structure:
                   },
                 ]}
               >
-                Allow camera permission to scan and identify ornamental fish.
+                AquaGuide AI uses your camera to capture photos of ornamental
+                fish for AI-powered fish identification and care
+                recommendations.
               </Text>
               <Pressable
                 onPress={onRequestPermission}
@@ -1277,7 +1325,7 @@ Use exactly this structure:
                     },
                   ]}
                 >
-                  Grant Permission
+                  Continue
                 </Text>
               </Pressable>
             </View>
@@ -2445,7 +2493,7 @@ const styles = StyleSheet.create({
   },
 
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
   },

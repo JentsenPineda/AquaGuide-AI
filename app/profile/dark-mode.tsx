@@ -1,7 +1,6 @@
 import AppHeader from "@/components/layout/AppHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
 import {
   Image,
   ScrollView,
@@ -250,7 +249,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   scrollView: {

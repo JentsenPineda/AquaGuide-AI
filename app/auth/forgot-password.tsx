@@ -4,7 +4,7 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -176,7 +176,7 @@ export default function ForgotPasswordScreen() {
         <View
           pointerEvents="none"
           style={[
-            StyleSheet.absoluteFillObject,
+            StyleSheet.absoluteFill,
             {
               backgroundColor: isDark
                 ? "rgba(3, 15, 25, 0.18)"
@@ -405,7 +405,7 @@ export default function ForgotPasswordScreen() {
       <View
         pointerEvents="none"
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             backgroundColor: isDark
               ? "rgba(3, 15, 25, 0.18)"
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   authPanel: {

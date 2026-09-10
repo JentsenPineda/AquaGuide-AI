@@ -4,7 +4,7 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { User } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -265,14 +265,14 @@ export default function LoginScreen() {
       <Image
         source={authenticationBackground}
         resizeMode="cover"
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       {/* Soft overlay keeps the form readable without hiding the artwork */}
       <View
         pointerEvents="none"
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             backgroundColor: isDark
               ? "rgba(3, 15, 25, 0.18)"

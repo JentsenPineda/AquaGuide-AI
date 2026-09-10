@@ -13,7 +13,7 @@ import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Timestamp } from "firebase/firestore";
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -1403,7 +1403,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   content: {

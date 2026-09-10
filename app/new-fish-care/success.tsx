@@ -9,7 +9,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 
 export default function SuccessScreen() {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   content: {

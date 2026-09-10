@@ -7,17 +7,18 @@ import { onboardingData } from "@/constants/onboarding";
 import { useAppColors } from "@/theme/useAppColors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   FlatList,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function OnboardingScreen() {
   const colors = useAppColors();
   const { width } = useWindowDimensions();
@@ -49,6 +50,7 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView
+      edges={["top", "bottom"]}
       style={[
         styles.container,
         {
@@ -56,8 +58,10 @@ export default function OnboardingScreen() {
         },
       ]}
     >
+      {/* APP HEADER */}
       <AppHeader title="Welcome" />
 
+      {/* ONBOARDING SLIDES */}
       <FlatList
         ref={flatListRef}
         style={styles.slideList}
@@ -77,6 +81,7 @@ export default function OnboardingScreen() {
         viewabilityConfig={viewabilityConfig}
       />
 
+      {/* FOOTER */}
       <View style={styles.footer}>
         <Pagination currentIndex={currentIndex} total={onboardingData.length} />
 
@@ -117,6 +122,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  slideList: {
+    flex: 1,
+  },
+
+  slideListContent: {
+    flexGrow: 1,
+  },
+
   footer: {
     paddingHorizontal: 24,
     paddingBottom: 30,
@@ -130,13 +143,5 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: 16,
     fontWeight: "600",
-  },
-
-  slideList: {
-    flex: 1,
-  },
-
-  slideListContent: {
-    flexGrow: 1,
   },
 });

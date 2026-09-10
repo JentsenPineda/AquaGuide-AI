@@ -4,7 +4,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
 import {
   Image,
   Pressable,
@@ -46,7 +45,7 @@ export default function FishDetailsScreen() {
         <View
           pointerEvents="none"
           style={[
-            StyleSheet.absoluteFillObject,
+            StyleSheet.absoluteFill,
             {
               backgroundColor: isDark
                 ? "rgba(3, 15, 25, 0.08)"
@@ -85,7 +84,7 @@ export default function FishDetailsScreen() {
       <View
         pointerEvents="none"
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             backgroundColor: isDark
               ? "rgba(3, 15, 25, 0.08)"
@@ -586,7 +585,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   center: {

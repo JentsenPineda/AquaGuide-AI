@@ -4,7 +4,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { breedingDatabase } from "../data/breedingDatabase";
 
@@ -505,7 +504,7 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 
   container: {

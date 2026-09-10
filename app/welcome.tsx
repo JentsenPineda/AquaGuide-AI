@@ -3,7 +3,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Image,
   StatusBar,
@@ -136,7 +136,7 @@ export default function WelcomeScreen() {
       <Image
         source={require("../assets/images/welcome-screen-background.png")}
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             /*
              * Keep Light Mode bright.
@@ -158,7 +158,7 @@ export default function WelcomeScreen() {
       <View
         pointerEvents="none"
         style={[
-          StyleSheet.absoluteFillObject,
+          StyleSheet.absoluteFill,
           {
             backgroundColor: isDark
               ? "rgba(8, 20, 31, 0.10)"

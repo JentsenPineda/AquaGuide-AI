@@ -1,8 +1,11 @@
+import { User, onAuthStateChanged, reload, signOut } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { User, onAuthStateChanged, reload, signOut } from "firebase/auth";
-
 import { auth } from "../config/firebase";
+import {
+  startNetworkSync,
+  stopNetworkSync,
+} from "../services/networkSyncService";
 
 interface AuthContextType {
   user: User | null;
@@ -55,6 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return refreshedUser;
   };
 
+  // Firebase authentication state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       console.log(
@@ -93,6 +97,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return unsubscribe;
   }, []);
+
+  // Start automatic offline → online synchronization
+  useEffect(() => {
+    if (!user) {
+      stopNetworkSync();
+      return;
+    }
+
+    console.log("NETWORK SYNC: Starting for user:", user.uid);
+
+    const cleanup = startNetworkSync(user.uid);
+
+    return cleanup;
+  }, [user]);
 
   return (
     <AuthContext.Provider

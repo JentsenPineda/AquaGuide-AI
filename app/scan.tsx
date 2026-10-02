@@ -9,6 +9,7 @@ import { askVisionAI } from "@/services/aiService";
 import { addScan } from "@/services/scanService";
 import { useAppColors } from "@/theme/useAppColors";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
@@ -35,24 +36,25 @@ type ScanState =
   | "done"
   | "error";
 
+const AI_ANALYSIS_NOTICE_KEY = "@aquaguide/ai-analysis-notice-accepted";
+
 export default function ScanScreen() {
   const router = useRouter();
   const colors = useAppColors();
   const cameraRef = useRef<CameraView>(null);
   const scanInProgressRef = useRef(false);
   const { user } = useAuth();
+
   const {
     remainingScans,
     reserveScan,
     releaseScan,
     loading: scanLimitLoading,
   } = useDailyScanLimit();
+
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<"back" | "front">("back");
   const [cameraReady, setCameraReady] = useState(false);
-
-  // Explicit consent before sending a user-selected image to the external AI service.
-  const [aiConsentGranted, setAiConsentGranted] = useState(false);
 
   const [scanState, setScanState] = useState<ScanState>("idle");
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
@@ -104,7 +106,6 @@ export default function ScanScreen() {
   }, [scanState, cameraReady]);
 
   // Start/stop the scanner animation depending on state
-
   const startScanAnimations = () => {
     scanLineY.setValue(0);
     pulse.setValue(0);
@@ -209,12 +210,14 @@ export default function ScanScreen() {
   useEffect(() => {
     console.log("SCAN: cameraReady state changed:", cameraReady);
   }, [cameraReady]);
+
   // Permission flow
   useEffect(() => {
     if (!permission) return;
 
     console.log("SCAN: cameraReady set FALSE by permission effect");
     setCameraReady(false);
+
     if (permission.granted) {
       setScanState("ready");
     } else {
@@ -239,30 +242,51 @@ export default function ScanScreen() {
 
   const onRequestPermission = async () => {
     const res = await requestPermission();
+
     if (res.granted) {
-      console.log("SCAN: cameraReady set FALSE by permission request");
+      console.log("SCAN: camera permission granted");
       setCameraReady(false);
       setScanState("ready");
     }
   };
 
-  const requestAIConsent = async (): Promise<boolean> => {
-    if (aiConsentGranted) return true;
+  /**
+   * Show the external-AI notice only once on this device.
+   * The notice is considered accepted only after the user taps Continue.
+   */
+  const confirmAIAnalysis = async (): Promise<boolean> => {
+    try {
+      const noticeAccepted = await AsyncStorage.getItem(AI_ANALYSIS_NOTICE_KEY);
+
+      if (noticeAccepted === "true") {
+        return true;
+      }
+    } catch (error) {
+      console.warn("SCAN: could not read AI analysis notice state:", error);
+    }
 
     return new Promise((resolve) => {
       Alert.alert(
-        "AI Fish Identification",
-        "To identify your fish, AquaGuide AI will send the selected fish photo to NaraRouter, an external AI service using the GPT-5.6 Terra model. The photo will be used to analyze your fish and provide identification and care information.",
+        "AI Analysis Notice",
+        "Your image will be sent to NaraRouter, an external AI service using the GPT-5.6 Terra model, for fish identification and analysis. Please continue only if you agree to send this image for AI analysis.",
         [
           {
-            text: "Not Now",
+            text: "Cancel",
             style: "cancel",
             onPress: () => resolve(false),
           },
           {
-            text: "Accept & Enable AI Features",
-            onPress: () => {
-              setAiConsentGranted(true);
+            text: "Continue",
+            onPress: async () => {
+              try {
+                await AsyncStorage.setItem(AI_ANALYSIS_NOTICE_KEY, "true");
+              } catch (error) {
+                console.warn(
+                  "SCAN: could not save AI analysis notice state:",
+                  error,
+                );
+              }
+
               resolve(true);
             },
           },
@@ -398,12 +422,6 @@ export default function ScanScreen() {
         return;
       }
 
-      const consentGranted = await requestAIConsent();
-
-      if (!consentGranted) {
-        return;
-      }
-
       const scanReservation = await reserveScan();
 
       if (!scanReservation.allowed) {
@@ -411,6 +429,21 @@ export default function ScanScreen() {
       }
 
       scanReserved = true;
+
+      // Ask for confirmation immediately before sending
+      // the image to the external AI service.
+      const confirmed = await confirmAIAnalysis();
+
+      if (!confirmed) {
+        if (scanReserved) {
+          await releaseScan();
+          scanReserved = false;
+        }
+
+        setScanState("ready");
+        return;
+      }
+
       setCapturedUri(uri);
       setSelectedUploadUri(null);
       setSelectedUploadBase64(null);
@@ -424,6 +457,16 @@ export default function ScanScreen() {
         `You are AquaGuide AI, an expert ornamental fish identification assistant.
 
 Your primary task is to identify the actual fish shown in the image as accurately as possible.
+
+FISH-ONLY GATE — THIS IS MANDATORY:
+
+- First determine whether the image actually contains a fish.
+- AquaGuide AI identifies FISH ONLY.
+- Do NOT identify, classify, describe, or return a result for dogs, cats, birds, reptiles, amphibians, insects, humans/people, food, cooked fish/food dishes, plants, objects, vehicles, scenery, tanks without a visible fish, or any other non-fish subject.
+- If a person is holding a fish, identify the fish only. Do not identify the person.
+- If the image contains both a fish and other objects/people/animals, identify the fish only.
+- If there is no visible fish, or you are not sufficiently certain that the subject is a fish, reject the image.
+- Never guess a fish species from a non-fish image.
 
 IDENTIFICATION PRIORITY:
 
@@ -618,15 +661,31 @@ Do not include markdown.
 Do not include code fences.
 Do not include explanations outside the JSON.
 
-Use exactly this structure:
+Use exactly this structure.
 
+If the image contains a fish:
 {
+  "isFish": true,
+  "rejectionReason": null,
   "species": "Fish Name",
   "variant": "Variant Name or null",
   "scientificName": "Scientific Name or null",
   "confidence": 0.95,
   "introduction": "Short 1–2 sentence introduction about the fish."
-}`,
+}
+
+If the image does NOT contain a fish:
+{
+  "isFish": false,
+  "rejectionReason": "The image does not contain a fish.",
+  "species": null,
+  "variant": null,
+  "scientificName": null,
+  "confidence": 0,
+  "introduction": ""
+}
+
+For a rejected image, do not invent a fish species.`,
       );
 
       console.log("SCAN: AI response returned", {
@@ -641,80 +700,85 @@ Use exactly this structure:
         );
       }
 
-      let aiResult: {
-        species: string;
-        variant: string | null;
-        scientificName: string | null;
-        confidence: number;
-        introduction: string;
-      };
+      let cleanedResponse = response.message.trim();
 
-      try {
-        let cleanedResponse = response.message.trim();
-        cleanedResponse = cleanedResponse
-          .replace(/^```json\s*/i, "")
-          .replace(/^```\s*/i, "")
-          .replace(/\s*```$/i, "")
-          .trim();
+      cleanedResponse = cleanedResponse
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
 
-        const firstBrace = cleanedResponse.indexOf("{");
-        const lastBrace = cleanedResponse.lastIndexOf("}");
+      const firstBrace = cleanedResponse.indexOf("{");
+      const lastBrace = cleanedResponse.lastIndexOf("}");
 
-        if (firstBrace !== -1 && lastBrace !== -1) {
-          cleanedResponse = cleanedResponse.slice(firstBrace, lastBrace + 1);
-        }
-
-        aiResult = JSON.parse(cleanedResponse);
-
-        if (
-          !aiResult ||
-          typeof aiResult.species !== "string" ||
-          typeof aiResult.confidence !== "number"
-        ) {
-          throw new Error("Invalid fish identification response.");
-        }
-
-        aiResult.variant =
-          typeof aiResult.variant === "string" && aiResult.variant.trim()
-            ? aiResult.variant.trim()
-            : null;
-
-        aiResult.scientificName =
-          typeof aiResult.scientificName === "string" &&
-          aiResult.scientificName.trim()
-            ? aiResult.scientificName.trim()
-            : null;
-
-        aiResult.introduction =
-          typeof aiResult.introduction === "string" &&
-          aiResult.introduction.trim()
-            ? aiResult.introduction.trim()
-            : "The fish could not be confidently identified from this image.";
-
-        aiResult.confidence = Math.max(0, Math.min(1, aiResult.confidence));
-      } catch (parseError) {
-        console.error("Invalid AI JSON response:", response.message);
-        console.error("JSON parsing error:", parseError);
-        throw new Error(
-          "The AI could not provide a valid identification. Please try a clearer photo.",
-        );
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanedResponse = cleanedResponse.slice(firstBrace, lastBrace + 1);
       }
+
+      const aiResult = JSON.parse(cleanedResponse);
+
+      // Hard application-side gate: only continue when the AI explicitly
+      // confirms that the image contains a fish.
+      if (!aiResult || aiResult.isFish !== true) {
+        if (scanReserved) {
+          await releaseScan();
+          scanReserved = false;
+        }
+
+        setResult(null);
+        setCapturedUri(null);
+        setSelectedUploadUri(null);
+        setSelectedUploadBase64(null);
+        setScanState("ready");
+
+        Alert.alert(
+          "Fish Only",
+          "AquaGuide AI can only identify fish. Please capture or upload a clear image containing a fish.",
+        );
+
+        return;
+      }
+
+      if (
+        typeof aiResult.species !== "string" ||
+        !aiResult.species.trim() ||
+        typeof aiResult.confidence !== "number"
+      ) {
+        throw new Error("Invalid fish identification response.");
+      }
+
+      const normalizedVariant =
+        typeof aiResult.variant === "string" && aiResult.variant.trim()
+          ? aiResult.variant.trim()
+          : null;
+
+      const normalizedScientificName =
+        typeof aiResult.scientificName === "string" &&
+        aiResult.scientificName.trim()
+          ? aiResult.scientificName.trim()
+          : null;
+
+      const normalizedIntroduction =
+        typeof aiResult.introduction === "string" &&
+        aiResult.introduction.trim()
+          ? aiResult.introduction.trim()
+          : "The fish could not be confidently identified from this image.";
+
+      const confidenceValue = Math.max(0, Math.min(1, aiResult.confidence));
 
       setResult({
         label: aiResult.species,
-        confidence: aiResult.confidence,
-        note: aiResult.introduction,
-        variant: aiResult.variant ?? null,
-        scientificName: aiResult.scientificName ?? null,
+        confidence: confidenceValue,
+        note: normalizedIntroduction,
+        variant: normalizedVariant,
+        scientificName: normalizedScientificName,
       });
 
-      if (user) {
-        await addScan(user.uid, {
-          label: aiResult.species,
-          confidence: aiResult.confidence,
-          note: aiResult.introduction,
-        });
-      }
+      await addScan(user.uid, {
+        label: aiResult.species,
+        confidence: confidenceValue,
+        note: normalizedIntroduction,
+      });
 
       setScanState("done");
     } catch (error) {
@@ -727,13 +791,7 @@ Use exactly this structure:
       setScanState("error");
     } finally {
       scanInProgressRef.current = false;
-      console.log("SCAN: scan lock released");
     }
-  };
-
-  const onAnalyzeUpload = async () => {
-    if (!selectedUploadBase64 || !selectedUploadUri) return;
-    await analyzeImage(selectedUploadBase64, selectedUploadUri);
   };
 
   const onScan = async () => {
@@ -769,6 +827,7 @@ Use exactly this structure:
       const scanReservation = await reserveScan();
 
       if (!scanReservation.allowed) return;
+
       scanReserved = true;
 
       setScanState("capturing");
@@ -785,15 +844,15 @@ Use exactly this structure:
 
       const processedImage = await prepareImageForAI(photo.uri);
 
-      // The reservation was already made for this camera capture, so analyze
-      // directly without reserving a second scan.
-      const consentGranted = await requestAIConsent();
+      // Show the confirmation before sending the captured image.
+      const confirmed = await confirmAIAnalysis();
 
-      if (!consentGranted) {
+      if (!confirmed) {
         if (scanReserved) {
           await releaseScan();
           scanReserved = false;
         }
+
         setScanState("ready");
         return;
       }
@@ -801,11 +860,23 @@ Use exactly this structure:
       setCapturedUri(processedImage.uri);
       setScanState("processing");
 
+      console.log("SCAN: AI request starting");
+
       const response = await askVisionAI(
         processedImage.base64,
         `You are AquaGuide AI, an expert ornamental fish identification assistant.
 
 Your primary task is to identify the actual fish shown in the image as accurately as possible.
+
+FISH-ONLY GATE — THIS IS MANDATORY:
+
+- First determine whether the image actually contains a fish.
+- AquaGuide AI identifies FISH ONLY.
+- Do NOT identify, classify, describe, or return a result for dogs, cats, birds, reptiles, amphibians, insects, humans/people, food, cooked fish/food dishes, plants, objects, vehicles, scenery, tanks without a visible fish, or any other non-fish subject.
+- If a person is holding a fish, identify the fish only. Do not identify the person.
+- If the image contains both a fish and other objects/people/animals, identify the fish only.
+- If there is no visible fish, or you are not sufficiently certain that the subject is a fish, reject the image.
+- Never guess a fish species from a non-fish image.
 
 IDENTIFICATION PRIORITY:
 
@@ -873,7 +944,7 @@ CHanna / SNAKEHEAD IDENTIFICATION:
   - overall Channa-like morphology
 - Bright or unusual coloration does NOT make a Channa a Betta.
 - Colorful Channa/Snakehead species must still be considered when the morphology supports them.
-- If the fish has an elongated body and Channa-like morphology, strongly consider Channa/Snakehead even when the fish is brightly colored.
+- If the fish has an elongated body and Channa-like morphology, strongly consider Channa/Snakehead even when it is brightly colored.
 
 OTHER COMMON FALSE IDENTIFICATIONS:
 
@@ -1000,16 +1071,38 @@ Do not include markdown.
 Do not include code fences.
 Do not include explanations outside the JSON.
 
-Use exactly this structure:
+Use exactly this structure.
 
+If the image contains a fish:
 {
+  "isFish": true,
+  "rejectionReason": null,
   "species": "Fish Name",
   "variant": "Variant Name or null",
   "scientificName": "Scientific Name or null",
   "confidence": 0.95,
   "introduction": "Short 1–2 sentence introduction about the fish."
-}`,
+}
+
+If the image does NOT contain a fish:
+{
+  "isFish": false,
+  "rejectionReason": "The image does not contain a fish.",
+  "species": null,
+  "variant": null,
+  "scientificName": null,
+  "confidence": 0,
+  "introduction": ""
+}
+
+For a rejected image, do not invent a fish species.`,
       );
+
+      console.log("SCAN: AI response returned", {
+        success: response.success,
+        hasMessage: Boolean(response.message),
+        error: response.error,
+      });
 
       if (!response.success) {
         throw new Error(
@@ -1018,6 +1111,7 @@ Use exactly this structure:
       }
 
       let cleanedResponse = response.message.trim();
+
       cleanedResponse = cleanedResponse
         .replace(/^```json\s*/i, "")
         .replace(/^```\s*/i, "")
@@ -1026,14 +1120,38 @@ Use exactly this structure:
 
       const firstBrace = cleanedResponse.indexOf("{");
       const lastBrace = cleanedResponse.lastIndexOf("}");
+
       if (firstBrace !== -1 && lastBrace !== -1) {
         cleanedResponse = cleanedResponse.slice(firstBrace, lastBrace + 1);
       }
 
       const aiResult = JSON.parse(cleanedResponse);
+
+      // Hard application-side gate: only continue when the AI explicitly
+      // confirms that the image contains a fish.
+      if (!aiResult || aiResult.isFish !== true) {
+        if (scanReserved) {
+          await releaseScan();
+          scanReserved = false;
+        }
+
+        setResult(null);
+        setCapturedUri(null);
+        setSelectedUploadUri(null);
+        setSelectedUploadBase64(null);
+        setScanState("ready");
+
+        Alert.alert(
+          "Fish Only",
+          "AquaGuide AI can only identify fish. Please capture or upload a clear image containing a fish.",
+        );
+
+        return;
+      }
+
       if (
-        !aiResult ||
         typeof aiResult.species !== "string" ||
+        !aiResult.species.trim() ||
         typeof aiResult.confidence !== "number"
       ) {
         throw new Error("Invalid fish identification response.");
@@ -1043,16 +1161,19 @@ Use exactly this structure:
         typeof aiResult.variant === "string" && aiResult.variant.trim()
           ? aiResult.variant.trim()
           : null;
+
       const normalizedScientificName =
         typeof aiResult.scientificName === "string" &&
         aiResult.scientificName.trim()
           ? aiResult.scientificName.trim()
           : null;
+
       const normalizedIntroduction =
         typeof aiResult.introduction === "string" &&
         aiResult.introduction.trim()
           ? aiResult.introduction.trim()
           : "The fish could not be confidently identified from this image.";
+
       const confidenceValue = Math.max(0, Math.min(1, aiResult.confidence));
 
       setResult({
@@ -1072,11 +1193,21 @@ Use exactly this structure:
       setScanState("done");
     } catch (error) {
       console.error(error);
-      if (scanReserved) await releaseScan();
+
+      if (scanReserved) {
+        await releaseScan();
+      }
+
       setScanState("error");
     } finally {
       scanInProgressRef.current = false;
     }
+  };
+
+  const onAnalyzeUpload = async () => {
+    if (!selectedUploadBase64 || !selectedUploadUri) return;
+
+    await analyzeImage(selectedUploadBase64, selectedUploadUri);
   };
 
   const scanLineTranslateY = scanLineY.interpolate({
@@ -1232,6 +1363,7 @@ Use exactly this structure:
   const matchedCare = matchedFish
     ? fishCareDatabase[matchedFish.id as keyof typeof fishCareDatabase]
     : undefined;
+
   return (
     <AppBackground>
       <AppHeader title="Ornamental Fish Identifier" showBack />
@@ -1288,6 +1420,7 @@ Use exactly this structure:
                 size={22}
                 color={colors.primary}
               />
+
               <Text
                 style={[
                   styles.permissionTitle,
@@ -1298,6 +1431,7 @@ Use exactly this structure:
               >
                 Camera Access Needed
               </Text>
+
               <Text
                 style={[
                   styles.permissionText,
@@ -1306,17 +1440,28 @@ Use exactly this structure:
                   },
                 ]}
               >
-                AquaGuide AI uses your camera to capture photos of ornamental
-                fish for AI-powered fish identification and care
-                recommendations.
+                Continue to allow camera access so AquaGuide AI can capture a
+                photo of your ornamental fish.
               </Text>
+
+              {/* Camera permission button */}
               <Pressable
                 onPress={onRequestPermission}
                 style={({ pressed }) => [
                   styles.primaryBtn,
-                  pressed && styles.btnPressed,
+                  {
+                    backgroundColor: colors.primary,
+                    flex: 0,
+                    width: "80%",
+                  },
                 ]}
               >
+                <Ionicons
+                  name="camera-outline"
+                  size={18}
+                  color={colors.textPrimary}
+                />
+
                 <Text
                   style={[
                     styles.primaryBtnText,
@@ -1355,6 +1500,7 @@ Use exactly this structure:
                   },
                 ]}
               />
+
               <Text style={styles.cameraStatusText}>
                 {cameraReady ? "Camera ready" : "Starting camera…"}
               </Text>
@@ -1558,6 +1704,7 @@ Use exactly this structure:
               >
                 {result.label.toUpperCase()}
               </Text>
+
               {result.scientificName && (
                 <Text
                   style={{
@@ -2112,6 +2259,7 @@ Use exactly this structure:
             </View>
           )}
         </View>
+
         {/* Scan Controls */}
         <View style={styles.scanControlsArea}>
           {selectedUploadUri && scanState === "ready" ? (
@@ -2130,6 +2278,7 @@ Use exactly this structure:
                   size={18}
                   color={colors.primary}
                 />
+
                 <Text
                   style={[
                     styles.uploadConfirmationTitle,
@@ -2139,6 +2288,7 @@ Use exactly this structure:
                   Confirm this image
                 </Text>
               </View>
+
               <Text
                 style={[
                   styles.uploadConfirmationText,
@@ -2147,6 +2297,7 @@ Use exactly this structure:
               >
                 Review your photo before using an AI scan.
               </Text>
+
               <View style={styles.confirmationActions}>
                 <Pressable
                   onPress={onUploadImage}
@@ -2164,6 +2315,7 @@ Use exactly this structure:
                     size={18}
                     color={colors.textPrimary}
                   />
+
                   <Text
                     style={[
                       styles.secondaryBtnText,
@@ -2173,11 +2325,14 @@ Use exactly this structure:
                     Change Photo
                   </Text>
                 </Pressable>
+
                 <Pressable
                   onPress={onAnalyzeUpload}
                   style={({ pressed }) => [
                     styles.primaryBtn,
-                    { backgroundColor: colors.primary },
+                    {
+                      backgroundColor: colors.primary,
+                    },
                     pressed && styles.btnPressed,
                   ]}
                 >
@@ -2186,6 +2341,7 @@ Use exactly this structure:
                     size={18}
                     color={colors.textPrimary}
                   />
+
                   <Text
                     style={[
                       styles.primaryBtnText,
@@ -2273,6 +2429,7 @@ Use exactly this structure:
                   >
                     Analyzing your fish...
                   </Text>
+
                   <Text
                     style={[
                       styles.analysisSubtitle,
@@ -2370,6 +2527,7 @@ Use exactly this structure:
                       size={18}
                       color={colors.textPrimary}
                     />
+
                     <Text
                       style={[
                         styles.secondaryBtnText,
@@ -2379,6 +2537,7 @@ Use exactly this structure:
                       Scan Again
                     </Text>
                   </Pressable>
+
                   <View
                     style={[
                       styles.disabledCapture,
@@ -2395,6 +2554,7 @@ Use exactly this structure:
                         color={colors.textSecondary}
                       />
                     </View>
+
                     <Text
                       style={[
                         styles.disabledCaptureText,
@@ -2413,9 +2573,16 @@ Use exactly this structure:
     </AppBackground>
   );
 }
+
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  container: { flex: 1, paddingHorizontal: 16, paddingTop: 10, gap: 14 },
+
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    gap: 14,
+  },
 
   header: {
     flexDirection: "row",
@@ -2423,7 +2590,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 2,
   },
-  title: { fontSize: 18, fontWeight: "800", color: "#fff" },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#fff",
+  },
+
   iconBtn: {
     width: 40,
     height: 40,
@@ -2484,7 +2657,13 @@ const styles = StyleSheet.create({
     padding: 18,
     gap: 10,
   },
-  permissionTitle: { color: "#fff", fontSize: 14.5, fontWeight: "800" },
+
+  permissionTitle: {
+    color: "#fff",
+    fontSize: 14.5,
+    fontWeight: "800",
+  },
+
   permissionText: {
     color: "rgba(255,255,255,0.7)",
     fontSize: 12.5,
@@ -2526,6 +2705,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 3,
     borderTopLeftRadius: 12,
   },
+
   cornerTR: {
     position: "absolute",
     right: "7%",
@@ -2536,6 +2716,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 3,
     borderTopRightRadius: 12,
   },
+
   cornerBL: {
     position: "absolute",
     left: "7%",
@@ -2546,6 +2727,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomLeftRadius: 12,
   },
+
   cornerBR: {
     position: "absolute",
     right: "7%",
@@ -2590,7 +2772,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  badgeRow: { flexDirection: "row", gap: 8, marginTop: 6, flexWrap: "wrap" },
+  badgeRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 6,
+    flexWrap: "wrap",
+  },
+
   badge: {
     flexDirection: "row",
     gap: 6,
@@ -2602,7 +2790,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.10)",
   },
-  badgeText: { color: "#fff", fontSize: 11.5, fontWeight: "800" },
+
+  badgeText: {
+    color: "#fff",
+    fontSize: 11.5,
+    fontWeight: "800",
+  },
 
   primaryBtn: {
     flex: 1,
@@ -2625,7 +2818,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  secondaryBtnText: { color: "#fff", fontSize: 13.5, fontWeight: "900" },
+  secondaryBtnText: {
+    color: "#fff",
+    fontSize: 13.5,
+    fontWeight: "900",
+  },
+
   disabledBtn: {
     flex: 1,
     height: 48,
@@ -2635,8 +2833,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.12)",
   },
 
-  primaryBtnText: { color: "#fff", fontSize: 13.5, fontWeight: "900" },
-  btnPressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
+  primaryBtnText: {
+    color: "#fff",
+    fontSize: 13.5,
+    fontWeight: "900",
+  },
+
+  btnPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.99 }],
+  },
 
   scanControlsArea: {
     alignItems: "center",
@@ -2644,6 +2850,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 12,
   },
+
   uploadImageButton: {
     width: "100%",
     minHeight: 64,
@@ -2679,6 +2886,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 16,
   },
+
   captureShutterOverlay: {
     position: "absolute",
     bottom: 4,
@@ -2703,12 +2911,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   captureShutterDisabled: {
     opacity: 0.38,
   },
+
   shutterPressed: {
     transform: [{ scale: 0.95 }],
   },
+
   analysisCard: {
     width: "100%",
     minHeight: 190,
@@ -2719,6 +2930,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     overflow: "hidden",
   },
+
   analysisVisual: {
     width: 92,
     height: 92,
@@ -2728,6 +2940,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 14,
   },
+
   analysisRing: {
     position: "absolute",
     width: 82,
@@ -2737,6 +2950,7 @@ const styles = StyleSheet.create({
     borderTopColor: "transparent",
     borderRightColor: "transparent",
   },
+
   analysisRingDot: {
     position: "absolute",
     width: 7,
@@ -2745,12 +2959,14 @@ const styles = StyleSheet.create({
     top: -3,
     left: 36,
   },
+
   analysisGlow: {
     position: "absolute",
     width: 58,
     height: 58,
     borderRadius: 29,
   },
+
   analysisCenter: {
     width: 50,
     height: 50,
@@ -2766,16 +2982,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 6,
   },
+
   analysisTitle: {
     fontSize: 16,
     fontWeight: "900",
     letterSpacing: 0.1,
   },
+
   analysisSubtitle: {
     marginTop: 4,
     fontSize: 12,
     fontWeight: "600",
   },
+
   uploadConfirmationCard: {
     width: "100%",
     borderRadius: 20,
@@ -2783,29 +3002,35 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 8,
   },
+
   uploadConfirmationHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
+
   uploadConfirmationTitle: {
     fontSize: 15,
     fontWeight: "800",
   },
+
   uploadConfirmationText: {
     fontSize: 12,
     lineHeight: 18,
   },
+
   confirmationActions: {
     flexDirection: "row",
     gap: 10,
     marginTop: 4,
   },
+
   afterScanActions: {
     width: "100%",
     flexDirection: "row",
     gap: 10,
   },
+
   disabledCapture: {
     flex: 1,
     minHeight: 52,
@@ -2817,6 +3042,7 @@ const styles = StyleSheet.create({
     gap: 8,
     opacity: 0.7,
   },
+
   disabledCaptureDot: {
     width: 30,
     height: 30,
@@ -2825,6 +3051,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.08)",
   },
+
   disabledCaptureText: {
     fontSize: 13.5,
     fontWeight: "900",

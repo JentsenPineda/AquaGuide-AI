@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#061724" />
+    <link rel="icon" type="image/png" href="./icon/iconnn.png" />
+    <link rel="apple-touch-icon" href="./icon/iconnn.png" />
     <meta
       name="description"
       content="Discover AquaGuide AI, your companion for ornamental fish identification, species information, aquarium care, and fishkeeping management."
@@ -172,14 +174,13 @@
       }
 
       .brand-icon {
-        display: grid;
-        place-items: center;
+        display: block;
         width: 43px;
         height: 43px;
-        border-radius: 14px;
-        background: linear-gradient(145deg, #48d9e3, #1686d5);
-        box-shadow: 0 5px 24px rgba(54, 169, 245, 0.23);
-        font-size: 23px;
+        flex: 0 0 43px;
+        object-fit: contain;
+        border-radius: 12px;
+        filter: drop-shadow(0 5px 12px rgba(54, 169, 245, 0.18));
       }
 
       .brand-name {
@@ -382,7 +383,10 @@
       .fish-emoji {
         position: relative;
         z-index: 1;
-        font-size: clamp(130px, 19vw, 220px);
+        display: block;
+        width: clamp(130px, 19vw, 220px);
+        height: clamp(130px, 19vw, 220px);
+        object-fit: contain;
         filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.4));
         animation: float 5s ease-in-out infinite;
         user-select: none;
@@ -718,7 +722,8 @@
           min-height: 350px;
         }
         .fish-emoji {
-          font-size: 175px;
+          width: 175px;
+          height: 175px;
         }
         .feature-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -776,7 +781,8 @@
           min-height: 290px;
         }
         .fish-emoji {
-          font-size: 145px;
+          width: 145px;
+          height: 145px;
         }
         .float-top {
           top: 7%;
@@ -825,7 +831,7 @@
     <nav class="navbar" aria-label="Main navigation">
       <div class="container nav-inner">
         <a class="brand" href="#home" aria-label="AquaGuide AI home">
-          <span class="brand-icon" aria-hidden="true">🐟</span>
+          <img class="brand-icon" src="./icon/iconnn.png" alt="" />
           <span class="brand-name">AquaGuide <span>AI</span></span>
         </a>
 
@@ -880,7 +886,7 @@
 
         <div class="visual" aria-label="Aquatic fish illustration">
           <div class="orb"></div>
-          <div class="fish-emoji" role="img" aria-label="Tropical fish">🐠</div>
+          <img class="fish-emoji" src="./icon/iconnn.png" alt="AquaGuide AI app icon" />
 
           <div class="floating-card float-top">
             <span class="floating-icon">🔎</span>
@@ -1120,7 +1126,7 @@
       <div class="container footer-inner">
         <div>
           <a class="brand" href="#home">
-            <span class="brand-icon" aria-hidden="true">🐟</span>
+            <img class="brand-icon" src="./icon/iconnn.png" alt="" />
             <span class="brand-name">AquaGuide <span>AI</span></span>
           </a>
           <p>Ornamental Fish Management Mobile Application</p>

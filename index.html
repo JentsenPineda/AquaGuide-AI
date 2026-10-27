@@ -1,1194 +1,209 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#061724" />
-    <link rel="icon" type="image/png" href="./Icon/iconnn.png" />
-    <link rel="apple-touch-icon" href="./Icon/iconnn.png" />
-    <meta
-      name="description"
-      content="Discover AquaGuide AI, your companion for ornamental fish identification, species information, aquarium care, and fishkeeping management."
-    />
-    <meta property="og:title" content="AquaGuide AI — Smarter Fishkeeping" />
-    <meta
-      property="og:description"
-      content="Identify ornamental fish, explore species, and organize your aquarium care routine."
-    />
-    <title>AquaGuide AI — Smarter Fishkeeping</title>
-
-    <style>
-      :root {
-        --bg: #061724;
-        --bg-light: #0a2232;
-        --panel: rgba(15, 43, 59, 0.76);
-        --cyan: #59e1dc;
-        --blue: #36a9f5;
-        --text: #f1fbff;
-        --muted: #a7c2d0;
-        --border: rgba(141, 220, 239, 0.15);
-        --radius: 22px;
-        --width: 1160px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-        scroll-padding-top: 90px;
-      }
-
-      body {
-        margin: 0;
-        font-family:
-          Inter,
-          ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(
-            ellipse at 12% 12%,
-            rgba(23, 131, 173, 0.19),
-            transparent 34%
-          ),
-          radial-gradient(
-            ellipse at 90% 42%,
-            rgba(17, 131, 133, 0.13),
-            transparent 32%
-          ),
-          var(--bg);
-        line-height: 1.7;
-        overflow-x: hidden;
-      }
-
-      a {
-        color: inherit;
-      }
-      button {
-        font: inherit;
-      }
-
-      .container {
-        width: min(var(--width), calc(100% - 40px));
-        margin-inline: auto;
-      }
-
-      .ambient {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        overflow: hidden;
-        z-index: -1;
-      }
-
-      .bubble {
-        position: absolute;
-        bottom: -70px;
-        width: 10px;
-        height: 10px;
-        border: 1px solid rgba(117, 226, 239, 0.24);
-        border-radius: 50%;
-        animation: rise linear infinite;
-      }
-
-      .bubble:nth-child(1) {
-        left: 12%;
-        animation-duration: 19s;
-      }
-      .bubble:nth-child(2) {
-        left: 28%;
-        width: 6px;
-        height: 6px;
-        animation-duration: 24s;
-        animation-delay: -8s;
-      }
-      .bubble:nth-child(3) {
-        left: 57%;
-        width: 14px;
-        height: 14px;
-        animation-duration: 22s;
-        animation-delay: -12s;
-      }
-      .bubble:nth-child(4) {
-        left: 79%;
-        width: 7px;
-        height: 7px;
-        animation-duration: 26s;
-        animation-delay: -4s;
-      }
-      .bubble:nth-child(5) {
-        left: 91%;
-        animation-duration: 20s;
-        animation-delay: -10s;
-      }
-
-      @keyframes rise {
-        from {
-          transform: translateY(0);
-          opacity: 0;
-        }
-        15% {
-          opacity: 0.8;
-        }
-        85% {
-          opacity: 0.5;
-        }
-        to {
-          transform: translateY(-115vh);
-          opacity: 0;
-        }
-      }
-
-      .navbar {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        background: rgba(6, 23, 36, 0.83);
-        border-bottom: 1px solid var(--border);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-      }
-
-      .nav-inner {
-        min-height: 76px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        white-space: nowrap;
-      }
-
-      .brand-icon {
-        display: block;
-        width: 43px;
-        height: 43px;
-        flex: 0 0 43px;
-        object-fit: contain;
-        border-radius: 12px;
-        filter: drop-shadow(0 5px 12px rgba(54, 169, 245, 0.18));
-      }
-
-      .brand-name {
-        font-size: 18px;
-      }
-      .brand-name span {
-        color: var(--cyan);
-      }
-
-      .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 27px;
-      }
-
-      .nav-links a {
-        color: var(--muted);
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-
-      .nav-links a:hover {
-        color: var(--cyan);
-      }
-
-      .nav-links .nav-cta {
-        padding: 10px 16px;
-        color: #041a26;
-        background: var(--cyan);
-        border-radius: 11px;
-      }
-
-      .menu-toggle {
-        display: none;
-        width: 44px;
-        height: 44px;
-        color: var(--text);
-        border: 1px solid var(--border);
-        background: var(--panel);
-        border-radius: 12px;
-        cursor: pointer;
-      }
-
-      .hero {
-        position: relative;
-        min-height: 610px;
-        display: grid;
-        align-items: center;
-        padding: 78px 0 86px;
-        overflow: hidden;
-      }
-
-      .hero::before {
-        content: "";
-        position: absolute;
-        width: 560px;
-        height: 560px;
-        top: -90px;
-        right: -100px;
-        background: radial-gradient(
-          circle,
-          rgba(26, 177, 201, 0.15),
-          transparent 68%
-        );
-        pointer-events: none;
-      }
-
-      .hero-grid {
-        position: relative;
-        display: grid;
-        grid-template-columns: 1.05fr 0.95fr;
-        align-items: center;
-        gap: 52px;
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        padding: 7px 12px;
-        border: 1px solid rgba(89, 225, 220, 0.23);
-        border-radius: 99px;
-        background: rgba(34, 139, 154, 0.1);
-        color: var(--cyan);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-      }
-
-      .eyebrow-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--cyan);
-        border-radius: 50%;
-        box-shadow: 0 0 12px var(--cyan);
-      }
-
-      h1 {
-        max-width: 670px;
-        margin: 23px 0 17px;
-        font-size: clamp(43px, 6.4vw, 76px);
-        line-height: 1.04;
-        letter-spacing: -3.5px;
-      }
-
-      .gradient-text {
-        color: var(--cyan);
-        background: linear-gradient(100deg, #7df2e5, #47b7f7);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .hero-copy {
-        max-width: 550px;
-        margin: 0;
-        color: var(--muted);
-        font-size: 17px;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 13px;
-        margin-top: 29px;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 9px;
-        min-height: 49px;
-        padding: 12px 19px;
-        border: 1px solid transparent;
-        border-radius: 12px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 800;
-        cursor: pointer;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s,
-          background 0.2s;
-      }
-
-      .btn:hover {
-        transform: translateY(-3px);
-      }
-
-      .btn-primary {
-        color: #041a26;
-        background: linear-gradient(100deg, #76eee0, #55c9f5);
-        box-shadow: 0 9px 28px rgba(49, 197, 210, 0.16);
-      }
-
-      .btn-secondary {
-        color: var(--text);
-        border-color: var(--border);
-        background: rgba(255, 255, 255, 0.035);
-      }
-
-      .hero-note {
-        margin-top: 18px;
-        color: #7fa4b5;
-        font-size: 12px;
-      }
-
-      .visual {
-        position: relative;
-        min-height: 400px;
-        display: grid;
-        place-items: center;
-        perspective: 1000px;
-      }
-
-      .orb {
-        position: absolute;
-        width: min(370px, 88%);
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background:
-          radial-gradient(
-            circle at 35% 30%,
-            rgba(91, 229, 228, 0.22),
-            transparent 45%
-          ),
-          radial-gradient(
-            circle,
-            rgba(26, 124, 169, 0.15),
-            rgba(5, 24, 39, 0) 70%
-          );
-        border: 1px solid rgba(89, 225, 220, 0.09);
-        box-shadow: 0 0 90px rgba(34, 155, 181, 0.08);
-      }
-
-      .fish-emoji {
-        position: relative;
-        z-index: 1;
-        display: block;
-        width: clamp(130px, 19vw, 220px);
-        height: clamp(130px, 19vw, 220px);
-        object-fit: contain;
-        filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.4));
-        animation: float 5s ease-in-out infinite;
-        user-select: none;
-      }
-
-      @keyframes float {
-        0%,
-        100% {
-          transform: translateY(0) rotate(-3deg);
-        }
-        50% {
-          transform: translateY(-13px) rotate(2deg);
-        }
-      }
-
-      .floating-card {
-        position: absolute;
-        z-index: 2;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 13px 16px;
-        border: 1px solid rgba(154, 228, 240, 0.19);
-        border-radius: 16px;
-        background: rgba(10, 36, 51, 0.88);
-        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.23);
-        backdrop-filter: blur(15px);
-        animation: float 6s ease-in-out infinite;
-      }
-
-      .floating-card strong {
-        display: block;
-        font-size: 13px;
-      }
-
-      .floating-card small {
-        display: block;
-        color: var(--muted);
-        font-size: 11px;
-      }
-
-      .floating-icon {
-        font-size: 25px;
-      }
-      .float-top {
-        top: 14%;
-        right: 0;
-      }
-      .float-bottom {
-        bottom: 12%;
-        left: 0;
-        animation-delay: -2s;
-      }
-
-      .section {
-        padding: 66px 0;
-      }
-
-      .section-heading {
-        max-width: 690px;
-        margin: 0 auto 34px;
-        text-align: center;
-      }
-
-      .section-kicker {
-        color: var(--cyan);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-      }
-
-      h2 {
-        margin: 10px 0;
-        font-size: clamp(29px, 4vw, 43px);
-        line-height: 1.17;
-        letter-spacing: -1.3px;
-      }
-
-      .section-heading p {
-        margin: 12px 0 0;
-        color: var(--muted);
-      }
-
-      .feature-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 17px;
-      }
-
-      .feature-card {
-        position: relative;
-        padding: 25px;
-        min-height: 205px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        background: linear-gradient(
-          145deg,
-          rgba(18, 49, 66, 0.83),
-          rgba(9, 30, 44, 0.84)
-        );
-        transition:
-          transform 0.25s,
-          border-color 0.25s,
-          box-shadow 0.25s;
-        overflow: hidden;
-      }
-
-      .feature-card::after {
-        content: "";
-        position: absolute;
-        width: 140px;
-        height: 140px;
-        top: -70px;
-        right: -60px;
-        border-radius: 50%;
-        background: rgba(89, 225, 220, 0.06);
-        transition: transform 0.3s;
-      }
-
-      .feature-card:hover {
-        transform: translateY(-5px);
-        border-color: rgba(89, 225, 220, 0.4);
-        box-shadow: 0 16px 35px rgba(0, 0, 0, 0.13);
-      }
-
-      .feature-card:hover::after {
-        transform: scale(1.7);
-      }
-
-      .feature-icon {
-        display: grid;
-        place-items: center;
-        width: 49px;
-        height: 49px;
-        margin-bottom: 16px;
-        border: 1px solid rgba(89, 225, 220, 0.14);
-        border-radius: 15px;
-        background: rgba(89, 225, 220, 0.09);
-        font-size: 24px;
-      }
-
-      .feature-card h3 {
-        margin: 0 0 7px;
-        font-size: 17px;
-      }
-      .feature-card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .workflow {
-        display: grid;
-        grid-template-columns: 0.85fr 1.15fr;
-        gap: 36px;
-        align-items: center;
-        padding: 35px;
-        border: 1px solid var(--border);
-        border-radius: 28px;
-        background: linear-gradient(
-          130deg,
-          rgba(18, 60, 76, 0.7),
-          rgba(8, 30, 44, 0.85)
-        );
-      }
-
-      .workflow-copy p {
-        color: var(--muted);
-      }
-
-      .steps {
-        display: grid;
-        gap: 13px;
-      }
-
-      .step {
-        display: flex;
-        gap: 15px;
-        align-items: flex-start;
-        padding: 16px;
-        border: 1px solid var(--border);
-        border-radius: 15px;
-        background: rgba(4, 23, 35, 0.5);
-      }
-
-      .step-number {
-        flex: 0 0 34px;
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 34px;
-        color: #04212b;
-        border-radius: 10px;
-        background: var(--cyan);
-        font-weight: 900;
-      }
-
-      .step strong {
-        display: block;
-        font-size: 14px;
-      }
-      .step p {
-        margin: 3px 0 0;
-        color: var(--muted);
-        font-size: 13px;
-      }
-
-      .privacy-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-      }
-
-      .info-card {
-        padding: 27px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        background: var(--panel);
-      }
-
-      .info-card h3 {
-        margin: 0 0 8px;
-      }
-      .info-card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .text-link {
-        display: inline-block;
-        margin-top: 17px;
-        color: var(--cyan);
-        font-weight: 800;
-        font-size: 14px;
-        text-decoration: none;
-      }
-
-      .text-link:hover {
-        text-decoration: underline;
-      }
-
-      .contact-banner {
-        padding: 42px 28px;
-        text-align: center;
-        border: 1px solid rgba(89, 225, 220, 0.2);
-        border-radius: 26px;
-        background:
-          radial-gradient(
-            ellipse at 50% 0%,
-            rgba(60, 192, 197, 0.13),
-            transparent 70%
-          ),
-          rgba(12, 38, 52, 0.8);
-      }
-
-      .contact-banner p {
-        color: var(--muted);
-      }
-      .contact-banner .hero-actions {
-        justify-content: center;
-      }
-
-      footer {
-        margin-top: 65px;
-        padding: 28px 0;
-        border-top: 1px solid var(--border);
-        color: #7fa1b2;
-        font-size: 12px;
-      }
-
-      .footer-inner {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: 18px;
-      }
-
-      .footer-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 18px;
-      }
-      .footer-links a {
-        text-decoration: none;
-      }
-      .footer-links a:hover {
-        color: var(--cyan);
-      }
-
-      .reveal {
-        opacity: 0;
-        transform: translateY(18px);
-        transition:
-          opacity 0.65s ease,
-          transform 0.65s ease;
-      }
-
-      .reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          scroll-behavior: auto !important;
-          transition-duration: 0.01ms !important;
-        }
-        .reveal {
-          opacity: 1;
-          transform: none;
-        }
-      }
-
-      @media (max-width: 850px) {
-        .hero-grid {
-          grid-template-columns: 1fr;
-          gap: 15px;
-        }
-        .hero {
-          padding-top: 65px;
-        }
-        .hero-copy {
-          max-width: 620px;
-        }
-        .visual {
-          min-height: 350px;
-        }
-        .fish-emoji {
-          width: 175px;
-          height: 175px;
-        }
-        .feature-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-        .workflow {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 620px) {
-        .container {
-          width: min(var(--width), calc(100% - 30px));
-        }
-        .nav-inner {
-          min-height: 68px;
-        }
-        .menu-toggle {
-          display: block;
-        }
-        .nav-links {
-          position: absolute;
-          top: 68px;
-          left: 0;
-          right: 0;
-          display: none;
-          align-items: stretch;
-          gap: 0;
-          padding: 10px 20px 17px;
-          background: rgba(6, 23, 36, 0.98);
-          border-bottom: 1px solid var(--border);
-        }
-        .nav-links.open {
-          display: flex;
-          flex-direction: column;
-        }
-        .nav-links a {
-          padding: 12px 8px;
-        }
-        .nav-links .nav-cta {
-          margin-top: 6px;
-          text-align: center;
-        }
-        .hero {
-          min-height: auto;
-          padding: 56px 0 35px;
-        }
-        h1 {
-          letter-spacing: -2px;
-          font-size: clamp(42px, 12vw, 60px);
-        }
-        .hero-copy {
-          font-size: 15px;
-        }
-        .visual {
-          min-height: 290px;
-        }
-        .fish-emoji {
-          width: 145px;
-          height: 145px;
-        }
-        .float-top {
-          top: 7%;
-          right: 0;
-        }
-        .float-bottom {
-          bottom: 5%;
-          left: 0;
-        }
-        .floating-card {
-          padding: 10px 12px;
-        }
-        .section {
-          padding: 46px 0;
-        }
-        .feature-grid,
-        .privacy-grid {
-          grid-template-columns: 1fr;
-        }
-        .feature-card {
-          min-height: auto;
-        }
-        .workflow {
-          padding: 23px;
-        }
-        .contact-banner {
-          padding: 31px 20px;
-        }
-        .footer-inner {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="ambient" aria-hidden="true">
-      <span class="bubble"></span>
-      <span class="bubble"></span>
-      <span class="bubble"></span>
-      <span class="bubble"></span>
-      <span class="bubble"></span>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#061724" />
+  <meta name="description" content="Read the AquaGuide AI Privacy Policy to learn how information is handled when you use the ornamental fish management application." />
+  <link rel="icon" type="image/png" href="../Icon/iconnn.png" />
+  <link rel="apple-touch-icon" href="../Icon/iconnn.png" />
+  <title>Privacy Policy | AquaGuide AI</title>
+  <style>
+    :root{--bg:#061724;--panel:rgba(15,43,59,.78);--cyan:#59e1dc;--blue:#36a9f5;--text:#f1fbff;--muted:#a7c2d0;--border:rgba(141,220,239,.16);--radius:20px;--width:900px}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:100px}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(ellipse at 12% 8%,rgba(23,131,173,.19),transparent 34%),radial-gradient(ellipse at 90% 42%,rgba(17,131,133,.13),transparent 32%),var(--bg);line-height:1.75;overflow-wrap:anywhere}
+    a{color:var(--cyan);text-underline-offset:4px}a:hover{color:#a0fff3}
+    .container{width:min(var(--width),calc(100% - 36px));margin-inline:auto}
+    .navbar{position:sticky;top:0;z-index:10;background:rgba(6,23,36,.88);border-bottom:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .nav-inner{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);font-weight:800;letter-spacing:-.5px;white-space:nowrap}
+    .brand-icon{display:block;width:43px;height:43px;flex:0 0 43px;object-fit:contain;border-radius:12px;filter:drop-shadow(0 5px 12px rgba(54,169,245,.18))}
+    .brand-name{font-size:18px}.brand-name span{color:var(--cyan)}
+    .nav-links{display:flex;align-items:center;gap:22px}.nav-links a{font-size:14px;font-weight:650;text-decoration:none;color:var(--muted)}.nav-links a:hover{color:var(--cyan)}
+    .menu-toggle{display:none;width:44px;height:44px;color:var(--text);border:1px solid var(--border);background:var(--panel);border-radius:12px;font:inherit;cursor:pointer}
+    .hero{padding:66px 0 36px}.eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid rgba(89,225,220,.23);border-radius:99px;background:rgba(34,139,154,.1);color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}.dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 12px var(--cyan)}
+    h1{margin:20px 0 12px;font-size:clamp(36px,6vw,58px);line-height:1.1;letter-spacing:-2px}.gradient{background:linear-gradient(100deg,#7df2e5,#47b7f7);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}.intro{max-width:720px;color:var(--muted);font-size:17px;margin:0}.updated{margin-top:20px;color:#7fa4b5;font-size:13px}
+    .layout{display:grid;grid-template-columns:220px minmax(0,1fr);align-items:start;gap:24px;padding:22px 0 70px}.toc,.policy{border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}.toc{position:sticky;top:98px;padding:20px}.toc h2{font-size:14px;margin:0 0 12px}.toc a{display:block;padding:6px 0;color:var(--muted);font-size:13px;text-decoration:none}.toc a:hover{color:var(--cyan)}
+    .policy{padding:clamp(20px,4vw,38px)}.policy section{scroll-margin-top:100px;padding:0 0 24px;margin:0 0 24px;border-bottom:1px solid var(--border)}.policy section:last-child{padding-bottom:0;margin-bottom:0;border-bottom:0}.policy h2{font-size:22px;line-height:1.3;margin:0 0 12px;letter-spacing:-.5px}.policy h3{font-size:16px;margin:18px 0 6px}.policy p{margin:8px 0;color:#d2e4ec}.policy ul{padding-left:22px;color:#d2e4ec}.policy li{padding:3px 0}.notice{padding:15px 17px;margin:16px 0;border:1px solid rgba(89,225,220,.2);border-radius:14px;background:rgba(89,225,220,.055);color:#d8f5f5;font-size:14px}
+    footer{border-top:1px solid var(--border);padding:26px 0;color:#7fa1b2;font-size:12px}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.footer-links{display:flex;gap:18px;flex-wrap:wrap}.footer-links a{color:var(--muted);text-decoration:none}.footer-links a:hover{color:var(--cyan)}
+    @media(max-width:760px){.layout{grid-template-columns:1fr}.toc{position:static}.toc nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.hero{padding-top:48px}.nav-inner{min-height:68px}.menu-toggle{display:block}.nav-links{display:none;position:absolute;top:68px;left:0;right:0;padding:10px 18px 16px;background:rgba(6,23,36,.98);border-bottom:1px solid var(--border);align-items:stretch;gap:0;flex-direction:column}.nav-links.open{display:flex}.nav-links a{padding:11px 6px}}
+    @media(max-width:420px){.container{width:calc(100% - 26px)}.brand{gap:8px}.brand-icon{width:38px;height:38px;flex-basis:38px}.brand-name{font-size:16px}.toc nav{grid-template-columns:1fr}.policy{padding:20px}.policy h2{font-size:20px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a class="brand" href="../" aria-label="AquaGuide AI home">
+        <img class="brand-icon" src="../Icon/iconnn.png" alt="" />
+        <span class="brand-name">AquaGuide <span>AI</span></span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="../#features">Features</a>
+        <a href="../#how-it-works">How It Works</a>
+        <a href="../account-deletion/index.html">Account Deletion</a>
+        <a href="../#contact">Contact</a>
+      </div>
     </div>
+  </nav>
 
-    <nav class="navbar" aria-label="Main navigation">
-      <div class="container nav-inner">
-        <a class="brand" href="#home" aria-label="AquaGuide AI home">
-          <img class="brand-icon" src="./Icon/iconnn.png" alt="" />
+  <header class="hero">
+    <div class="container">
+      <span class="eyebrow"><span class="dot"></span> Trust &amp; transparency</span>
+      <h1>Privacy <span class="gradient">Policy</span></h1>
+      <p class="intro">This Privacy Policy explains how AquaGuide AI handles information when you use our ornamental fish management mobile application and related services. Please read it carefully.</p>
+      <p class="updated">Last updated: October 28, 2026</p>
+    </div>
+  </header>
+
+  <main class="container layout">
+    <aside class="toc" aria-label="Privacy policy contents">
+      <h2>On this page</h2>
+      <nav>
+        <a href="#overview">Overview</a><a href="#information">Information involved</a>
+        <a href="#ai">AI fish recognition</a><a href="#firebase">App services</a>
+        <a href="#use">How information is used</a><a href="#sharing">Sharing</a>
+        <a href="#retention">Storage and retention</a><a href="#security">Security</a>
+        <a href="#choices">Your choices</a><a href="#children">Children's privacy</a>
+        <a href="#changes">Policy changes</a><a href="#contact">Contact us</a>
+      </nav>
+    </aside>
+
+    <article class="policy">
+      <section id="overview">
+        <h2>1. Overview</h2>
+        <p>AquaGuide AI is a mobile application designed to help users explore ornamental fish species and access fishkeeping information and tools. Features may include AI-assisted fish image recognition, a species library, tank and care guidance, disease and breeding information, aquatic plant and equipment information, reminders, and a logbook.</p>
+        <p>This policy applies to the AquaGuide AI app and the services it uses. Some features may process information differently depending on whether you use them, whether you sign in, and the permissions you grant.</p>
+      </section>
+
+      <section id="information">
+        <h2>2. Information that may be involved</h2>
+        <p>The information involved depends on the features you use. It may include:</p>
+        <ul>
+          <li><strong>Account information:</strong> information associated with your sign-in account, such as your email address and authentication identifiers, when you create an account or sign in.</li>
+          <li><strong>Fish images:</strong> an image you choose or capture and submit for AI-assisted fish recognition.</li>
+          <li><strong>User-created records:</strong> reminders, logbook entries, notes, and related information you choose to save in the app.</li>
+          <li><strong>Device permissions:</strong> camera or photo-library access when you choose to capture or select an image. You can manage these permissions in your device settings.</li>
+          <li><strong>Technical information:</strong> limited information that may be processed by the app platform or service providers to operate, protect, and troubleshoot their services, according to their configurations and policies.</li>
+        </ul>
+        <p>AquaGuide AI does not need you to submit unrelated personal information to browse general species and care content. Please avoid including sensitive or identifying information in images, notes, or other submissions unless it is necessary for your use of the app.</p>
+      </section>
+
+      <section id="ai">
+        <h2>3. AI-assisted fish recognition</h2>
+        <p>If you use the AI fish recognition feature, the image you submit and the prompt or request needed to process it may be sent to a third-party AI service through the application's AI routing provider. The service processes the request and returns a response that the app uses to present an identification or related information.</p>
+        <div class="notice"><strong>Important:</strong> Do not assume that an image is immediately deleted or that zero data retention applies unless the current terms for the exact provider, model, and service route confirm it. Processing, logging, and retention may depend on the providers and settings in effect when a request is made.</div>
+        <p>AI results may be inaccurate or incomplete and should be treated as guidance, not a guarantee of species identity, diagnosis, or veterinary advice. Check important fish-care decisions against reliable sources or a qualified aquatic animal professional.</p>
+        <p>By choosing to use AI recognition, you understand that the image and request must be transmitted to the relevant service provider for processing. If you do not want an image sent to an external AI service, do not use that feature.</p>
+      </section>
+
+      <section id="firebase">
+        <h2>4. Authentication and app data services</h2>
+        <p>AquaGuide AI uses Firebase services for account authentication and cloud data features. When you sign in or use cloud-synced features, information necessary for authentication and the data you choose to save may be processed by Firebase according to the app's implementation and Google's applicable terms and privacy documentation.</p>
+        <p>Reminder and logbook information may be associated with your account so that it can be retrieved across supported sessions or devices. Guest access may be available for some features, while saving certain personal records may require an account.</p>
+        <p>For more information about Google's handling of information, review the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>.</p>
+      </section>
+
+      <section id="use">
+        <h2>5. How information is used</h2>
+        <p>Information may be used to:</p>
+        <ul>
+          <li>provide account sign-in and account-related functions;</li>
+          <li>process images submitted for AI-assisted recognition and return results;</li>
+          <li>save and display reminders, logbook entries, and other records you create;</li>
+          <li>operate, maintain, troubleshoot, and help protect the app and its services; and</li>
+          <li>respond to support, privacy, or account-deletion requests.</li>
+        </ul>
+        <p>The exact processing depends on the feature used and the service providers involved.</p>
+      </section>
+
+      <section id="sharing">
+        <h2>6. Sharing and third-party services</h2>
+        <p>AquaGuide AI does not operate in isolation. Information may be transmitted to service providers when needed to deliver a feature, including:</p>
+        <ul>
+          <li><strong>AI routing and model providers:</strong> images and associated requests submitted for AI recognition are sent for processing.</li>
+          <li><strong>Firebase / Google:</strong> authentication and cloud-data services used by the app may process account and saved app information.</li>
+          <li><strong>Your device and operating system:</strong> camera, photo selection, and local notification features operate through platform capabilities when you grant permission.</li>
+        </ul>
+        <p>These providers may handle information under their own terms, privacy policies, technical settings, and retention practices. Review the applicable provider documentation for details. This policy does not override third-party policies.</p>
+      </section>
+
+      <section id="retention">
+        <h2>7. Storage and retention</h2>
+        <p>Account and cloud-saved records may remain stored while needed to provide the relevant app features, subject to the service configuration and applicable provider practices. Information sent to third-party AI services may be processed or retained according to the policies and settings applicable to the specific service route.</p>
+        <p>We do not make a blanket promise that all submitted images or requests are immediately erased. If you need to know the precise retention period for a specific AI provider or model, consult that provider's current documentation or contact us for information about the route used by the app.</p>
+      </section>
+
+      <section id="security">
+        <h2>8. Security</h2>
+        <p>Reasonable measures and the security features of the underlying platforms are used to support the operation of the app. However, no app, internet transmission, or storage system can be guaranteed to be completely secure. Keep your account credentials private and use the device permissions and account controls available to you.</p>
+      </section>
+
+      <section id="choices">
+        <h2>9. Your choices and account deletion</h2>
+        <ul>
+          <li>You can choose whether to use AI recognition and whether to submit an image.</li>
+          <li>You can manage camera and photo-library permissions through your device settings.</li>
+          <li>You can choose what information to enter into reminders and logbook notes.</li>
+          <li>You can request account deletion using the instructions on our <a href="../account-deletion/index.html">Account &amp; Data Deletion</a> page.</li>
+        </ul>
+        <p>Deleting an account may not instantly remove information held independently by third-party providers or records they are required or permitted to retain. Any deletion request will be handled in accordance with the app's capabilities and applicable provider processes.</p>
+      </section>
+
+      <section id="children">
+        <h2>10. Children's privacy</h2>
+        <p>AquaGuide AI is not intended to collect personal information from children in violation of applicable law. If you believe a child has provided personal information inappropriately, please contact us so we can review the concern and take appropriate steps where possible.</p>
+      </section>
+
+      <section id="changes">
+        <h2>11. Changes to this policy</h2>
+        <p>This Privacy Policy may be updated as the app, its features, or its service providers change. The latest version will be published on this page with an updated date. Please review it periodically.</p>
+      </section>
+
+      <section id="contact">
+        <h2>12. Contact us</h2>
+        <p>If you have questions about this Privacy Policy, information handled by AquaGuide AI, or an account-related request, contact:</p>
+        <p><strong>AquaGuide AI</strong><br />Email: <a href="mailto:aquaguideai@gmail.com">aquaguideai@gmail.com</a></p>
+        <p><a href="../">← Back to AquaGuide AI homepage</a></p>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>
+        <a class="brand" href="../">
+          <img class="brand-icon" src="../Icon/iconnn.png" alt="" />
           <span class="brand-name">AquaGuide <span>AI</span></span>
         </a>
-
-        <button
-          class="menu-toggle"
-          id="menuToggle"
-          aria-label="Open navigation menu"
-          aria-expanded="false"
-        >
-          ☰
-        </button>
-
-        <div class="nav-links" id="navLinks">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#privacy">Privacy</a>
-          <a href="#contact" class="nav-cta">Contact Us ↗</a>
-        </div>
+        <p>Ornamental Fish Management Mobile Application</p>
+        <p>© <span id="year"></span> AquaGuide AI. All rights reserved.</p>
       </div>
-    </nav>
-
-    <header class="hero" id="home">
-      <div class="container hero-grid">
-        <div class="hero-content">
-          <div class="eyebrow">
-            <span class="eyebrow-dot"></span>
-            Your fishkeeping companion
-          </div>
-
-          <h1>
-            A better way to<br />
-            <span class="gradient-text">care for your fish.</span>
-          </h1>
-
-          <p class="hero-copy">
-            Discover ornamental fish, explore species information, and organize
-            your aquarium care routine with AquaGuide AI — a mobile app built
-            for fishkeeping enthusiasts.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#features">
-              Explore Features <span aria-hidden="true">→</span>
-            </a>
-            <a class="btn btn-secondary" href="#about">
-              Discover AquaGuide AI
-            </a>
-          </div>
-
-          <p class="hero-note">Identify · Learn · Care · Keep track</p>
-        </div>
-
-        <div class="visual" aria-label="Aquatic fish illustration">
-          <div class="orb"></div>
-          <img class="fish-emoji" src="./Icon/iconnn.png" alt="AquaGuide AI app icon" />
-
-          <div class="floating-card float-top">
-            <span class="floating-icon">🔎</span>
-            <span>
-              <strong>Fish Recognition</strong>
-              <small>Explore ornamental species</small>
-            </span>
-          </div>
-
-          <div class="floating-card float-bottom">
-            <span class="floating-icon">💧</span>
-            <span>
-              <strong>Care &amp; Reminders</strong>
-              <small>Organize your fishkeeping routine</small>
-            </span>
-          </div>
-        </div>
+      <div class="footer-links">
+        <a href="../">Home</a>
+        <a href="../account-deletion/index.html">Account Deletion</a>
+        <a href="mailto:aquaguideai@gmail.com">Contact</a>
       </div>
-    </header>
-
-    <main>
-      <section class="section" id="about">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker">Meet AquaGuide AI</span>
-            <h2>Everything for your aquatic hobby, in one place.</h2>
-            <p>
-              AquaGuide AI brings ornamental fish information and everyday
-              fishkeeping tools together in one convenient mobile application.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="features">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker">Explore the app</span>
-            <h2>Made for your aquarium journey.</h2>
-            <p>
-              Discover the tools that help you learn about ornamental fish and
-              manage your aquarium care activities.
-            </p>
-          </div>
-
-          <div class="feature-grid">
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🐠</div>
-              <h3>Species Library</h3>
-              <p>
-                Explore ornamental fish species and learn about their
-                characteristics and care needs.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🔍</div>
-              <h3>AI Fish Recognition</h3>
-              <p>
-                Submit a fish image for AI-assisted identification and related
-                information.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">💧</div>
-              <h3>Tank &amp; Care Guidance</h3>
-              <p>
-                Explore aquarium setup, water conditions, and general fish care
-                recommendations.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🩺</div>
-              <h3>Disease Guide</h3>
-              <p>
-                Learn about common ornamental fish health concerns and care
-                information.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🌱</div>
-              <h3>Aquatic Plants</h3>
-              <p>
-                Discover aquatic plants and information relevant to planted
-                aquariums.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🧰</div>
-              <h3>Fishkeeping Equipment</h3>
-              <p>
-                Explore equipment commonly used to maintain an aquarium
-                environment.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🪺</div>
-              <h3>Breeding Guide</h3>
-              <p>Explore breeding information for ornamental fish species.</p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">🔔</div>
-              <h3>Reminders</h3>
-              <p>
-                Organize recurring fishkeeping tasks such as feeding and water
-                changes.
-              </p>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon" aria-hidden="true">📔</div>
-              <h3>Logbook</h3>
-              <p>
-                Keep a record of fishkeeping activities and aquarium
-                maintenance.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="how-it-works">
-        <div class="container">
-          <div class="workflow reveal">
-            <div class="workflow-copy">
-              <span class="section-kicker">Simple to explore</span>
-              <h2>Your fishkeeping journey, organized.</h2>
-              <p>
-                Use the app to explore fish information, find relevant care
-                guidance, and keep track of regular aquarium tasks.
-              </p>
-              <a class="btn btn-primary" href="#contact">Get in Touch →</a>
-            </div>
-
-            <div class="steps">
-              <div class="step">
-                <span class="step-number">1</span>
-                <div>
-                  <strong>Discover</strong>
-                  <p>
-                    Browse the species library or use AI-assisted fish
-                    recognition.
-                  </p>
-                </div>
-              </div>
-
-              <div class="step">
-                <span class="step-number">2</span>
-                <div>
-                  <strong>Learn</strong>
-                  <p>
-                    Explore species details, aquarium guidance, and fishkeeping
-                    resources.
-                  </p>
-                </div>
-              </div>
-
-              <div class="step">
-                <span class="step-number">3</span>
-                <div>
-                  <strong>Keep track</strong>
-                  <p>
-                    Use reminders and your logbook to organize ongoing care
-                    activities.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="privacy">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker">Trust &amp; transparency</span>
-            <h2>Your information matters.</h2>
-            <p>
-              Find the information you need about privacy, account management,
-              and contacting the AquaGuide AI team.
-            </p>
-          </div>
-
-          <div class="privacy-grid">
-            <article class="info-card reveal">
-              <h3>🔒 Privacy Policy</h3>
-              <p>
-                Review information about the app's data practices, services, and
-                handling of user information.
-              </p>
-              <a class="text-link" href="privacy-policy/index.html"
-                >Read Privacy Policy →</a
-              >
-            </article>
-
-            <article class="info-card reveal">
-              <h3>🗑️ Account &amp; Data Deletion</h3>
-              <p>
-                Learn how to request account deletion and the removal of
-                associated application data.
-              </p>
-              <a class="text-link" href="account-deletion/index.html"
-                >View Deletion Information →</a
-              >
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="contact">
-        <div class="container">
-          <div class="contact-banner reveal">
-            <span class="section-kicker">We're here to help</span>
-            <h2>Questions about AquaGuide AI?</h2>
-            <p>
-              Contact us for app support, privacy questions, or account-related
-              requests.
-            </p>
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="mailto:aquaguideai@gmail.com">
-                ✉ Email AquaGuide AI
-              </a>
-            </div>
-            <p class="hero-note">aquaguideai@gmail.com</p>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <div class="container footer-inner">
-        <div>
-          <a class="brand" href="#home">
-            <img class="brand-icon" src="./Icon/iconnn.png" alt="" />
-            <span class="brand-name">AquaGuide <span>AI</span></span>
-          </a>
-          <p>Ornamental Fish Management Mobile Application</p>
-          <p>© <span id="year"></span> AquaGuide AI. All rights reserved.</p>
-        </div>
-
-        <div class="footer-links">
-          <a href="#features">Features</a>
-          <a href="privacy-policy/index.html">Privacy Policy</a>
-          <a href="account-deletion/index.html">Account Deletion</a>
-          <a href="mailto:aquaguideai@gmail.com">Contact</a>
-        </div>
-      </div>
-    </footer>
-
-    <script>
-      // Mobile navigation
-      const menuToggle = document.getElementById("menuToggle");
-      const navLinks = document.getElementById("navLinks");
-
-      menuToggle.addEventListener("click", () => {
-        const isOpen = navLinks.classList.toggle("open");
-        menuToggle.setAttribute("aria-expanded", String(isOpen));
-        menuToggle.setAttribute(
-          "aria-label",
-          isOpen ? "Close navigation menu" : "Open navigation menu",
-        );
-        menuToggle.textContent = isOpen ? "✕" : "☰";
-      });
-
-      navLinks.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          navLinks.classList.remove("open");
-          menuToggle.setAttribute("aria-expanded", "false");
-          menuToggle.setAttribute("aria-label", "Open navigation menu");
-          menuToggle.textContent = "☰";
-        });
-      });
-
-      // Reveal elements as they enter the viewport.
-      const revealItems = document.querySelectorAll(".reveal");
-
-      if ("IntersectionObserver" in window) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.12 },
-        );
-
-        revealItems.forEach((item) => observer.observe(item));
-      } else {
-        revealItems.forEach((item) => item.classList.add("visible"));
-      }
-
-      // Current copyright year.
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
-  </body>
+    </div>
+  </footer>
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+      menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+      menuToggle.textContent = isOpen ? '✕' : '☰';
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.setAttribute('aria-label', 'Open navigation menu');
+      menuToggle.textContent = '☰';
+    }));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
 </html>

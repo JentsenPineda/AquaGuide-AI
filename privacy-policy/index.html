@@ -9,6 +9,7 @@
       content="Read the AquaGuide AI Privacy Policy to understand how account information, fishkeeping records, and AI fish identification requests are handled."
     />
     <title>Privacy Policy | AquaGuide AI</title>
+    <link rel="icon" type="image/png" href="../Icon/iconnn.png" />
 
     <style>
       :root {
@@ -105,10 +106,18 @@
         height: 40px;
         display: grid;
         place-items: center;
+        flex: 0 0 40px;
+        overflow: hidden;
         border-radius: 13px;
         background: linear-gradient(135deg, #52e0d0, #63baff);
-        color: #071522;
-        font-size: 22px;
+      }
+
+      .brand-icon img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: inherit;
       }
 
       .brand small {
@@ -484,7 +493,9 @@
     <header class="site-header">
       <nav class="nav" aria-label="Main navigation">
         <a class="brand" href="../" aria-label="AquaGuide AI home">
-          <span class="brand-icon" aria-hidden="true">🐠</span>
+          <span class="brand-icon" aria-hidden="true">
+            <img src="../Icon/iconnn.png" alt="" />
+          </span>
           <span>
             AquaGuide AI
             <small>Ornamental Fish Companion</small>

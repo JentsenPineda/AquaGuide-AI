@@ -1,219 +1,788 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AquaGuide AI — Account Deletion</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071522" />
+    <meta
+      name="description"
+      content="Learn how to request deletion of your AquaGuide AI account and associated application data."
+    />
+    <title>Account &amp; Data Deletion | AquaGuide AI</title>
 
-  <style>
-    :root {
-      --primary: #1687c7;
-      --dark: #123c55;
-      --text: #1f2937;
-      --muted: #64748b;
-      --background: #f4f9fc;
-      --border: #dbe7ef;
-    }
+    <style>
+      :root {
+        --bg: #071522;
+        --surface: #0d2131;
+        --surface-light: #112a3c;
+        --cyan: #52e0d0;
+        --blue: #63baff;
+        --text: #eaf4fb;
+        --muted: #a2b6c6;
+        --border: rgba(165, 203, 224, 0.15);
+        --max-width: 1000px;
+      }
 
-    * {
-      box-sizing: border-box;
-    }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    body {
-      margin: 0;
-      background: var(--background);
-      color: var(--text);
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-      line-height: 1.65;
-    }
+      html {
+        scroll-behavior: smooth;
+      }
 
-    main {
-      max-width: 850px;
-      margin: 0 auto;
-      padding: 30px 16px 60px;
-    }
+      body {
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          sans-serif;
+        background:
+          radial-gradient(
+            ellipse at 80% 0%,
+            rgba(27, 115, 151, 0.17),
+            transparent 40%
+          ),
+          var(--bg);
+        color: var(--text);
+        line-height: 1.75;
+        -webkit-font-smoothing: antialiased;
+      }
 
-    article {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 34px;
-      box-shadow: 0 8px 30px rgba(15, 55, 80, 0.06);
-    }
+      a {
+        color: var(--cyan);
+        text-decoration: none;
+      }
 
-    h1 {
-      margin: 0;
-      color: var(--primary);
-      font-size: 32px;
-    }
+      a:hover {
+        color: var(--blue);
+      }
 
-    h2 {
-      margin-top: 30px;
-      color: var(--dark);
-      font-size: 21px;
-    }
+      a:focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 4px;
+        border-radius: 4px;
+      }
 
-    p {
-      margin: 12px 0;
-    }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(7, 21, 34, 0.92);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(16px);
+      }
 
-    .subtitle {
-      margin-top: 5px;
-      font-size: 19px;
-      font-weight: 700;
-    }
+      .nav {
+        max-width: var(--max-width);
+        min-height: 76px;
+        margin: auto;
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
 
-    .notice {
-      background: #eef8fd;
-      border-left: 4px solid var(--primary);
-      padding: 16px;
-      border-radius: 8px;
-      margin: 22px 0;
-    }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--text);
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+      }
 
-    .steps {
-      padding-left: 22px;
-    }
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background: linear-gradient(135deg, var(--cyan), var(--blue));
+        color: #071522;
+        font-size: 22px;
+      }
 
-    .steps li {
-      margin: 10px 0;
-    }
+      .brand small {
+        display: block;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+      }
 
-    .email {
-      display: inline-block;
-      margin-top: 8px;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        font-size: 13px;
+        font-weight: 600;
+      }
 
-    .footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 18px;
-    }
+      .nav-links a {
+        color: var(--muted);
+      }
 
-    @media (max-width: 600px) {
-      article {
-        padding: 22px 18px;
-        border-radius: 14px;
+      .nav-links a:hover,
+      .nav-links a[aria-current="page"] {
+        color: var(--cyan);
+      }
+
+      .home-link {
+        padding: 9px 15px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      main {
+        max-width: var(--max-width);
+        margin: auto;
+        padding: 58px 24px 78px;
+      }
+
+      .hero {
+        max-width: 760px;
+        margin-bottom: 34px;
+        animation: fade-up 0.6s ease both;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        color: var(--cyan);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 22px;
+        height: 2px;
+        background: var(--cyan);
+        border-radius: 2px;
       }
 
       h1 {
-        font-size: 27px;
+        margin-bottom: 16px;
+        font-size: clamp(35px, 6vw, 54px);
+        line-height: 1.12;
+        letter-spacing: -1.8px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <main>
-    <article>
+      h1 span {
+        color: var(--cyan);
+      }
 
-      <h1>AquaGuide AI</h1>
-      <p class="subtitle">Account &amp; Data Deletion</p>
+      .hero-description {
+        max-width: 660px;
+        color: var(--muted);
+        font-size: 16px;
+      }
 
-      <p>
-        AquaGuide AI provides users with the ability to delete their account
-        and associated application data.
-      </p>
+      .page-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 22px;
+        padding: 9px 13px;
+        border: 1px solid var(--border);
+        background: rgba(17, 42, 60, 0.65);
+        border-radius: 9px;
+        color: var(--muted);
+        font-size: 12px;
+      }
 
-      <div class="notice">
-        <strong>Important:</strong>
-        If you still have AquaGuide AI installed, you can delete your account
-        directly from the application through
-        <strong>Profile → Account → Delete Account</strong>.
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.8fr);
+        gap: 22px;
+        align-items: start;
+      }
+
+      .panel {
+        min-width: 0;
+        background: linear-gradient(
+          145deg,
+          rgba(13, 33, 49, 0.96),
+          rgba(9, 27, 41, 0.96)
+        );
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: clamp(22px, 4vw, 34px);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.12);
+      }
+
+      .panel h2 {
+        margin-bottom: 12px;
+        font-size: 21px;
+        line-height: 1.4;
+        letter-spacing: -0.4px;
+      }
+
+      .panel h3 {
+        margin: 22px 0 8px;
+        color: var(--cyan);
+        font-size: 15px;
+      }
+
+      .panel p {
+        margin: 11px 0;
+        color: #b9cbd7;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+      }
+
+      .notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin: 22px 0 27px;
+        padding: 17px;
+        border: 1px solid rgba(82, 224, 208, 0.2);
+        border-radius: 13px;
+        background: rgba(82, 224, 208, 0.06);
+      }
+
+      .notice-icon {
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        background: rgba(82, 224, 208, 0.12);
+        color: var(--cyan);
+        font-size: 17px;
+      }
+
+      .notice strong {
+        color: var(--text);
+      }
+
+      .notice p {
+        margin: 3px 0 0;
+      }
+
+      .path {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 8px 11px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface-light);
+        color: var(--cyan);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .steps {
+        list-style: none;
+        margin: 20px 0 26px;
+        padding: 0;
+        counter-reset: deletion-step;
+      }
+
+      .steps li {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin: 0 0 17px;
+        color: #b9cbd7;
+        font-size: 14px;
+        counter-increment: deletion-step;
+      }
+
+      .steps li::before {
+        content: counter(deletion-step);
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid rgba(82, 224, 208, 0.25);
+        border-radius: 9px;
+        background: rgba(82, 224, 208, 0.07);
+        color: var(--cyan);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .data-list {
+        list-style: none;
+        padding: 0;
+        margin: 17px 0;
+      }
+
+      .data-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--border);
+        color: #b9cbd7;
+        font-size: 14px;
+      }
+
+      .data-list li:last-child {
+        border-bottom: 0;
+      }
+
+      .check {
+        color: var(--cyan);
+        font-weight: 800;
+      }
+
+      .email-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        margin-top: 15px;
+        padding: 12px 17px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--cyan), var(--blue));
+        color: #071522;
+        font-size: 13px;
+        font-weight: 800;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        overflow-wrap: anywhere;
+      }
+
+      .email-button:hover {
+        color: #071522;
+        transform: translateY(-2px);
+        box-shadow: 0 9px 24px rgba(82, 224, 208, 0.15);
+      }
+
+      .secondary-panel {
+        margin-top: 22px;
+      }
+
+      .small-note {
+        color: var(--muted) !important;
+        font-size: 12px !important;
+      }
+
+      .side-panel {
+        position: sticky;
+        top: 100px;
+      }
+
+      .side-panel + .side-panel {
+        margin-top: 18px;
+      }
+
+      .side-panel h2 {
+        font-size: 17px;
+      }
+
+      .side-panel p {
+        font-size: 13px;
+      }
+
+      .contact-email {
+        display: inline-block;
+        margin-top: 9px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      .related-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 17px;
+      }
+
+      .related-links a {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 13px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .related-links a:hover {
+        border-color: var(--cyan);
+        background: rgba(82, 224, 208, 0.05);
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        background: rgba(4, 15, 25, 0.6);
+      }
+
+      .footer-inner {
+        max-width: var(--max-width);
+        margin: auto;
+        padding: 27px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .footer-inner p,
+      .footer-links {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 17px;
+        flex-wrap: wrap;
+      }
+
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 760px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .side-panel {
+          position: static;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .nav {
+          min-height: 66px;
+          padding: 12px 17px;
+        }
+
+        .brand {
+          font-size: 15px;
+        }
+
+        .brand-icon {
+          width: 35px;
+          height: 35px;
+        }
+
+        .nav-links {
+          gap: 10px;
+          font-size: 12px;
+        }
+
+        .home-link {
+          padding: 8px 10px;
+        }
+
+        .nav-links .privacy-link {
+          display: none;
+        }
+
+        main {
+          padding: 38px 15px 48px;
+        }
+
+        h1 {
+          letter-spacing: -1px;
+        }
+
+        .hero-description {
+          font-size: 14px;
+        }
+
+        .panel {
+          padding: 22px 18px;
+          border-radius: 14px;
+        }
+
+        .panel h2 {
+          font-size: 19px;
+        }
+
+        .panel p,
+        .steps li,
+        .data-list li {
+          font-size: 13px;
+        }
+
+        .footer-inner {
+          padding: 24px 17px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html" aria-label="AquaGuide AI home">
+          <span class="brand-icon" aria-hidden="true">🐠</span>
+          <span>
+            AquaGuide AI
+            <small>Ornamental Fish Companion</small>
+          </span>
+        </a>
+
+        <div class="nav-links">
+          <a
+            class="home-link"
+            href="https://jentsenpineda.github.io/AquaGuide-AI/"
+            >Home</a
+          >
+          <a class="privacy-link" href="../privacy-policy/index.html"
+            >Privacy</a
+          >
+          <a href="./" aria-current="page">Account Deletion</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Account &amp; Data Control</div>
+        <h1>Your account.<br /><span>Your choice.</span></h1>
+        <p class="hero-description">
+          AquaGuide AI provides a way to request deletion of your account and
+          associated application data. Find the available options and learn what
+          happens when your deletion request is processed.
+        </p>
+
+        <div class="page-tag">
+          <span aria-hidden="true">🔒</span>
+          Account deletion information
+        </div>
+      </section>
+
+      <div class="layout">
+        <div>
+          <section class="panel">
+            <h2>How to Delete Your Account</h2>
+            <p>
+              If you can still access AquaGuide AI, you can initiate account
+              deletion directly in the mobile application.
+            </p>
+
+            <div class="notice">
+              <div class="notice-icon" aria-hidden="true">!</div>
+              <div>
+                <strong>Already have the app installed?</strong>
+                <p>Open AquaGuide AI and navigate to the following location:</p>
+                <div class="path">Profile → Account → Delete Account</div>
+              </div>
+            </div>
+
+            <h3>Request deletion by email</h3>
+            <p>
+              If you no longer have access to the application, or prefer to
+              request deletion through the web, contact us using the email
+              address below.
+            </p>
+            <p>
+              Include the email address associated with your AquaGuide AI
+              account so that we can identify the account and process the
+              request. We may ask for additional verification to protect your
+              account.
+            </p>
+
+            <a
+              class="email-button"
+              href="mailto:aquaguideai@gmail.com?subject=AquaGuide%20AI%20Account%20Deletion%20Request"
+            >
+              <span aria-hidden="true">✉</span>
+              Request Account Deletion
+            </a>
+
+            <p class="small-note">
+              This opens your device's or browser's default email application.
+              Sending the email does not itself confirm that deletion has been
+              completed.
+            </p>
+          </section>
+
+          <section class="panel secondary-panel">
+            <h2>What Data Will Be Deleted?</h2>
+            <p>
+              After the request is verified and processed, AquaGuide AI will
+              delete the Firebase Authentication account and associated
+              application data controlled by AquaGuide AI, including:
+            </p>
+
+            <ul class="data-list">
+              <li>
+                <span class="check">✓</span
+                ><span>User profile information</span>
+              </li>
+              <li><span class="check">✓</span><span>Logbook entries</span></li>
+              <li><span class="check">✓</span><span>Reminders</span></li>
+              <li><span class="check">✓</span><span>AI scan history</span></li>
+              <li>
+                <span class="check">✓</span
+                ><span>Daily AI scan usage records</span>
+              </li>
+            </ul>
+
+            <div class="notice">
+              <div class="notice-icon" aria-hidden="true">!</div>
+              <div>
+                <strong>Permanent action</strong>
+                <p>
+                  Account deletion is permanent and cannot be undone. Make sure
+                  you no longer need the account data before confirming
+                  deletion.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel secondary-panel">
+            <h2>How the Request Is Processed</h2>
+            <ol class="steps">
+              <li>
+                Submit a deletion request through the in-app Delete Account
+                feature or the email address provided on this page.
+              </li>
+              <li>
+                Provide the email address associated with your AquaGuide AI
+                account when requesting deletion by email.
+              </li>
+              <li>
+                We may verify the request to help prevent unauthorized account
+                deletion.
+              </li>
+              <li>
+                Once verified and processed, the associated account and
+                application data controlled by AquaGuide AI will be deleted.
+              </li>
+            </ol>
+            <p>
+              If you submit your request by email, we will need to review and
+              process it. Sending a request does not mean the account has
+              already been deleted.
+            </p>
+          </section>
+
+          <section class="panel secondary-panel">
+            <h2>Third-Party Services and Data Retention</h2>
+            <p>
+              AquaGuide AI uses third-party services, including Firebase and
+              NaraRouter with its configured AI model provider, to support
+              application features.
+            </p>
+            <p>
+              Deletion of your AquaGuide AI account and application data does
+              not necessarily delete records independently held by third-party
+              service providers. Those providers may retain information
+              according to their own applicable privacy policies, terms, and
+              retention practices.
+            </p>
+            <p>
+              For more information about information handling, please read our
+              Privacy Policy.
+            </p>
+
+            <div class="related-links">
+              <a href="../privacy-policy/index.html">Read Privacy Policy →</a>
+            </div>
+          </section>
+        </div>
+
+        <aside>
+          <section class="panel side-panel">
+            <h2>Need assistance?</h2>
+            <p>
+              Contact us if you cannot access the in-app deletion feature or
+              have questions about a deletion request.
+            </p>
+            <a class="contact-email" href="mailto:aquaguideai@gmail.com"
+              >aquaguideai@gmail.com</a
+            >
+          </section>
+
+          <section class="panel side-panel">
+            <h2>Before you proceed</h2>
+            <ul class="data-list">
+              <li>
+                <span class="check">✓</span
+                ><span>Confirm the account you want to delete.</span>
+              </li>
+              <li>
+                <span class="check">✓</span
+                ><span>Understand that deletion is permanent.</span>
+              </li>
+              <li>
+                <span class="check">✓</span
+                ><span>Review the data covered by deletion.</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="panel side-panel">
+            <h2>Related pages</h2>
+            <div class="related-links">
+              <a
+                class="home-link"
+                href="https://jentsenpineda.github.io/AquaGuide-AI/"
+                >Home</a
+              >
+              <a href="../privacy-policy/index.html">Privacy Policy</a>
+            </div>
+          </section>
+        </aside>
       </div>
+    </main>
 
-      <h2>How to Request Account Deletion</h2>
+    <footer>
+      <div class="footer-inner">
+        <p>© <span id="year">2026</span> AquaGuide AI. All rights reserved.</p>
+        <div class="footer-links">
+          <a
+            class="home-link"
+            href="https://jentsenpineda.github.io/AquaGuide-AI/"
+            >Home</a
+          >
+          <a href="../privacy-policy/index.html">Privacy Policy</a>
+          <a href="./">Account Deletion</a>
+          <a href="mailto:aquaguideai@gmail.com">Contact</a>
+        </div>
+      </div>
+    </footer>
 
-      <p>
-        If you no longer have access to the AquaGuide AI application, or if
-        you prefer to submit a deletion request through the web, contact us
-        using the email address below.
-      </p>
-
-      <p>
-        Please include the email address associated with your AquaGuide AI
-        account so that we can identify the account and process the request.
-      </p>
-
-      <a
-        class="email"
-        href="mailto:aquaguideai@gmail.com?subject=AquaGuide%20AI%20Account%20Deletion%20Request"
-      >
-        aquaguideai@gmail.com
-      </a>
-
-      <h2>What Will Be Deleted</h2>
-
-      <p>
-        After the account deletion request is verified and processed, AquaGuide
-        AI will delete the user's Firebase Authentication account and
-        associated application data controlled by AquaGuide AI, including:
-      </p>
-
-      <ul class="steps">
-        <li>User profile information</li>
-        <li>Logbook entries</li>
-        <li>Reminders</li>
-        <li>AI scan history</li>
-        <li>Daily AI scan usage records</li>
-      </ul>
-
-      <h2>Deletion Process</h2>
-
-      <ol class="steps">
-        <li>Submit a deletion request using the email address above.</li>
-        <li>Provide the email address associated with your AquaGuide AI account.</li>
-        <li>
-          The request may be verified to protect the account from unauthorized
-          deletion.
-        </li>
-        <li>
-          Once verified, the associated account and application data will be
-          deleted.
-        </li>
-      </ol>
-
-      <p>
-        Account deletion is permanent and cannot be undone.
-      </p>
-
-      <h2>Third-Party Services</h2>
-
-      <p>
-        Third-party service providers may retain information according to
-        their own applicable privacy policies and retention practices.
-        AquaGuide AI cannot directly control the retention practices of
-        independent third-party services.
-      </p>
-
-      <h2>Contact</h2>
-
-      <p>
-        For account deletion assistance or privacy-related concerns:
-      </p>
-
-      <a
-        class="email"
-        href="mailto:aquaguideai@gmail.com"
-      >
-        aquaguideai@gmail.com
-      </a>
-
-    </article>
-
-    <div class="footer">
-      AquaGuide AI · Account &amp; Data Deletion
-    </div>
-  </main>
-</body>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
 </html>

@@ -9,6 +9,8 @@
       content="Learn how to request deletion of your AquaGuide AI account and associated application data."
     />
     <title>Account &amp; Data Deletion | AquaGuide AI</title>
+    <link rel="icon" type="image/png" href="../Icon/iconnn.png" />
+    <link rel="apple-touch-icon" href="../Icon/iconnn.png" />
 
     <style>
       :root {
@@ -102,12 +104,10 @@
       .brand-icon {
         width: 40px;
         height: 40px;
-        display: grid;
-        place-items: center;
-        border-radius: 13px;
-        background: linear-gradient(135deg, var(--cyan), var(--blue));
-        color: #071522;
-        font-size: 22px;
+        display: block;
+        flex-shrink: 0;
+        object-fit: contain;
+        border-radius: 10px;
       }
 
       .brand small {
@@ -550,7 +550,7 @@
     <header class="site-header">
       <nav class="nav" aria-label="Main navigation">
         <a class="brand" href="../index.html" aria-label="AquaGuide AI home">
-          <span class="brand-icon" aria-hidden="true">🐠</span>
+          <img class="brand-icon" src="../Icon/iconnn.png" alt="" aria-hidden="true" />
           <span>
             AquaGuide AI
             <small>Ornamental Fish Companion</small>
